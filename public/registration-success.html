@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Registration Successful | Symposium 2026</title>
+
+<style>
+  :root {
+    --primary: #00c6ff;
+    --accent: #00ffae;
+    --deep-bg: #0f2027;
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* IMPROVEMENT: Background Glow for Depth */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: var(--primary);
+    filter: blur(150px);
+    border-radius: 50%;
+    opacity: 0.15;
+    z-index: 0;
+    animation: moveGlow 10s infinite alternate;
+  }
+
+  @keyframes moveGlow {
+    from { transform: translate(-50%, -50%); }
+    to { transform: translate(50%, 50%); }
+  }
+
+  .container {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(15px);
+    padding: 50px 30px;
+    border-radius: 20px;
+    width: 420px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+    animation: entranceEffect 0.8s ease-out forwards;
+    overflow: hidden; /* For the shine effect */
+  }
+
+  /* IMPROVEMENT: Subtle Glass Shine Effect */
+  .container::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
+    transform: rotate(45deg);
+    animation: glassShine 6s infinite;
+  }
+
+  @keyframes glassShine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    20%, 100% { transform: translateX(100%) rotate(45deg); }
+  }
+
+  @keyframes entranceEffect {
+    from { transform: translateY(30px) scale(0.95); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  /* ---------- PROGRESS BAR ---------- */
+  .progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .progress::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: 10%;
+    width: 80%;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .progress::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: 10%;
+    width: 80%;
+    height: 3px;
+    background: var(--primary);
+    box-shadow: 0 0 15px var(--primary);
+    /* IMPROVEMENT: Fill animation */
+    animation: fillBar 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  @keyframes fillBar { from { width: 0; } to { width: 80%; } }
+
+  .step {
+    width: 33%;
+    text-align: center;
+    z-index: 1;
+  }
+
+  .circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin: 0 auto 8px;
+    line-height: 30px;
+    color: #000;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+
+  .label {
+    font-size: 11px;
+    color: #ccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .step.active .circle {
+    box-shadow: 0 0 20px var(--primary);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  /* ---------- SUCCESS CONTENT ---------- */
+  .success-icon {
+    font-size: 70px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(0, 255, 174, 0.4);
+    animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes pop {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  h2 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  h2 span { color: var(--accent); font-weight: 700; }
+
+  p {
+    font-size: 14px;
+    color: #aaa;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .primary-btn {
+    padding: 14px;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s;
+    box-shadow: 0 10px 20px rgba(0, 198, 255, 0.3);
+  }
+
+  .primary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 25px rgba(0, 198, 255, 0.5);
+    filter: brightness(1.1);
+  }
+
+  .outline-btn {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ccc;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .outline-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: #fff;
+  }
+
+  /* IMPROVEMENT: CSS Confetti Particles */
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    top: -20px;
+    opacity: 0;
+    animation: fall 3s ease-in-out forwards;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="confetti-wrapper"></div>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="step">
+      <div class="circle">✓</div>
+      <div class="label">Student</div>
+    </div>
+    <div class="step">
+      <div class="circle">✓</div>
+      <div class="label">Events</div>
+    </div>
+    <div class="step active">
+      <div class="circle">3</div>
+      <div class="label">Confirm</div>
+    </div>
+  </div>
+
+  <div class="success-icon">✦</div>
+  <h2>Registration <span>Successful</span></h2>
+  <p>Your details and event selections have been securely recorded. You can see your live status of team memebers</p>
+
+  <div class="btn-group">
+    <button class="primary-btn" onclick="window.location.href='view-registration.html'">
+      🎟️ See Live
+    </button>
+
+    <a href="student-details.html" class="outline-btn">
+      Register Another Participant
+    </a>
+  </div>
+
+  <div style="margin-top: 25px; font-size: 11px; color: #666;">
+    A confirmation email has been sent to your registered address.
+  </div>
+
+</div>
+
+<script>
+  // Simple Confetti Generator
+  function createConfetti() {
+    const wrapper = document.getElementById('confetti-wrapper');
+    const colors = ['#00c6ff', '#00ffae', '#ffffff', '#0072ff'];
+    
+    for (let i = 0; i < 40; i++) {
+      const conf = document.createElement('div');
+      conf.className = 'confetti';
+      conf.style.left = Math.random() * 100 + 'vw';
+      conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      conf.style.animationDelay = Math.random() * 2 + 's';
+      conf.style.width = Math.random() * 8 + 5 + 'px';
+      conf.style.height = conf.style.width;
+      wrapper.appendChild(conf);
+    }
+  }
+  window.onload = createConfetti;
+</script>
+
+</body>
+</html>

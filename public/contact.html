@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Symposium 2026</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #00c6ff;
+            --dark-bg: #0f2027;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+            color: #fff;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 80px; 
+            box-sizing: border-box;
+        }
+
+        /* ---------- NAVBAR ---------- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 10001;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            box-sizing: border-box;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; color: #fff; }
+        .logo span { color: var(--primary); }
+
+        .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+        .bar { width: 25px; height: 2px; background-color: var(--primary); margin: 5px 0; transition: 0.4s; }
+
+        .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+        .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
+
+        /* ---------- SIDE MENU ---------- */
+        .nav-overlay {
+            height: 100vh; width: 280px; position: fixed; z-index: 10000; top: 0; left: 0;
+            background: #0a1419; border-right: 1px solid var(--primary);
+            transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+        }
+        .nav-overlay.open { transform: translateX(0); }
+        .overlay-content { padding: 120px 30px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .nav-item { text-decoration: none; padding: 15px 0; display: block; transition: 0.3s; }
+        .nav-number { font-size: 10px; color: var(--primary); font-weight: bold; margin-bottom: 5px; display: block; }
+        .nav-text { color: #ccc; font-size: 18px; font-weight: 600; transition: 0.3s; }
+        .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
+        .nav-item:hover .nav-text, .nav-item.active .nav-text { color: #fff; transform: translateX(10px); }
+        .nav-item.active .nav-text { color: var(--primary); }
+
+        /* ---------- CONTENT LAYOUT ---------- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        .contact-info-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .contact-info-card h2 { font-size: 32px; margin-bottom: 10px; color: var(--primary); font-weight: 700; }
+        .contact-info-card p { font-size: 16px; color: #ccc; margin-bottom: 40px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+        }
+
+        .info-item:hover {
+            background: rgba(0, 198, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .info-item .icon { 
+            width: 40px; height: 40px; background: var(--primary); border-radius: 50%; 
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; 
+            color: #000; font-weight: bold; font-size: 18px;
+        }
+
+        .info-item b { color: var(--primary); display: block; margin-bottom: 5px; font-size: 14px; text-transform: uppercase; }
+        .info-item span { font-size: 15px; color: #fff; line-height: 1.4; }
+
+        /* ---------- MAP SECTION ---------- */
+        .map-wrapper {
+            width: 100%;
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05); /* Placeholder while loading */
+            filter: grayscale(1) invert(0.92) contrast(1.2);
+            opacity: 0.8;
+            transition: 0.5s;
+        }
+        .map-wrapper:hover { opacity: 1; filter: grayscale(0.2) invert(0.92); }
+
+        @media (max-width: 600px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .contact-info-card { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="menu-toggle" id="menuToggle">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <div class="logo">Symposium <span>2026</span></div>
+    </header>
+
+    <nav id="sideMenu" class="nav-overlay">
+        <div class="overlay-content">
+            <a href="index.html" class="nav-item">
+                <span class="nav-number">01</span>
+                <div class="nav-text">Home <small>Landing Page</small></div>
+            </a>
+            <a href="student-details.html" class="nav-item">
+                <span class="nav-number">02</span>
+                <div class="nav-text">Registration <small>Step 1</small></div>
+            </a>
+            <a href="about-events.html" class="nav-item">
+                <span class="nav-number">03</span>
+                <div class="nav-text">About Events <small>Details</small></div>
+            </a>
+            <a href="view-registration.html" class="nav-item">
+                <span class="nav-number">04</span>
+                <div class="nav-text">My History <small>View Entry</small></div>
+            </a>
+            <a href="contact.html" class="nav-item active">
+                <span class="nav-number">05</span>
+                <div class="nav-text">Contact Us <small>Get in Touch</small></div>
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="contact-info-card">
+            <h2>Venue & Support</h2>
+            <p>University College of Engineering Nagercoil, Konam, Kanyakumari District.</p>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="icon">V</div>
+                    <b>Location</b>
+                    <span>UCE Nagercoil,<br>Konam, Nagercoil</span>
+                </div>
+                <div class="info-item">
+                    <div class="icon">E</div>
+                    <b>Email Us</b>
+                    <span>symposium@ucen.ac.in</span>
+                </div>
+                <div class="info-item">
+                    <div class="icon">C</div>
+                    <b>Call Support</b>
+                    <span>+91 04652 260511</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-wrapper">
+    <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3949.332349079933!2d77.4120586757657!3d8.166835391863923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b04f0e513adaba1%3A0xe22e3eb86c9146bf!2sUniversity%20College%20of%20Engineering%2CNagercoil!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+        width="100%" 
+        height="100%" 
+        style="border:0;" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+</div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuToggle = document.getElementById("menuToggle");
+            const sideMenu = document.getElementById("sideMenu");
+
+            menuToggle.addEventListener("click", (e) => {
+                e.stopPropagation();
+                sideMenu.classList.toggle("open");
+                menuToggle.classList.toggle("open");
+            });
+
+            document.addEventListener("click", (e) => {
+                if (sideMenu.classList.contains("open") && !sideMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sideMenu.classList.remove("open");
+                    menuToggle.classList.remove("open");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

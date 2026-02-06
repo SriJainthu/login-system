@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Events | Symposium 2026</title>
+    <style>
+        :root {
+            --primary: #00c6ff;
+            --accent: #00ffae;
+            --error-red: #ff4b2b;
+            --glass: rgba(255, 255, 255, 0.07);
+            --border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+            color: #fff;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 700px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-small { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 10px; display: block; }
+        .logo-small span { color: var(--primary); }
+
+        h2 { font-weight: 300; letter-spacing: 1px; margin: 0; text-transform: uppercase; font-size: 1.8rem; }
+        h2 b { color: var(--primary); font-weight: 700; }
+
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 35px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .event-grid::-webkit-scrollbar { width: 5px; }
+        .event-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        .event-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 30px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .event-card:hover {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+        }
+
+        .event-card.selected {
+            background: rgba(0, 198, 255, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 255, 174, 0.15);
+        }
+
+        .event-card h3 {
+            margin: 0;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: var(--transition);
+        }
+
+        .event-card.selected h3 { color: var(--accent); }
+
+        .indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--accent);
+            color: #0f2027;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: var(--transition);
+        }
+
+        .event-card.selected .indicator { opacity: 1; transform: scale(1); }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 25px;
+        }
+
+        .status-text { font-size: 14px; color: #aaa; }
+        .status-text span { color: var(--primary); font-weight: bold; }
+        #max-limit-display { color: var(--accent); }
+
+        .confirm-btn {
+            padding: 14px 35px;
+            background: linear-gradient(90deg, var(--primary), #0072ff);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(0, 198, 255, 0.2);
+        }
+
+        .confirm-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(0, 198, 255, 0.3);
+        }
+
+        .confirm-btn:disabled {
+            background: #2a3a40;
+            color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.6;
+        }
+
+        .custom-alert-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 30000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .custom-alert-overlay.flex-show { display: flex; opacity: 1; }
+
+        .alert-box {
+            background: #16262e;
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--error-red);
+            text-align: center;
+            max-width: 350px;
+            transform: scale(0.8);
+            transition: var(--transition);
+        }
+
+        .alert-box.active { transform: scale(1); }
+        .alert-box h3 { color: var(--error-red); margin: 15px 0; text-transform: uppercase; }
+        .alert-box p { color: #ccc; font-size: 15px; margin-bottom: 25px; line-height: 1.5; }
+        .alert-box button {
+            background: var(--error-red);
+            color: white; border: none; padding: 12px 25px;
+            border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%;
+        }
+
+        .team-code-container {
+            margin-top: 15px;
+            width: 90%;
+            display: none; 
+            animation: fadeIn 0.3s ease;
+        }
+
+        .event-card.selected .team-code-container {
+            display: block;
+        }
+
+        .team-code-container input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--accent);
+            font-size: 12px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .team-code-container label {
+            font-size: 10px;
+            color: #aaa;
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* New Validation Styles */
+.verify-btn {
+    background: var(--primary);
+    color: #0f2027;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: var(--transition);
+}
+.verify-btn:hover { background: var(--accent); }
+
+.token-msg {
+    font-size: 10px;
+    margin-top: 5px;
+    font-weight: 600;
+    min-height: 12px;
+}.event-grid {
+        display: block !important; /* Change from grid to block to allow stacking sections */
+        max-height: 500px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .event-section {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        color: var(--primary);
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sub-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    /* Small adjustment to card padding for better fit */
+    .event-card {
+        min-height: 120px;
+        padding: 20px 15px;
+    }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <span class="logo-small">Symposium <span>2026</span></span>
+        <h2>Select <b>Events</b></h2>
+    </div>
+
+    <div class="event-grid" id="eventSelectionGrid">
+        <div class="event-section">
+        <h3 class="section-title">👤 Solo Events</h3>
+        <div id="soloEventsContainer" class="sub-grid"></div>
+    </div>
+        <div class="event-section">
+        <h3 class="section-title">👥 Group Events</h3>
+        <div id="groupEventsContainer" class="sub-grid"></div>
+    </div>
+    
+    
+</div>
+    <div class="footer">
+        <div class="status-text">Selected: <span id="count">0</span> / <span id="max-limit-display">3</span></div>
+        <button class="confirm-btn" id="confirmBtn" disabled onclick="submitEvents()">Confirm Choice</button>
+    </div>
+</div>
+
+<div id="customAlert" class="custom-alert-overlay">
+    <div id="alertBox" class="alert-box">
+        <div style="font-size: 40px;">⚠️</div>
+        <h3 id="alertTitle">Limit Reached</h3>
+        <p id="alertMessage"></p>
+        <button onclick="closeAlert()">Got it</button>
+    </div>
+</div>
+
+<script>
+    let selectedList = [];
+    let adminEventLimit = 3; 
+
+    function generateUniqueToken(eventName) {
+    const prefix = eventName.substring(0, 3).toUpperCase().replace(/\s/g, 'X');
+    const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const datePart = Date.now().toString().slice(-3);
+    return `${prefix}-${randomPart}${datePart}`;
+}
+
+    async function syncAdminSettings() {
+        try {
+            const settingsRes = await fetch("http://localhost:3000/api/settings");
+            const settings = await settingsRes.json();
+            
+            adminEventLimit = parseInt(settings.event_selection_limit) || 3;
+            document.getElementById('max-limit-display').textContent = adminEventLimit;
+
+            const eventRes = await fetch("http://localhost:3000/events");
+            const adminEvents = await eventRes.json();
+            
+            const groupContainer = document.getElementById("groupEventsContainer");
+            const soloContainer = document.getElementById("soloEventsContainer");
+
+            groupContainer.innerHTML = ""; 
+            soloContainer.innerHTML = ""; 
+
+            if (adminEvents && adminEvents.length > 0) {
+                const renderedNames = new Set();
+
+                adminEvents.forEach(event => {
+                    const eName = event.event_name || event.name;
+                    const normalizedName = eName.toLowerCase().trim();
+                    if (renderedNames.has(normalizedName)) return;
+                    renderedNames.add(normalizedName);
+
+                    const isGroup = event.event_type === 'group' || event.type === 'group'; 
+                    const card = document.createElement("div");
+                    card.className = "event-card";
+                    
+                    card.onclick = function(e) { 
+                        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') toggleEvent(card, eName); 
+                    };
+
+                    card.innerHTML = `
+                        <span class="indicator">✓</span>
+                        <h3>${eName}</h3>
+                        ${isGroup ? `
+                            <div class="team-code-container">
+                                <label>Join Team (Leave blank if Leader)</label>
+                                <div style="display: flex; gap: 5px;">
+                                    <input type="text" placeholder="Code" 
+                                           id="token_${event.id}" 
+                                           maxlength="12" oninput="resetValidation('${eName}')">
+                                    <button type="button" class="verify-btn" onclick="verifyToken(event, ${event.id}, '${eName}')">Verify</button>
+                                </div>
+                                <p id="msg_${event.id}" class="token-msg"></p>
+                            </div>
+                        ` : ''}
+                    `;
+                    
+                    // Logic to separate the events into containers
+                    if (isGroup) {
+                        groupContainer.appendChild(card);
+                    } else {
+                        soloContainer.appendChild(card);
+                    }
+                });
+
+                // Hide section if empty
+                if (groupContainer.children.length === 0) groupContainer.parentElement.style.display = 'none';
+                if (soloContainer.children.length === 0) soloContainer.parentElement.style.display = 'none';
+
+            } else {
+                document.getElementById("eventSelectionGrid").innerHTML = "<p>No events found.</p>";
+            }
+        } catch (err) {
+            console.error("Sync Error:", err);
+        }
+    }
+
+    function toggleEvent(el, name) {
+        if (el.classList.contains('selected')) {
+            el.classList.remove('selected');
+            selectedList = selectedList.filter(item => item !== name);
+        } else {
+            if (selectedList.length < adminEventLimit) {
+                el.classList.add('selected');
+                selectedList.push(name);
+                validatedTokens[name] = true;
+            } else {
+                openAlert(`Symposium rules allow a maximum of ${adminEventLimit} events.`, "Limit Reached");
+            }
+        }
+        updateState();
+    }
+
+    function updateState() {
+        document.getElementById('count').textContent = selectedList.length;
+        document.getElementById('confirmBtn').disabled = selectedList.length === 0;
+    }
+
+    function openAlert(msg, title = "Limit Reached") {
+        document.getElementById('alertTitle').textContent = title;
+        document.getElementById('alertMessage').textContent = msg;
+        const overlay = document.getElementById('customAlert');
+        overlay.classList.add('flex-show');
+        setTimeout(() => document.getElementById('alertBox').classList.add('active'), 10);
+    }
+
+    function closeAlert() {
+        document.getElementById('alertBox').classList.remove('active');
+        setTimeout(() => document.getElementById('customAlert').classList.remove('flex-show'), 300);
+    }
+
+    async function submitEvents() {
+    const confirmBtn = document.getElementById("confirmBtn");
+    const studentData = JSON.parse(localStorage.getItem("studentData"));
+    
+    // 1. Safety Gate
+    // --- UPDATED SAFETY GATE ---
+const eventCards = document.querySelectorAll('.event-card.selected');
+for (let card of eventCards) {
+    const eventName = card.querySelector('h3').innerText.trim().toLowerCase(); // Normalize this
+    const tokenInput = card.querySelector('input[type="text"]');
+    
+    if (tokenInput) {
+        const tokenValue = tokenInput.value.trim();
+        
+        // Check validatedTokens using the same normalized name
+        if (tokenValue !== "" && !validatedTokens[eventName]) {
+            openAlert(`Please verify the team code for ${card.querySelector('h3').innerText} or leave it blank to be the Leader.`, "Verification Required");
+            return;
+        }
+    }
+}
+
+    if (!studentData) {
+        alert("Session expired.");
+        window.location.href = "student-details.html";
+        return;
+    }
+
+   const eventPayload = Array.from(document.querySelectorAll('.event-card.selected')).map(card => {
+    const eventName = card.querySelector('h3').innerText.trim().toLowerCase();;
+    // Look for the input specifically inside THIS selected card
+    const tokenInput = card.querySelector('input[type="text"]');
+    
+    let finalToken = null;
+
+    if (tokenInput) {
+        const userVal = tokenInput.value.trim();
+        if (userVal === "") {
+            // LEADER: Generate the token
+            finalToken = generateUniqueToken(eventName);
+        } else {
+            // MEMBER: Use their code
+            finalToken = userVal;
+        }
+    }
+
+    console.log(`🚀 Sending to Server -> Event: ${eventName}, Token: ${finalToken}`);
+
+    return {
+        name: eventName,
+        token: finalToken
+    };
+});
+
+    const payload = { ...studentData, events: eventPayload };
+
+    confirmBtn.disabled = true;
+    confirmBtn.innerText = "Processing...";
+
+    try {
+        const response = await fetch("http://localhost:3000/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            localStorage.removeItem("studentData");
+            window.location.href = 'registration-success.html';
+        } else {
+            openAlert(result.message, "Registration Error");
+            confirmBtn.disabled = false;
+            confirmBtn.innerText = "Confirm Choice";
+        }
+    } catch (error) {
+        openAlert("Network error. Please check your connection.", "Error");
+        confirmBtn.disabled = false;
+        confirmBtn.innerText = "Confirm Choice";
+    }
+}
+    let validatedTokens = {}; // Keep track of which events are verified
+
+async function verifyToken(event, eventId, eventName) {
+    // 1. Stop the card from deselecting when clicking this button
+    if (event) event.stopPropagation();
+
+    // Normalize name to lowercase to match the safety gate
+    const normalizedName = eventName.trim().toLowerCase();
+
+    // Use the correct ID based on your HTML generation (token_${eventId})
+    const inputElement = document.getElementById(`token_${eventId}`);
+    const token = inputElement.value.trim();
+    const msgElement = document.getElementById(`msg_${eventId}`);
+    
+    // 2. Handle Leader Mode (Blank Input)
+    if (token === "") {
+        msgElement.innerText = "👑 You will be the Team Leader";
+        msgElement.style.color = "#00ffae"; 
+        validatedTokens[normalizedName] = true; // Use normalized name
+        return;
+    }
+
+    if (token.length < 3) {
+        msgElement.innerText = "⚠️ Token too short";
+        msgElement.style.color = "orange";
+        validatedTokens[normalizedName] = false;
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://localhost:3000/validate-token?eventId=${eventId}&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+
+        msgElement.innerText = data.message;
+
+        if (data.status === "join") {
+    // ONLY the "join" status (existing team) counts as verified
+    msgElement.style.color = "#2ecc71"; // Green
+    validatedTokens[normalizedName] = true;
+} else {
+    // "full" or "invalid" (new team) are both rejected
+    msgElement.style.color = "#ff4b2b"; // Red
+    validatedTokens[normalizedName] = false;
+}
+    } catch (err) {
+        msgElement.innerText = "Connection error";
+        msgElement.style.color = "orange";
+    }
+}
+function resetValidation(eventName) {
+    const input = window.event.target; 
+    const normalizedName = eventName.trim().toLowerCase();
+    const eventId = input.id.split('_')[1];
+    const msgElement = document.getElementById(`msg_${eventId}`);
+
+    if (input.value.trim() === "") {
+        // If empty, they are a leader again.
+        validatedTokens[normalizedName] = true; 
+        if (msgElement) msgElement.innerText = "👑 Leader Mode";
+    } else {
+        // If they type, they MUST verify.
+        validatedTokens[normalizedName] = false;
+        if (msgElement) msgElement.innerText = "⚠️ Please verify this code";
+    }
+}
+    window.onload = syncAdminSettings;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Status - Symposium 2026</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+    --primary: #00c6ff;
+    --primary-blue: #00c6ff; /* Add this line */
+    --dark-bg: #0f2027;
+    --accent: #00ffae;
+    --error-red: #ff4b2b;
+    --transition-speed: 0.5s;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 80px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        /* ---------- ANIMATIONS ---------- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes modalPop {
+            0% { transform: scale(0.9) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .fade-in { animation: fadeIn var(--transition-speed) ease forwards; }
+        
+        /* ---------- NAVBAR & MENU ---------- */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 20px 40px; display: flex; align-items: center;
+            gap: 20px; z-index: 10001; background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px); box-sizing: border-box;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .logo { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+        .logo span { color: var(--primary); }
+        .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+        .bar { width: 25px; height: 2px; background-color: var(--primary); margin: 5px 0; transition: 0.4s; }
+        .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+        .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
+
+       
+       
+     
+
+        /* ---------- CONTAINER ---------- */
+        .container {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 1;
+            margin: 20px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        h2 { text-align: center; margin-bottom: 25px; font-weight: 300; font-size: 2rem; }
+        h2 b { color: var(--primary); font-weight: 700; text-shadow: 0 0 10px rgba(0,198,255,0.3); }
+
+        input {
+            width: 100%; padding: 14px; border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.08);
+            color: #fff; box-sizing: border-box; margin-bottom: 20px; outline: none;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+        input:focus { border-color: var(--primary); background: rgba(0,198,255,0.05); box-shadow: 0 0 15px rgba(0,198,255,0.2); }
+
+        button {
+            width: 100%; padding: 14px; background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border: none; border-radius: 12px; font-weight: bold;
+            cursor: pointer; color: #fff; transition: all 0.3s ease;
+            position: relative; overflow: hidden; font-size: 1rem;
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 198, 255, 0.4); filter: brightness(1.1); }
+        button:active { transform: translateY(0); }
+        button:disabled { background: #444; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ---------- STATUS DISPLAY ---------- */
+        .result-wrapper { 
+            display: none; 
+            margin-top: 30px; 
+            opacity: 0; 
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .result-wrapper.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .status-card {
+            background: #fff;
+            color: #333;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: relative;
+        }
+        .status-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .status-header {
+            border-bottom: 1px dashed #ddd;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-header h3 { margin: 0; color: #2c5364; font-size: 1.3rem; letter-spacing: -0.5px; }
+
+        .data-row { margin-bottom: 12px; display: flex; font-size: 14px; align-items: center; }
+        .data-label { font-weight: 800; width: 110px; color: #aaa; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .data-value { font-weight: 600; color: #111; font-size: 15px; }
+
+        .event-section { margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px; }
+        .event-item {
+            background: #f8fbff;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+        .event-item:hover { transform: scale(1.03) translateX(5px); background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        /* ---------- PROFESSIONAL MODALS ---------- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+            z-index: 30000; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .modal-box { 
+            background: #1a2a30; padding: 40px; border-radius: 28px; 
+            text-align: center; width: 100%; max-width: 360px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        }
+        .modal-box .icon { font-size: 50px; margin-bottom: 15px; display: block; }
+        .modal-box h3 { font-size: 1.5rem; margin: 10px 0; }
+        .modal-box p { color: #8899a0; font-size: 0.95em; line-height: 1.6; margin: 15px 0 25px; }
+        
+        .modal-box button { 
+            background: transparent; 
+            border: 1px solid var(--primary); 
+            color: var(--primary); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .modal-box button:hover { background: var(--primary); color: #000; }
+
+        #step-reg, #step-otp { transition: opacity 0.4s ease, transform 0.4s ease; }
+         /* ---------- SIDE MENU ---------- */
+        .nav-overlay {
+            height: 100vh; 
+            width: 280px; 
+            position: fixed;
+            z-index: 10000; 
+            top: 0; left: 0;
+            background: #0a1419; 
+            border-right: 1px solid var(--primary);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+        }
+        .nav-overlay.open { transform: translateX(0); }
+        .overlay-content { padding: 120px 30px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .nav-item { 
+            text-decoration: none; 
+            padding: 15px 0; 
+            display: block; 
+            transition: 0.3s;
+        }
+
+        .nav-number { font-size: 10px; color: var(--primary-blue); font-weight: bold; margin-bottom: 5px; display: block; }
+        .nav-text { color: #ffffff; font-size: 18px; font-weight: 600; transition: 0.3s; }
+        .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
+        
+        .nav-item:hover .nav-text, .nav-item.active .nav-text { color: #4fdcff; transform: translateX(10px); }
+        .nav-item.active .nav-text { color: var(--primary-blue); }
+
+    </style>
+</head>
+<body>
+
+    <div id="errorModal" class="modal-overlay">
+        <div class="modal-box" style="border-top: 4px solid var(--error-red);">
+            <span class="icon">🔍</span>
+            <h3 style="color: var(--error-red);">Not Found</h3>
+            <p>We couldn't locate any registration for that number. Please double-check your ID and try again.</p>
+            <button onclick="closeErrorModal()" style="border-color: var(--error-red); color: var(--error-red);">Check Again</button>
+        </div>
+    </div>
+
+    <div id="customAlert" class="modal-overlay">
+        <div class="modal-box" style="border-top: 4px solid var(--primary);">
+            <span class="icon">⚠️</span>
+            <h3 style="color: var(--primary);">Verification Failed</h3>
+            <p id="alertMessage"></p>
+            <button onclick="closeAlert()">Try Again</button>
+        </div>
+    </div>
+
+    <header class="navbar">
+        <div class="menu-toggle" id="menuToggle">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <div class="logo">Symposium <span>2026</span></div>
+    </header>
+
+    <nav id="sideMenu" class="nav-overlay">
+        <div class="overlay-content">
+            <a href="index.html" class="nav-item">
+                <span class="nav-number">01</span>
+                <div class="nav-text">Home <small>Landing Page</small></div>
+            </a>
+            <a href="student-details.html" class="nav-item">
+                <span class="nav-number">02</span>
+                <div class="nav-text">Registration <small>Step 1</small></div>
+            </a>
+            <a href="about-events.html" class="nav-item">
+                <span class="nav-number">03</span>
+                <div class="nav-text">About Events <small>Details</small></div>
+            </a>
+            <a href="view-registration.html" class="nav-item active">
+                <span class="nav-number">04</span>
+                <div class="nav-text">My History <small>View Entry</small></div>
+            </a>
+            <a href="contact.html" class="nav-item">
+                <span class="nav-number">05</span>
+                <div class="nav-text">Contact Us <small>Get in Touch</small></div>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container fade-in" id="mainContainer">
+        <h2>Live <b>Status</b></h2>
+
+        <div id="step-reg">
+            <p style="text-align: center; font-size: 0.85em; opacity: 0.8; margin-bottom: 25px; line-height: 1.6;">Securely access your registration details and event tokens.</p>
+          <input type="text" id="regNo" placeholder="Enter 12-digit Register No" 
+       maxlength="12" 
+       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <button onclick="handleSendOTP()" id="sendOtpBtn">Get Access OTP</button>
+        </div>
+
+        <div id="step-otp" style="display: none; opacity: 0; transform: translateY(10px);">
+            <p id="otp-status" style="text-align: center; font-size: 0.9em; color: var(--accent); line-height: 1.6; margin-bottom: 20px;"></p>
+            <input type="text" id="otpInput" placeholder="Enter 6-digit Code" maxlength="6">
+            <button onclick="handleVerifyOTP()">Verify Identity</button>
+            <div class="resend-container">
+                <span id="timerText" style="opacity: 0.6;">Resend available in <span id="seconds">30</span>s</span>
+                <a id="resendBtnLink" onclick="handleSendOTP()">Resend OTP Now</a>
+            </div>
+        </div>
+
+        <div class="error" id="error" style="color: #ff6b6b; text-align: center; margin-top: 15px; font-size: 0.9em; font-weight: 500;"></div>
+
+        <div id="capture-area" class="result-wrapper">
+            <div class="status-card" id="result">
+                <div class="status-header">
+                    <h3>Digital Pass</h3>
+                    <div id="qrcode"></div>
+                </div>
+
+                <div class="data-row"><div class="data-label">NAME</div><div class="data-value" id="disp-name"></div></div>
+                <div class="data-row"><div class="data-label">REG NO</div><div class="data-value" id="disp-reg"></div></div>
+                <div class="data-row"><div class="data-label">DEPARTMENT</div><div class="data-value" id="disp-dept"></div></div>
+
+                <div class="event-section">
+                    <h4 style="color: #bbb; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Live Event Schedule</h4>
+                    <div id="event-list"></div>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 11px; color: #888; margin-top: 20px; opacity: 0.7;">Verified Digital ID • Symposium 2026</p>
+        </div>
+    </div>
+
+<script>
+    /* ALL ORIGINAL LOGIC PRESERVED */
+
+    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function closeErrorModal() { closeModal('errorModal'); }
+    
+    function showCustomAlert(msg) {
+        document.getElementById('alertMessage').textContent = msg;
+        showModal('customAlert');
+    }
+    function closeAlert() { closeModal('customAlert'); }
+
+    const menuToggle = document.getElementById("menuToggle");
+    const sideMenu = document.getElementById("sideMenu");
+    menuToggle.onclick = () => {
+        sideMenu.classList.toggle("open");
+        menuToggle.classList.toggle("open");
+    };
+
+    let cachedData = null;
+    let serverOTP = ""; 
+    let resendTimer;
+
+    function maskEmail(email) {
+        if (!email) return "your registered email";
+        const [user, domain] = email.split("@");
+        const visible = user.substring(0, 4);
+        return `${visible.toUpperCase()}***@${domain.toUpperCase()}`;
+    }
+
+    function startResendTimer() {
+        const timerText = document.getElementById("timerText");
+        const resendBtnLink = document.getElementById("resendBtnLink");
+        const secondsSpan = document.getElementById("seconds");
+        let timeLeft = 30;
+
+        timerText.style.display = "inline";
+        resendBtnLink.style.display = "none";
+        secondsSpan.textContent = timeLeft;
+
+        clearInterval(resendTimer);
+        resendTimer = setInterval(() => {
+            timeLeft--;
+            secondsSpan.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(resendTimer);
+                timerText.style.display = "none";
+                resendBtnLink.style.display = "inline";
+            }
+        }, 1000);
+    }
+
+    async function handleSendOTP() {
+    const regNoField = document.getElementById("regNo");
+    const regNo = regNoField.value.trim();
+    const btn = document.getElementById("sendOtpBtn");
+    const errorDiv = document.getElementById("error");
+
+    // NEW: Strict 12-digit validation check
+    if (!regNo) {
+        errorDiv.textContent = "Please enter your Register No";
+        return;
+    }
+    
+    if (regNo.length !== 12) {
+        errorDiv.textContent = "Register number must be exactly 12 digits";
+        regNoField.style.borderColor = "var(--error-red)";
+        return;
+    }
+    
+    // Reset styling if valid
+    regNoField.style.borderColor = "var(--glass-border)";
+    btn.disabled = true; 
+    btn.textContent = "Verifying ID...";
+    errorDiv.textContent = "";
+
+    try {
+        // Change this URL to match your absolute path if not using a proxy
+        const response = await fetch(`http://localhost:3000/registration/${regNo}`);
+        
+        if (!response.ok) {
+            showModal('errorModal');
+            btn.disabled = false;
+            btn.textContent = "Get Access OTP";
+            return;
+        }
+        
+        const data = await response.json();
+        cachedData = data; 
+        serverOTP = data.secret; 
+        
+        const emailHint = maskEmail(data.student.email);
+
+        // Step Transition with fading
+        const stepReg = document.getElementById("step-reg");
+        stepReg.style.opacity = '0';
+        stepReg.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+            stepReg.style.display = "none";
+            const stepOtp = document.getElementById("step-otp");
+            stepOtp.style.display = "block";
+            
+            setTimeout(() => {
+                stepOtp.style.opacity = '1';
+                stepOtp.style.transform = 'translateY(0)';
+            }, 50);
+            
+            document.getElementById("otp-status").innerHTML = `Code sent to:<br><b>${emailHint}</b>`;
+            startResendTimer();
+        }, 400);
+
+    } catch (err) {
+        console.error("Fetch error:", err);
+        showModal('errorModal');
+        btn.disabled = false;
+        btn.textContent = "Get Access OTP";
+    }
+}
+
+    function handleVerifyOTP() {
+        if (document.getElementById("otpInput").value === serverOTP) {
+            displayStatus();
+        } else {
+            showCustomAlert("The security code entered is incorrect. Please check your registered email.");
+        }
+    }
+
+    function displayStatus() {
+        const { student, events } = cachedData;
+        
+        document.getElementById("disp-name").textContent = student.name.toUpperCase();
+        document.getElementById("disp-reg").textContent = student.reg_no;
+        document.getElementById("disp-dept").textContent = student.department;
+
+        let qrData = `STUDENT: ${student.name.toUpperCase()}\nREG: ${student.reg_no}\n--- EVENTS ---\n`;
+
+        const eventListDiv = document.getElementById("event-list");
+        eventListDiv.innerHTML = "";
+        
+        events.forEach(ev => {
+            const isGroup = ev.team_token && ev.team_token.trim() !== "";
+            let membersHtml = '';
+            
+            qrData += `- ${ev.event_name.toUpperCase()} (${isGroup ? 'Group' : 'Solo'})\n`;
+
+            if (isGroup && ev.team_members) {
+                const names = ev.team_members.split(',');
+                membersHtml = `
+                    <div class="members-container" style="margin-top: 10px; border-top: 1px solid #f0f0f0; padding-top: 8px;">
+                        <div style="font-size: 10px; color: #aaa; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">Team Lineup</div>
+                        ${names.map(name => `
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <span style="color: var(--primary); font-size: 12px;">👤</span>
+                                <span style="font-size: 13px; color: #444; font-weight: 500;">${name.trim().toUpperCase()}</span>
+                            </div>
+                        `).join('')}
+                    </div>`;
+            }
+
+            const item = document.createElement("div");
+            item.className = "event-item";
+            item.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 700; color: #2c5364; font-size: 15px;">${ev.event_name.toUpperCase()}</span>
+                    <span style="font-size: 9px; background: #e0f7fa; color: #00838f; padding: 3px 10px; border-radius: 20px; font-weight: bold;">${isGroup ? "GROUP" : "SOLO"}</span>
+                </div>
+                ${isGroup ? `<div style="font-size: 12px; margin-top: 4px; color: #666;">Team Token: <b style="color:var(--primary)">${ev.team_token}</b></div>` : ''}
+                ${membersHtml}
+            `;
+            eventListDiv.appendChild(item);
+        });
+
+        const qrContainer = document.getElementById("qrcode");
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, { 
+            text: qrData, 
+            width: 100, 
+            height: 100,
+            correctLevel : QRCode.CorrectLevel.M 
+        });
+
+        const stepOtp = document.getElementById("step-otp");
+        const wrapper = document.getElementById("capture-area");
+        
+        stepOtp.style.opacity = '0';
+        stepOtp.style.transform = 'translateY(-10px)';
+
+        setTimeout(() => {
+            stepOtp.style.display = "none";
+            wrapper.style.display = "block";
+            setTimeout(() => wrapper.classList.add('visible'), 50);
+        }, 400);
+    }
+</script>
+</body>
+</html>

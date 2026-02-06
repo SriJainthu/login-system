@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Events - Symposium 2026</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #00c6ff;
+            --accent: #00ffae;
+            --dark-bg: #0f2027;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+            color: #fff;
+            margin: 0;
+            padding-top: 100px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ---------- NAVBAR ---------- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 10001;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            box-sizing: border-box;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; color: #fff; }
+        .logo span { color: var(--primary); }
+
+        .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+        .bar { width: 25px; height: 2px; background-color: var(--primary); margin: 5px 0; transition: 0.4s; }
+
+        .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+        .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
+
+        /* ---------- SIDE MENU ---------- */
+        .nav-overlay {
+            height: 100vh; 
+            width: 280px; 
+            position: fixed;
+            z-index: 10000; 
+            top: 0; left: 0;
+            background: #0a1419; 
+            border-right: 1px solid var(--primary);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+        }
+        .nav-overlay.open { transform: translateX(0); }
+        .overlay-content { padding: 120px 30px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .nav-item { 
+            text-decoration: none; 
+            padding: 15px 0; 
+            display: block; 
+            transition: 0.3s;
+        }
+        .nav-number { font-size: 10px; color: var(--primary); font-weight: bold; margin-bottom: 5px; display: block; }
+        .nav-text { color: #ccc; font-size: 18px; font-weight: 600; transition: 0.3s; }
+        .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
+        
+        .nav-item:hover .nav-text, .nav-item.active .nav-text { color: #fff; transform: translateX(10px); }
+        .nav-item.active .nav-text { color: var(--primary); }
+
+        /* ---------- CONTENT CONTAINER ---------- */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 30px;
+            text-align: center;
+        }
+
+        h1 { 
+            margin-bottom: 10px; 
+            font-size: 3.5rem; 
+            font-weight: 300; 
+            animation: fadeInDown 0.8s ease-out forwards;
+            letter-spacing: -1px;
+        }
+        h1 span { color: var(--primary); font-weight: 700; text-shadow: 0 0 20px rgba(0, 198, 255, 0.3); }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 60px;
+            font-size: 1.1rem;
+            animation: fadeInDown 0.8s ease-out 0.2s forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ---------- EVENT GRID & CARDS ---------- */
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 25px;
+            padding-bottom: 80px;
+        }
+
+        .event-card {
+            background: var(--glass-bg);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            transition: var(--transition);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: cardSlideUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0.3;
+            transition: var(--transition);
+        }
+
+        @keyframes cardSlideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .event-card:hover::before { opacity: 1; height: 5px; }
+
+        .event-card h3 { 
+            color: var(--primary); 
+            font-size: 24px; 
+            margin: 0 0 15px 0; 
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .event-card p { 
+            color: #d1d1d1; 
+            line-height: 1.8; 
+            font-size: 15px; 
+            margin: 0;
+            font-weight: 300;
+        }
+
+        /* ---------- MOBILE RESPONSIVENESS ---------- */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .event-grid { grid-template-columns: 1fr; }
+            .navbar { padding: 15px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="menu-toggle" id="menuToggle">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <div class="logo">Symposium <span>2026</span></div>
+    </header>
+
+    <nav id="sideMenu" class="nav-overlay">
+        <div class="overlay-content">
+            <a href="index.html" class="nav-item">
+                <span class="nav-number">01</span>
+                <div class="nav-text">Home <small>Landing Page</small></div>
+            </a>
+            <a href="student-details.html" class="nav-item">
+                <span class="nav-number">02</span>
+                <div class="nav-text">Registration <small>Step 1</small></div>
+            </a>
+            <a href="about-events.html" class="nav-item active">
+                <span class="nav-number">03</span>
+                <div class="nav-text">About Events <small>Details</small></div>
+            </a>
+            <a href="view-registration.html" class="nav-item">
+                <span class="nav-number">04</span>
+                <div class="nav-text">My History <small>View Entry</small></div>
+            </a>
+            <a href="contact.html" class="nav-item">
+                <span class="nav-number">05</span>
+                <div class="nav-text">Contact Us <small>Get in Touch</small></div>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Event <span>Catalog</span></h1>
+        <p class="subtitle">Explore the technical challenges and innovative competitions</p>
+        
+        <div class="event-grid" id="eventGrid">
+            </div>
+    </div>
+
+ <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuToggle = document.getElementById("menuToggle");
+        const sideMenu = document.getElementById("sideMenu");
+
+        const toggleMenu = () => {
+            sideMenu.classList.toggle("open");
+            menuToggle.classList.toggle("open");
+        };
+
+        menuToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+
+        document.addEventListener("click", (e) => {
+            if (sideMenu.classList.contains("open") && 
+                !sideMenu.contains(e.target) && 
+                !menuToggle.contains(e.target)) {
+                sideMenu.classList.remove("open");
+                menuToggle.classList.remove("open");
+            }
+        });
+
+        // --- UPDATED DYNAMIC LOADING ---
+        const loadDynamicEvents = async () => {
+            const grid = document.getElementById("eventGrid");
+            
+            try {
+                // Fetch events from your Node.js server
+                const response = await fetch('http://localhost:3000/events');
+                const adminEvents = await response.json();
+
+                if (adminEvents && adminEvents.length > 0) {
+                    grid.innerHTML = ""; 
+                    
+                    adminEvents.forEach((event, index) => {
+                        const card = document.createElement("div");
+                        card.className = "event-card";
+                        card.style.animationDelay = `${(index + 1) * 0.1}s`;
+                        
+                        // Note: Using 'event_name' and 'description' to match 
+                        // your MySQL column names exactly
+                        card.innerHTML = `
+                            <h3>${event.event_name}</h3>
+                            <p>${event.description || "No description available."}</p>
+                            <div style="margin-top:15px; font-size:12px; color:var(--accent);">
+                                Max Team Size: ${event.max_team_size}
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = "<p style='grid-column: 1/-1; color: #666;'>No events are currently listed.</p>";
+                }
+            } catch (error) {
+                console.error("Error fetching events:", error);
+                grid.innerHTML = "<p style='grid-column: 1/-1; color: #ff4d4d;'>Failed to load events from server.</p>";
+            }
+        };
+
+        loadDynamicEvents();
+    });
+</script>
+</body>
+</html>

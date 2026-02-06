@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration - Symposium 2026</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        :root {
+            --primary-blue: #00c6ff;
+            --dark-bg: #0f2027;
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --error-red: #ff4b2b;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        /* ---------- NAVBAR (Synced with About-Events) ---------- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 10001;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo { font-size: 20px; font-weight: 700; color: #fff; }
+        .logo span { color: var(--primary-blue); }
+
+        .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+        .bar { width: 25px; height: 2px; background-color: var(--primary-blue); margin: 5px 0; transition: 0.4s; }
+
+        .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+        .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
+
+        /* ---------- SIDE MENU ---------- */
+        .nav-overlay {
+            height: 100vh; 
+            width: 280px; 
+            position: fixed;
+            z-index: 10000; 
+            top: 0; left: 0;
+            background: #0a1419; 
+            border-right: 1px solid var(--primary);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+        }
+        .nav-overlay.open { transform: translateX(0); }
+        .overlay-content { padding: 120px 30px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .nav-item { 
+            text-decoration: none; 
+            padding: 15px 0; 
+            display: block; 
+            transition: 0.3s;
+        }
+        .nav-number { font-size: 10px; color: var(--primary-blue); font-weight: bold; margin-bottom: 5px; display: block; }
+        .nav-text { color: #ffffff; font-size: 18px; font-weight: 600; transition: 0.3s; }
+        .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
+        
+        .nav-item:hover .nav-text, .nav-item.active .nav-text { color: #4fdcff; transform: translateX(10px); }
+        .nav-item.active .nav-text { color: var(--primary-blue); }
+
+        /* ---------- CONTAINER ---------- */
+        .container {
+            background: var(--glass-bg);
+            padding: 40px;
+            border-radius: 24px;
+            width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: entranceEffect 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes entranceEffect {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ---------- FORM ELEMENTS ---------- */
+        .progress { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .progress::before {
+            content: ""; position: absolute; top: 15px; left: 10%; width: 80%; height: 2px;
+            background: rgba(255,255,255,0.1); z-index: 0;
+        }
+
+        .step { text-align: center; z-index: 1; width: 33%; }
+        .circle {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: #162a31; margin: 0 auto 8px;
+            line-height: 30px; font-size: 13px; color: #fff; border: 1px solid rgba(255,255,255,0.2);
+            transition: var(--transition);
+        }
+
+        .step.active .circle {
+            background: var(--primary-blue);
+            color: #000; font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.5);
+            border-color: var(--primary-blue);
+        }
+
+        .input-field { position: relative; margin-bottom: 30px; }
+        .input-field input {
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+            outline: none; background: rgba(255,255,255,0.05); color: #fff; box-sizing: border-box;
+            transition: 0.3s; font-size: 15px;
+        }
+        .input-field input:focus { border-color: var(--primary-blue); background: rgba(255,255,255,0.1); box-shadow: 0 0 10px rgba(0, 198, 255, 0.1); }
+        
+        .input-field label {
+            position: absolute; top: 14px; left: 14px; pointer-events: none;
+            transition: 0.3s; color: #999; font-size: 15px;
+        }
+
+        .input-field input:focus + label,
+        .input-field input:not(:placeholder-shown) + label {
+            top: -22px; left: 5px; font-size: 12px; color: var(--primary-blue);
+        }
+
+        /* BUTTON FAST TRANSITION */
+        button {
+            width: 100%; padding: 15px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            border: none; border-radius: 12px; font-weight: 700;
+            cursor: pointer; color: #fff; 
+            transition: var(--transition);
+            text-transform: uppercase; letter-spacing: 1px;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        
+        button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 198, 255, 0.4); }
+        button:active:not(:disabled) { transform: scale(0.98); }
+
+        button:disabled {
+            background: #2a3a40 !important;
+            color: #666 !important;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        /* Loader Spinner */
+        .loader {
+            width: 18px; height: 18px; border: 2px solid #fff;
+            border-bottom-color: transparent; border-radius: 50%;
+            display: none; animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ---------- OVERLAYS ---------- */
+        .deadline-overlay, .custom-alert-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 20, 25, 0.95); backdrop-filter: blur(10px);
+            z-index: 30000; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.4s ease;
+        }
+        .deadline-overlay.flex-show, .custom-alert-overlay.flex-show { display: flex; opacity: 1; }
+
+        .deadline-box, .alert-box {
+            background: #1a2a33; padding: 40px; border-radius: 24px;
+            border: 1px solid var(--error-red); text-align: center; width: 340px;
+            transform: scale(0.8); transition: var(--transition);
+        }
+        /* Inline Error Styling */
+.error-text {
+    position: absolute;
+    top: -12px; /* Pulls it up onto the top border */
+    right: 15px;
+    background: #fff;
+    color: #333;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid #ff4b2b;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.input-field.has-error input {
+    border-color: #ff6b6b !important;
+    background: rgba(255, 75, 43, 0.05) !important;
+}
+
+.input-field.has-error .error-text {
+    opacity: 1;
+    transform: translateY(0);
+}
+.error-text::before {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #ff4b2b;
+}
+
+/* Icon for the error */
+.error-text::after {
+    content: "⚠️";
+    font-size: 14px;
+    order: -1; /* Puts icon before text */
+}
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+}
+.input-field.has-error {
+    animation: errorShake 0.4s ease-in-out;
+}
+
+        .deadline-box.active, .alert-box.active { transform: scale(1); }
+    </style>
+
+</head>
+<body>
+
+<div class="deadline-overlay" id="deadlineModal">
+    <div class="deadline-box" id="deadlineBox">
+        <h2 style="color: var(--error-red);">Registration Closed</h2>
+        <p style="color: #ccc;">The registration window for Symposium '26 has officially closed.</p>
+        <button onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+</div>
+
+<div id="customAlert" class="custom-alert-overlay">
+    <div id="alertBox" class="alert-box">
+        <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+        <h3>Action Required</h3>
+        <p id="alertMessage" style="color: #ccc;"></p>
+        <button onclick="closeAlert()">Acknowledged</button>
+    </div>
+</div>
+
+<header class="navbar">
+    <div class="menu-toggle" id="menuToggle">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+    <div class="logo">Symposium <span>2026</span></div>
+</header>
+
+    <nav id="sideMenu" class="nav-overlay">
+        <div class="overlay-content">
+            <a href="index.html" class="nav-item">
+                <span class="nav-number">01</span>
+                <div class="nav-text">Home <small>Landing Page</small></div>
+            </a>
+            <a href="student-details.html" class="nav-item active">
+                <span class="nav-number">02</span>
+                <div class="nav-text">Registration <small>Step 1</small></div>
+            </a>
+            <a href="about-events.html" class="nav-item">
+                <span class="nav-number">03</span>
+                <div class="nav-text">About Events <small>Details</small></div>
+            </a>
+            <a href="view-registration.html" class="nav-item">
+                <span class="nav-number">04</span>
+                <div class="nav-text">My History <small>View Entry</small></div>
+            </a>
+            <a href="contact.html" class="nav-item">
+                <span class="nav-number">05</span>
+                <div class="nav-text">Contact Us <small>Get in Touch</small></div>
+            </a>
+        </div>
+    </nav>
+
+<div class="container" id="formContainer">
+    <div class="progress">
+        <div class="step active"><div class="circle">1</div><div class="label" style="font-size: 11px;">Student</div></div>
+        <div class="step"><div class="circle">2</div><div class="label" style="font-size: 11px;">Events</div></div>
+        <div class="step"><div class="circle">3</div><div class="label" style="font-size: 11px;">Confirm</div></div>
+    </div>
+
+    <h2 style="text-align: center; margin-top: 0; font-weight: 300; letter-spacing: 1px;">Register <span style="color: var(--primary-blue); font-weight: 700;">Now</span></h2>
+
+    <div class="input-field">
+    <input type="text" id="name" placeholder=" " required oninput="validateField('name')">
+    <label>Full Name</label>
+    <span class="error-text" id="nameError"></span>
+</div>
+    <div class="input-field">
+    <input type="text" id="reg_no" maxlength="12" placeholder=" " required oninput="validateField('reg_no')">
+    <label>Register Number</label>
+    <span class="error-text" id="reg_noError"></span>
+</div>
+<div class="input-field">
+    <input type="text" id="college" placeholder=" " required oninput="validateField('college')">
+    <label>College</label>
+    <span class="error-text" id="collegeError"></span>
+</div>
+
+<div class="input-field">
+    <input type="text" id="department" placeholder=" " required oninput="validateField('department')">
+    <label>Department</label>
+    <span class="error-text" id="departmentError"></span>
+</div>
+
+<div class="input-field">
+    <input type="number" id="year" placeholder=" " required oninput="validateField('year')">
+    <label>Year of Study</label>
+    <span class="error-text" id="yearError"></span>
+</div>
+
+<div class="input-field">
+    <input type="email" id="email" placeholder=" " required oninput="validateField('email')">
+    <label>Email Address</label>
+    <span class="error-text" id="emailError"></span>
+</div>
+
+<div class="input-field">
+    <input type="text" id="phone" placeholder=" " required oninput="validateField('phone')">
+    <label>Phone Number</label>
+    <span class="error-text" id="phoneError"></span>
+</div>
+    
+    
+   
+    
+   <button id="nextStepBtn" onclick="initiateRegistrationOTP()">
+        <span class="loader" id="btnLoader"></span>
+        <span id="btnText">Next Step →</span>
+    </button>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #999;">
+        Already registered? <a href="view-registration.html" style="color: var(--primary-blue); text-decoration: none;">View Details</a>
+    </div>
+</div>
+
+<div id="otpOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:20001; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
+    <div style="background:#1a2a33; padding:35px; border-radius:24px; text-align:center; width:320px; border: 1px solid var(--primary-blue); box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+        <h3>Verify Email</h3>
+        <p style="font-size:13px; color:#aaa; margin-bottom: 20px;">Enter the 6-digit OTP sent to your email.</p>
+        <input type="text" id="registrationOtp" maxlength="6" style="width:100%; padding:15px; margin-bottom:20px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); text-align:center; letter-spacing:8px; background: rgba(255,255,255,0.05); color: #fff; font-size: 20px; font-weight: bold; outline: none;">
+        <span id="otpError" style="color:#ff6b6b; font-size:11px; display:block; margin-bottom:15px;"></span>
+        <button id="verifyBtn" onclick="verifyAndProceed()">Verify & Continue</button>
+        <p onclick="closeOtpOverlay()" style="margin-top:20px; font-size:13px; color:#666; cursor:pointer; transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#666'">Cancel & Edit Registration</p>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+    /* ---------- 1. MENU LOGIC ---------- */
+    const menuToggle = document.getElementById("menuToggle");
+    const sideMenu = document.getElementById("sideMenu");
+    
+    if (menuToggle && sideMenu) {
+        menuToggle.onclick = (e) => {
+            e.stopPropagation();
+            sideMenu.classList.toggle("open");
+            menuToggle.classList.toggle("open");
+        };
+
+        document.addEventListener("click", (e) => {
+            if (sideMenu.classList.contains("open") && !sideMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                sideMenu.classList.remove("open");
+                menuToggle.classList.remove("open");
+            }
+        });
+    }
+
+    /* ---------- 2. DEADLINE CHECK ---------- */
+    const deadlineModal = document.getElementById('deadlineModal');
+    const deadlineBox = document.getElementById('deadlineBox');
+    const nextBtn = document.getElementById('nextStepBtn');
+    const inputs = document.querySelectorAll('.input-field input');
+
+    try {
+        const response = await fetch('/api/settings');
+        const data = await response.json();
+        // Assuming your API returns { settings: { registration_deadline: "..." } }
+        const deadline = data.settings ? data.settings.registration_deadline : data.registration_deadline;
+        
+        const targetTime = new Date(deadline).getTime();
+        const currentTime = new Date().getTime();
+
+        if (currentTime >= targetTime) {
+            if (deadlineModal) deadlineModal.classList.add('flex-show');
+            if (deadlineBox) setTimeout(() => deadlineBox.classList.add('active'), 10);
+
+            inputs.forEach(input => input.disabled = true);
+            if (nextBtn) {
+                nextBtn.disabled = true;
+                nextBtn.innerText = "REGISTRATION CLOSED";
+                nextBtn.style.background = "#2a3a40";
+            }
+        }
+    } catch (error) {
+        console.error("Deadline sync failed:", error);
+    }
+});
+</script>
+</body>
+</html>
