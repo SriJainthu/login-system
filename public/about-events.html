@@ -220,6 +220,9 @@
     </div>
 
  <script>
+    const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-vcj6.onrender.com';
     document.addEventListener("DOMContentLoaded", () => {
         const menuToggle = document.getElementById("menuToggle");
         const sideMenu = document.getElementById("sideMenu");
@@ -249,7 +252,7 @@
             
             try {
                 // Fetch events from your Node.js server
-                const response = await fetch('http://localhost:3000/events');
+                const response = await fetch(`${API_BASE_URL}/events`);
                 const adminEvents = await response.json();
 
                 if (adminEvents && adminEvents.length > 0) {

@@ -216,7 +216,7 @@
         
         .nav-item:hover .nav-text, .nav-item.active .nav-text { color: #4fdcff; transform: translateX(10px); }
         .nav-item.active .nav-text { color: var(--primary-blue); }
-
+        #qrcode img { margin: 0 auto; border: 5px solid #fff; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -318,7 +318,9 @@
 
 <script>
     /* ALL ORIGINAL LOGIC PRESERVED */
-
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-vcj6.onrender.com';
     function showModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     function closeErrorModal() { closeModal('errorModal'); }
@@ -395,7 +397,8 @@
 
     try {
         // Change this URL to match your absolute path if not using a proxy
-        const response = await fetch(`http://localhost:3000/registration/${regNo}`);
+       // ✅ Correct: Uses backticks
+const response = await fetch(`${API_BASE_URL}/registration/${regNo}`);
         
         if (!response.ok) {
             showModal('errorModal');

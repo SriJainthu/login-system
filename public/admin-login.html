@@ -353,6 +353,9 @@
 <script src="https://assets.codepen.io/16327/MorphSVGPlugin3.min.js"></script>
 
 <script>
+    const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-vcj6.onrender.com';
     gsap.registerPlugin(MorphSVGPlugin);
 
     // Updated Selectors to match your HTML IDs
@@ -565,7 +568,7 @@ loginBtn.addEventListener('click', async (e) => {
 
     try {
         // Change localhost:3000 to your server's actual URL/port if different
-        const response = await fetch('http://localhost:3000/admin/login', {
+        const response = await fetch(`${API_BASE_URL}/admin/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password: passwordValue })
@@ -574,6 +577,7 @@ loginBtn.addEventListener('click', async (e) => {
         const data = await response.json();
 
         if (response.ok && data.success) {
+            localStorage.setItem("adminLoggedIn", "true");
             // ✅ SUCCESS: Happy Yeti and Redirect
             mouthStatus = "large";
             gsap.to([mouthBG, mouthOutline, mouthMaskPath], 0.3, { morphSVG: mouthLargeBG });
@@ -588,7 +592,7 @@ loginBtn.addEventListener('click', async (e) => {
     } catch (err) {
         // 🛠️ SERVER DOWN: The fetch failed entirely
         console.error("Connection Error:", err);
-        showError("Server is offline. Please start server.js");
+        showError("Cannot connect to server. Please check your internet or Render status");
     }
 });
 

@@ -270,7 +270,7 @@ const eventListHtml = events.map(userSelectedEvent => {
         </div>`;
 }).join('');
 // Change this to your actual production domain when you go live
-const BASE_URL = "http://localhost:3000"; 
+const BASE_URL = process.env.BASE_URL || "https://login-system-1-vcj6.onrender.com";
 
 const mailOptions = {
     from: `"Symposium 2026 Team" <${process.env.EMAIL_USER}>`,

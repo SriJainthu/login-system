@@ -1,3 +1,6 @@
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-vcj6.onrender.com';
 const validators = {
     name: value => /^[A-Za-z\s]+$/.test(value),
     college: value => /^[A-Za-z\s]+$/.test(value),
@@ -76,7 +79,7 @@ async function initiateRegistrationOTP() {
     if(btnText) btnText.innerText = "Verifying..."; 
 
    try {
-        const response = await fetch('/register/send-otp', {
+        const response = await fetch(`${API_BASE_URL}/register/send-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: fields.email, reg_no: fields.reg_no }) 
@@ -142,7 +145,8 @@ function verifyAndProceed() {
     verifyBtn.disabled = true;
     verifyBtn.innerText = "Processing...";
 
-    fetch('/register/verify-otp', {
+    // Change this line:
+fetch(`${API_BASE_URL}/register/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp })
@@ -241,8 +245,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
         // 1. Fetch both Events AND Settings (to get the limit)
         const [eventRes, settingsRes] = await Promise.all([
-            fetch("/events"),
-            fetch("/api/settings")
+            fetch(`${API_BASE_URL}/events`),
+    fetch(`${API_BASE_URL}/api/settings`)
         ]);
         
         const events = await eventRes.json();
@@ -340,7 +344,7 @@ function submitRegistration() {
     registerBtn.disabled = true;
     registerBtn.innerText = "Finishing...";
 
-    fetch("/register", {
+    fetch(`${API_BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...student, events: eventData })

@@ -329,6 +329,9 @@
 </div>
 
 <script>
+  const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-vcj6.onrender.com';
     let selectedList = [];
     let adminEventLimit = 3; 
 
@@ -341,13 +344,13 @@
 
     async function syncAdminSettings() {
         try {
-            const settingsRes = await fetch("http://localhost:3000/api/settings");
+            const settingsRes = await fetch(`${API_BASE_URL}/api/settings`);
             const settings = await settingsRes.json();
             
             adminEventLimit = parseInt(settings.event_selection_limit) || 3;
             document.getElementById('max-limit-display').textContent = adminEventLimit;
 
-            const eventRes = await fetch("http://localhost:3000/events");
+            const eventRes = await fetch(`${API_BASE_URL}/events`);
             const adminEvents = await eventRes.json();
             
             const groupContainer = document.getElementById("groupEventsContainer");
@@ -504,7 +507,7 @@ for (let card of eventCards) {
     confirmBtn.innerText = "Processing...";
 
     try {
-        const response = await fetch("http://localhost:3000/register", {
+       const response = await fetch(`${API_BASE_URL}/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -556,7 +559,7 @@ async function verifyToken(event, eventId, eventName) {
     }
 
     try {
-        const res = await fetch(`http://localhost:3000/validate-token?eventId=${eventId}&token=${encodeURIComponent(token)}`);
+       const res = await fetch(`${API_BASE_URL}/validate-token?eventId=${eventId}&token=${encodeURIComponent(token)}`);
         const data = await res.json();
 
         msgElement.innerText = data.message;

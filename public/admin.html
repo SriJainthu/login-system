@@ -523,6 +523,10 @@ th, td {
     </div>
 </div>
 <script>
+    // Add this at the top of your script
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-vcj6.onrender.com';
     let eventChart;
     let eventsList = [];
     let currentIsGroupView = false;
@@ -531,7 +535,7 @@ th, td {
     // --- 1. INITIALIZATION & SYNC ---
     async function fetchEventsFromServer() {
         try {
-            const res = await fetch("http://localhost:3000/events");
+          const res = await fetch(`${API_BASE_URL}/events`);
             const data = await res.json();
             eventsList = data.map(e => ({
                 name: e.event_name,
@@ -633,7 +637,7 @@ th, td {
         if (!name || !desc) return alert("Fill name and description");
 
         try {
-            const response = await fetch("http://localhost:3000/admin/add-event", {
+          const response = await fetch(`${API_BASE_URL}/admin/add-event`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
@@ -670,7 +674,7 @@ th, td {
             
             if (currentIsGroupView) {
                 // Fetch Grouped Logic (Includes Token in Query)
-                const res = await fetch(`http://localhost:3000/admin/grouped-teams?eventName=${encodeURIComponent(selectedEventName)}&college=${document.getElementById("college").value}&token=${encodeURIComponent(tokenSearch)}`);
+               const res = await fetch(`${API_BASE_URL}/admin/grouped-teams?eventName=${encodeURIComponent(selectedEventName)}&college=${document.getElementById("college").value}&token=${encodeURIComponent(tokenSearch)}`);
                 const data = await res.json();
                 renderGroupedRows(data);
             } else {
@@ -680,7 +684,7 @@ th, td {
                     year: document.getElementById("year").value,
                     event: selectedEventName
                 });
-                const res = await fetch("http://localhost:3000/admin/students?" + params.toString());
+               const res = await fetch(`${API_BASE_URL}/admin/students?` + params.toString());
                 const data = await res.json();
                 renderStandardRows(data);
                 updateChart(data);
@@ -842,7 +846,7 @@ th, td {
     async function deleteEvent() {
         const eventName = eventsList[eventToDeleteIndex].name;
         try {
-            const res = await fetch(`http://localhost:3000/admin/delete-event?name=${encodeURIComponent(eventName)}`, { method: "DELETE" });
+            const res = await fetch(`${API_BASE_URL}/admin/delete-event?name=${encodeURIComponent(eventName)}`, { method: "DELETE" });
             if (res.ok) {
                 showToast("🗑️ Event Deleted");
                 closeModal();
@@ -892,7 +896,7 @@ th, td {
 
     async function updateEventLimit() {
         const val = document.getElementById("adminLimitInput").value;
-        await fetch("http://localhost:3000/api/settings", {
+        await fetch(`${API_BASE_URL}/api/settings`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ limit: val })
@@ -903,7 +907,7 @@ th, td {
 
     function updateSymposiumDate() {
         const val = document.getElementById("adminDateInput").value;
-        fetch('http://localhost:3000/api/settings', {
+       fetch(`${API_BASE_URL}/api/settings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ deadline: val })
@@ -1021,7 +1025,18 @@ th, td {
     printWindow.document.close();
     setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
 }
-    window.onload = fetchEventsFromServer;
+    window.onload = () => {
+    const isAdmin = localStorage.getItem("adminLoggedIn");
+    
+    // Check: If no badge AND we aren't testing locally, kick them out
+    if (!isAdmin && window.location.hostname !== 'localhost') {
+        alert("🔒 Access Denied. Please Login.");
+        window.location.href = "admin-login.html"; // Redirect to login page
+    } else {
+        // If they have the badge, proceed to load data
+        fetchEventsFromServer();
+    }
+};
 </script>
 </body>
 </html>
