@@ -51,8 +51,8 @@ function validateField(fieldId) {
 
 /* ---------- REGISTRATION STEP 1: DUPLICATION CHECK & OTP ---------- */
 /* Update only this function in your script.js */
+/* Update only this function in your script.js */
 async function initiateRegistrationOTP() {
-    const mainError = document.getElementById("mainError");
     const btn = document.getElementById("nextStepBtn");
     const btnText = document.getElementById("btnText");
     const loader = document.getElementById("btnLoader");
@@ -74,41 +74,41 @@ async function initiateRegistrationOTP() {
     if (!isFormValid) return; 
 
     // UI Loading State
-    btn.disabled = true;
-    if(loader) loader.style.display = "inline-block";
-    if(btnText) btnText.innerText = "Verifying..."; 
+    if (btn) btn.disabled = true;
+    if (loader) loader.style.display = "inline-block";
+    if (btnText) btnText.innerText = "Verifying..."; 
 
-   try {
+    try {
         const response = await fetch(`${API_BASE_URL}/register/send-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: fields.email, reg_no: fields.reg_no }) 
         });
 
-        // ALWAYS parse the data first, even for errors
         const data = await response.json();
 
         if (response.status === 409) {
-            // This is where "Already Registered" is handled
-            // Use the message from the server, or a fallback
+            // Handled via your custom tooltip alert
             showCustomAlert(data.message || "This Email or Register Number is already registered.");
-            resetBtn(btn, btnText, loader); 
+            resetBtn(); 
         } else if (response.ok && data.success) {
-            // Success logic...
+            // Success logic
             localStorage.setItem("studentData", JSON.stringify(fields));
             const otpOverlay = document.getElementById('otpOverlay');
-            otpOverlay.style.display = 'flex';
-            setTimeout(() => { otpOverlay.style.opacity = "1"; }, 10);
+            if (otpOverlay) {
+                otpOverlay.style.display = 'flex';
+                setTimeout(() => { otpOverlay.style.opacity = "1"; }, 10);
+            }
         } else {
-            // Other server errors (500, etc.)
-            const errorDisplay = document.getElementById("mainError");
-            errorDisplay.textContent = data.message || "Server error. Please try again.";
-            resetBtn(btn, btnText, loader);
+            // Handle 500 errors using your custom alert instead of the missing div
+            showCustomAlert(data.message || "Server error. Please try again.");
+            resetBtn();
         }
     } catch (error) {
         console.error("Fetch error:", error);
-        document.getElementById("mainError").textContent = "Connection error. Is the server running?";
-        resetBtn(btn, btnText, loader);
+        // Handle connection timeouts or crashes
+        showCustomAlert("Connection error. Please check your internet or if the server is live.");
+        resetBtn();
     }
 }
 function resetBtn() {
@@ -118,15 +118,20 @@ function resetBtn() {
 
     if (btn) {
         btn.disabled = false;
-        btn.style.background = ""; // Restores original gradient
+        btn.style.background = ""; // Restores your original CSS gradient
         btn.style.opacity = "1";
     }
     
-    if (loader) loader.style.display = "none";
+    // Hide the spinner
+    if (loader) {
+        loader.style.display = "none";
+    }
     
+    // Restore the original text
     if (btnText) {
         btnText.innerText = "Next Step →";
     } else if (btn) {
+        // Fallback in case btnText span is missing but btn exists
         btn.innerText = "Next Step →";
     }
 }

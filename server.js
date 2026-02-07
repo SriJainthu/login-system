@@ -9,12 +9,19 @@ const axios = require("axios");
 const nodemailer = require("nodemailer");
 
 /* ---------- EMAIL CONFIG ---------- */
+/* ---------- UPDATED EMAIL CONFIG ---------- */
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, 
+  pool: true, // Keep connection open for better performance on Render
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  connectionTimeout: 8000, // 8 seconds
+  greetingTimeout: 5000,
+  socketTimeout: 10000,
 });
 
 transporter.verify(function (error, success) {
@@ -67,7 +74,11 @@ db.connect(err => {
   }
   console.log("✅ MySQL connected");
 });
-
+setInterval(() => {
+    db.query('SELECT 1', (err) => {
+        if (err) console.error("MySQL Keep-alive error:", err);
+    });
+}, 30000);
 /* ---------- EVENTS ---------- */
 app.get("/events", (req, res) => {
   db.query("SELECT * FROM events", (err, rows) => {
@@ -141,7 +152,15 @@ app.post("/register/send-otp", checkDeadline, (req, res) => {
     </div>`
 };
         transporter.sendMail(mailOptions, (error) => {
-            if (error) return res.status(500).json({ message: "Failed to send email" });
+            if (error) {
+                console.error("❌ OTP Email Failed:", error);
+                // IMPORTANT: delete the record so they can try again immediately
+                delete otpStore[email]; 
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Email delivery failed. Please check your address or try again later." 
+                });
+            }
             res.json({ success: true, message: "OTP sent!" });
         });
     });
@@ -333,17 +352,15 @@ const mailOptions = {
     </div>`
 };
 
-                               transporter.sendMail(mailOptions, (mailErr) => {
-    if (mailErr) {
-        console.error("❌ Mail Error:", mailErr);
-        // Even if mail fails, we usually want to tell the user the DB part worked
-    }
+          
+transporter.sendMail(mailOptions, (mailErr) => {
+    if (mailErr) console.error("❌ Success Mail Error:", mailErr);
     
-    // This sends the signal back to your registration.html
-    res.json({ 
+    // Send success signal back
+    return res.status(200).json({ 
         success: true, 
         message: "Registration successful!",
-        redirect: "registration-success.html" // Pass the target page here
+        redirect: "/registration-success.html" // Ensure this matches your file path
     });
 });
                             });
@@ -471,7 +488,7 @@ app.get("/registration/:reg_no", (req, res) => {
 
         const student = students[0];
         const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-
+        
         // 2. Optimized Query: Get events AND all member names for the same token
         const eventQuery = `
             SELECT 
@@ -726,7 +743,21 @@ app.post("/admin/login", (req, res) => {
         });
     }
 });
+app.get("/test-email", (req, res) => {
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: process.env.EMAIL_USER, // Send it to yourself
+        subject: "Test Email",
+        text: "If you see this, your email config is perfect!"
+    };
 
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return res.status(500).json({ error: error.message });
+        }
+        res.json({ message: "Email sent successfully!", info: info.response });
+    });
+});
 /* ---------- SERVER START ---------- */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
