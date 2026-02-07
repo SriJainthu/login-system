@@ -4,36 +4,15 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs");
 require('dotenv').config(); 
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 const app = express();
 const axios = require("axios");
-const nodemailer = require("nodemailer");
 
-/* ---------- EMAIL CONFIG ---------- */
-/* ---------- UPDATED EMAIL CONFIG ---------- */
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // Use false for STARTTLS (Port 587)
-  pool: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    // This prevents connection failures if the certificate handshake is strict
-    rejectUnauthorized: false 
-  },
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-});
 
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log("❌ Email Server Error:", error);
-  } else {
-    console.log("✅ Email Server is ready to send messages");
-  }
-});
+
+
 
 const otpStore = {}; // TEMP storage for both registration and viewing
 let globalSettings = { 
@@ -94,7 +73,7 @@ app.get("/events", (req, res) => {
 });
 
 /* ---------- REGISTRATION: STEP 1 - SEND OTP ---------- */
-app.post("/register/send-otp", checkDeadline, (req, res) => {
+app.post("/register/send-otp", checkDeadline, async (req, res) => {
     const { email, reg_no } = req.body;
 
     if (!email || !reg_no) {
@@ -113,9 +92,10 @@ app.post("/register/send-otp", checkDeadline, (req, res) => {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         otpStore[email] = { otp, expires: Date.now() + 10 * 60 * 1000 };
-
-       const mailOptions = {
-    from: `"Symposium 2026" <${process.env.EMAIL_USER}>`,
+(async () => {
+       try {
+  await resend.emails.send({
+    from: "Symposium 2026 <onboarding@resend.dev>",
     to: email,
     subject: `🔐 ${otp} is your Symposium Verification Code`,
     html: `
@@ -153,21 +133,22 @@ app.post("/register/send-otp", checkDeadline, (req, res) => {
             </div>
         </div>
     </div>`
-};
-        transporter.sendMail(mailOptions, (error) => {
-            if (error) {
-                console.error("❌ OTP Email Failed:", error);
-                // IMPORTANT: delete the record so they can try again immediately
-                delete otpStore[email]; 
-                return res.status(500).json({ 
-                    success: false, 
-                    message: "Email delivery failed. Please check your address or try again later." 
-                });
-            }
-            res.json({ success: true, message: "OTP sent!" });
-        });
-    });
 });
+ res.json({ success: true, message: "OTP sent!" });
+
+} catch (error) {
+  console.error("❌ OTP Email Failed:", error);
+  delete otpStore[email];
+
+  return res.status(500).json({
+    success: false,
+    message: "Email delivery failed. Please try again."
+  });
+}
+})();
+      });
+});
+     
 
 /* ---------- REGISTRATION: STEP 2 - VERIFY OTP ---------- */
 app.post("/register/verify-otp", (req, res) => {
@@ -186,7 +167,7 @@ app.post("/register/verify-otp", (req, res) => {
 });
 
 /* ---------- REGISTRATION: STEP 3 - FINAL SUBMISSION ---------- */
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
     const { name, reg_no, college, department, year, email, phone, events } = req.body;
 
     if (!name || !reg_no || !email || !events || !Array.isArray(events) || events.length === 0) {
@@ -293,9 +274,10 @@ const eventListHtml = events.map(userSelectedEvent => {
 }).join('');
 // Change this to your actual production domain when you go live
 const BASE_URL = process.env.BASE_URL || "https://login-system-1-vcj6.onrender.com";
-
-const mailOptions = {
-    from: `"Symposium 2026 Team" <${process.env.EMAIL_USER}>`,
+(async () => {
+try {
+  await resend.emails.send({
+    from: "Symposium 2026 Team <onboarding@resend.dev>",
     to: email,
     subject: `✔️ Registration Confirmed: ${reg_no} | Symposium 2026`,
     html: `
@@ -353,19 +335,25 @@ const mailOptions = {
             </div>
         </div>
     </div>`
-};
+});
 
           
-transporter.sendMail(mailOptions, (mailErr) => {
-    if (mailErr) console.error("❌ Success Mail Error:", mailErr);
-    
-    // Send success signal back
-    return res.status(200).json({ 
-        success: true, 
-        message: "Registration successful!",
-        redirect: "/registration-success.html" // Ensure this matches your file path
-    });
-});
+  return res.status(200).json({
+    success: true,
+    message: "Registration successful!",
+    redirect: "/registration-success.html"
+  });
+
+} catch (mailErr) {
+  console.error("❌ Success Mail Error:", mailErr);
+
+  return res.status(200).json({
+    success: true,
+    message: "Registration successful (email failed)",
+    redirect: "/registration-success.html"
+  });
+}
+})();
                             });
                         });
                     });
@@ -450,23 +438,28 @@ app.get("/admin/download", (req, res) => {
 });
 
 /* ---------- VIEW REGISTRATION: SEND & VERIFY OTP ---------- */
-app.post("/send-otp", (req, res) => {
+app.post("/send-otp",async (req, res) => {
   const { reg_no } = req.body;
   db.query("SELECT email FROM students WHERE reg_no = ?", [reg_no], (err, rows) => {
     if (err || rows.length === 0) return res.status(404).json({ message: "Register number not found" });
     const email = rows[0].email;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore[reg_no] = { otp, expires: Date.now() + 5 * 60 * 1000 };
-    const mailOptions = {
-      from: `"Symposium Security" <${process.env.EMAIL_USER}>`,
+    (async () => {
+    try {
+  await resend.emails.send({
+    from: "Symposium Security <onboarding@resend.dev>",
       to: email,
       subject: "Verification Code",
       html: `<h2>Your Code: ${otp}</h2>`
-    };
-    transporter.sendMail(mailOptions, (error) => {
-      if (error) return res.status(500).json({ message: "Email failed" });
-      res.json({ success: true, message: "Code sent!" });
     });
+      res.json({ success: true, message: "Code sent!" });
+
+} catch (error) {
+  console.error("❌ OTP Mail Failed:", error);
+  res.status(500).json({ message: "Email failed" });
+}
+})();
   });
 });
 
@@ -480,7 +473,7 @@ app.post("/verify-otp", (req, res) => {
 });
 
 /* ---------- VIEW REGISTRATION: GET DATA & LIVE TEAM STATUS ---------- */
-app.get("/registration/:reg_no", (req, res) => {
+app.get("/registration/:reg_no",async  (req, res) => {
     const reg_no = req.params.reg_no.trim(); 
 
     // 1. Find the student
@@ -491,7 +484,11 @@ app.get("/registration/:reg_no", (req, res) => {
 
         const student = students[0];
         const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-        
+        otpStore[reg_no] = {
+  otp: generatedOTP,
+  expires: Date.now() + 10 * 60 * 1000
+};
+
         // 2. Optimized Query: Get events AND all member names for the same token
         const eventQuery = `
             SELECT 
@@ -509,10 +506,11 @@ app.get("/registration/:reg_no", (req, res) => {
 
         db.query(eventQuery, [student.id], (err, events) => {
             if (err) return res.status(500).json({ message: "Error fetching team details" });
-
+(async () => {
             // 3. Send Email with OTP
-            const mailOptions = {
-    from: `"Symposium 2026 Team" <${process.env.EMAIL_USER}>`,
+          try {
+  await resend.emails.send({
+    from: "Symposium 2026 Team <onboarding@resend.dev>",
     to: student.email,
     subject: `🔐 Your Access Code: ${generatedOTP}`,
     html: `
@@ -551,22 +549,21 @@ app.get("/registration/:reg_no", (req, res) => {
             </div>
         </div>
     </div>`
-};
+});
 
-            transporter.sendMail(mailOptions, (mailErr) => {
-                if (mailErr) {
-                    console.error("❌ Mail send failed:", mailErr);
-                    return res.status(500).json({ message: "Failed to send verification email." });
-                }
+              res.json({
+    student,
+    events,
+    secret: generatedOTP
+  });
 
-                // 4. Return data to frontend
-                // team_members will now be a string like "John Doe, Jane Smith"
-                res.json({ 
-                    student: student, 
-                    events: events, 
-                    secret: generatedOTP 
-                });
-            });
+} catch (mailErr) {
+  console.error("❌ Mail send failed:", mailErr);
+  return res.status(500).json({
+    message: "Failed to send verification email."
+  });
+}
+})();
         });
     });
 });
@@ -746,21 +743,7 @@ app.post("/admin/login", (req, res) => {
         });
     }
 });
-app.get("/test-email", (req, res) => {
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER, // Send it to yourself
-        subject: "Test Email",
-        text: "If you see this, your email config is perfect!"
-    };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            return res.status(500).json({ error: error.message });
-        }
-        res.json({ message: "Email sent successfully!", info: info.response });
-    });
-});
 /* ---------- SERVER START ---------- */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
