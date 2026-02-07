@@ -409,7 +409,7 @@ const response = await fetch(`${API_BASE_URL}/registration/${regNo}`);
         
         let data;
 try {
-  data = await res.json();
+  data = await response.json();
 } catch {
   throw new Error("Server error. Please try again.");
 }

@@ -87,7 +87,7 @@ async function initiateRegistrationOTP() {
 
         let data;
 try {
-  data = await res.json();
+  data = await response.json();
 } catch {
   throw new Error("Server error. Please try again.");
 }
