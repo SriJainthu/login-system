@@ -61,47 +61,50 @@ app.get("/events", (req, res) => {
     res.json(rows);
   });
 });
-
-/* ======================================================
-   REGISTRATION STEP 1 — SEND OTP (DB BASED)
-====================================================== */
 app.post("/register/send-otp", checkDeadline, async (req, res) => {
-  const { email, reg_no } = req.body;
-  if (!email || !reg_no) return res.status(400).json({ message: "Missing fields" });
+  try {
+    const { email, reg_no } = req.body;
 
-  db.query(
-    "SELECT email, reg_no FROM students WHERE email = ? OR reg_no = ?",
-    [email, reg_no],
-    async (err, existing) => {
-      if (existing.length > 0) {
-        return res.status(409).json({
-          success: false,
-          message: "Already registered"
-        });
-      }
-
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-      await db.promise().query(
-        `REPLACE INTO otp_verification (identifier, otp, expires_at, purpose)
-         VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE), 'register')`,
-        [email, otp]
-      );
-
-      try {
-        await resend.emails.send({
-          from: "Symposium 2026 <onboarding@resend.dev>",
-          to: email,
-          subject: `Your OTP: ${otp}`,
-          html: `<h2>${otp}</h2>`
-        });
-
-        res.json({ success: true, message: "OTP sent" });
-      } catch (e) {
-        res.status(500).json({ message: "Email failed" });
-      }
+    if (!email || !reg_no) {
+      return res.status(400).json({ success: false, message: "Missing data" });
     }
-  );
+
+    const [existing] = await db.promise().query(
+      "SELECT id FROM students WHERE email = ? OR reg_no = ?",
+      [email, reg_no]
+    );
+
+    if (existing.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: "Email or Register Number already registered"
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await db.promise().query(
+      `REPLACE INTO otp_verification (identifier, otp, expires_at, purpose)
+       VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE), 'register')`,
+      [email, otp]
+    );
+
+    await resend.emails.send({
+      from: "Symposium 2026 <onboarding@resend.dev>",
+      to: email,
+      subject: "Your Registration OTP",
+      html: `<h2>${otp}</h2>`
+    });
+
+    return res.json({ success: true, message: "OTP sent successfully" });
+
+  } catch (err) {
+    console.error("❌ Register OTP Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while sending OTP"
+    });
+  }
 });
 
 /* ======================================================

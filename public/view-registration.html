@@ -407,7 +407,13 @@ const response = await fetch(`${API_BASE_URL}/registration/${regNo}`);
             return;
         }
         
-        const data = await response.json();
+        let data;
+try {
+  data = await res.json();
+} catch {
+  throw new Error("Server error. Please try again.");
+}
+
         cachedData = data; 
         serverOTP = data.secret; 
         

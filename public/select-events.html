@@ -560,7 +560,13 @@ async function verifyToken(event, eventId, eventName) {
 
     try {
        const res = await fetch(`${API_BASE_URL}/validate-token?eventId=${eventId}&token=${encodeURIComponent(token)}`);
-        const data = await res.json();
+        let data;
+try {
+  data = await res.json();
+} catch {
+  throw new Error("Server error. Please try again.");
+}
+
 
         msgElement.innerText = data.message;
 

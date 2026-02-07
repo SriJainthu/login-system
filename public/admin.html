@@ -536,7 +536,13 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     async function fetchEventsFromServer() {
         try {
           const res = await fetch(`${API_BASE_URL}/events`);
-            const data = await res.json();
+            let data;
+try {
+  data = await res.json();
+} catch {
+  throw new Error("Server error. Please try again.");
+}
+
             eventsList = data.map(e => ({
                 name: e.event_name,
                 desc: e.description,
@@ -675,7 +681,13 @@ const API_BASE_URL = window.location.hostname === 'localhost'
             if (currentIsGroupView) {
                 // Fetch Grouped Logic (Includes Token in Query)
                const res = await fetch(`${API_BASE_URL}/admin/grouped-teams?eventName=${encodeURIComponent(selectedEventName)}&college=${document.getElementById("college").value}&token=${encodeURIComponent(tokenSearch)}`);
-                const data = await res.json();
+                let data;
+try {
+  data = await res.json();
+} catch {
+  throw new Error("Server error. Please try again.");
+}
+
                 renderGroupedRows(data);
             } else {
                 const params = new URLSearchParams({
@@ -685,7 +697,13 @@ const API_BASE_URL = window.location.hostname === 'localhost'
                     event: selectedEventName
                 });
                const res = await fetch(`${API_BASE_URL}/admin/students?` + params.toString());
-                const data = await res.json();
+               let data;
+try {
+  data = await res.json();
+} catch {
+  throw new Error("Server error. Please try again.");
+}
+
                 renderStandardRows(data);
                 updateChart(data);
             }

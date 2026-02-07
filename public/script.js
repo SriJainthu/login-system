@@ -85,7 +85,13 @@ async function initiateRegistrationOTP() {
             body: JSON.stringify({ email: fields.email, reg_no: fields.reg_no }) 
         });
 
-        const data = await response.json();
+        let data;
+try {
+  data = await res.json();
+} catch {
+  throw new Error("Server error. Please try again.");
+}
+
 
         if (response.status === 409) {
             // Handled via your custom tooltip alert

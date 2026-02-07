@@ -574,7 +574,13 @@ loginBtn.addEventListener('click', async (e) => {
             body: JSON.stringify({ username, password: passwordValue })
         });
 
-        const data = await response.json();
+        let data;
+try {
+  data = await res.json();
+} catch {
+  throw new Error("Server error. Please try again.");
+}
+
 
         if (response.ok && data.success) {
             localStorage.setItem("adminLoggedIn", "true");
