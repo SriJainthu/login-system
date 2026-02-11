@@ -290,7 +290,7 @@
             <button onclick="handleVerifyOTP()">Verify Identity</button>
             <div class="resend-container">
                 <span id="timerText" style="opacity: 0.6;">Resend available in <span id="seconds">30</span>s</span>
-                <a id="resendBtnLink" onclick="handleSendOTP()">Resend OTP Now</a>
+                <a id="resendBtnLink" style="cursor:pointer; color:var(--primary); text-decoration:underline;" onclick="handleResendLogic()">Resend OTP Now</a>
             </div>
         </div>
 
@@ -317,6 +317,19 @@
     </div>
 
 <script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const reg = urlParams.get('reg');
+        const regInput = document.getElementById('regNo');
+        
+        if (reg && regInput) {
+            regInput.value = reg;
+            // Optional: Automatically trigger the OTP send if the number is valid
+            if (reg.length === 12) {
+                console.log("Auto-filled registration number detected.");
+            }
+        }
+    });
     /* ALL ORIGINAL LOGIC PRESERVED */
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
@@ -342,12 +355,13 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     let serverOTP = ""; 
     let resendTimer;
 
-    function maskEmail(email) {
-        if (!email) return "your registered email";
-        const [user, domain] = email.split("@");
-        const visible = user.substring(0, 4);
-        return `${visible.toUpperCase()}***@${domain.toUpperCase()}`;
-    }
+function maskEmail(email) {
+    if (!email) return "your registered email";
+    const [user, domain] = email.split("@");
+    // Shows 1st char, then asterisks, then the domain
+    const maskedUser = user.charAt(0) + "*".repeat(5); 
+    return `${maskedUser}@${domain}`;
+}
 
     function startResendTimer() {
         const timerText = document.getElementById("timerText");
@@ -377,52 +391,46 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     const btn = document.getElementById("sendOtpBtn");
     const errorDiv = document.getElementById("error");
 
-    // NEW: Strict 12-digit validation check
-    if (!regNo) {
-        errorDiv.textContent = "Please enter your Register No";
+    if (!regNo || regNo.length !== 12) {
+        errorDiv.textContent = "Please enter a valid 12-digit Register No";
         return;
     }
     
-    if (regNo.length !== 12) {
-        errorDiv.textContent = "Register number must be exactly 12 digits";
-        regNoField.style.borderColor = "var(--error-red)";
-        return;
-    }
-    
-    // Reset styling if valid
-    regNoField.style.borderColor = "var(--glass-border)";
     btn.disabled = true; 
-    btn.textContent = "Verifying ID...";
+    btn.textContent = "Sending Code...";
     errorDiv.textContent = "";
 
     try {
-        // Change this URL to match your absolute path if not using a proxy
-       // ✅ Correct: Uses backticks
-const response = await fetch(`${API_BASE_URL}/registration/${regNo}`);
-        
-        if (!response.ok) {
-            showModal('errorModal');
+        // 1. Request the server to send the OTP email
+        const otpResponse = await fetch(`${API_BASE_URL}/send-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reg_no: regNo })
+        });
+
+        const data = await otpResponse.json();
+
+        if (!otpResponse.ok) {
+            // STOP: Captures 429 (Limit) or 404 (Not Found)
+            if (typeof showCustomAlert === "function") {
+                showCustomAlert(data.message || "Request failed");
+            } else {
+                alert(data.message || "Request failed");
+            }
             btn.disabled = false;
             btn.textContent = "Get Access OTP";
-            return;
+            return; 
         }
-        
-        let data;
-try {
-  data = await response.json();
-} catch {
-  throw new Error("Server error. Please try again.");
-}
 
-        cachedData = data; 
-        serverOTP = data.secret; 
+        // 2. Fetch student data for UI
+        const dataResponse = await fetch(`${API_BASE_URL}/registration/${regNo}`);
+        if (!dataResponse.ok) throw new Error("Could not find registration");
         
-        const emailHint = maskEmail(data.student.email);
+        cachedData = await dataResponse.json();
 
-        // Step Transition with fading
+        // 3. UI TRANSITION
         const stepReg = document.getElementById("step-reg");
         stepReg.style.opacity = '0';
-        stepReg.style.transform = 'translateY(-10px)';
         
         setTimeout(() => {
             stepReg.style.display = "none";
@@ -434,23 +442,42 @@ try {
                 stepOtp.style.transform = 'translateY(0)';
             }, 50);
             
-            document.getElementById("otp-status").innerHTML = `Code sent to:<br><b>${emailHint}</b>`;
+            const userEmail = cachedData.student.email;
+            document.getElementById("otp-status").innerHTML = 
+                `Verification code sent to <br><b style="color:var(--primary)">${maskEmail(userEmail)}</b>`;
             startResendTimer();
         }, 400);
 
     } catch (err) {
-        console.error("Fetch error:", err);
-        showModal('errorModal');
+        console.error("Critical Frontend Error:", err);
+        const errMsg = err.message || "An unexpected error occurred.";
+        if (typeof showCustomAlert === "function") {
+            showCustomAlert(errMsg);
+        } else {
+            alert(errMsg);
+        }
         btn.disabled = false;
         btn.textContent = "Get Access OTP";
     }
 }
+   async function handleVerifyOTP() {
+        const otpInput = document.getElementById("otpInput").value;
+        const regNo = document.getElementById("regNo").value.trim();
 
-    function handleVerifyOTP() {
-        if (document.getElementById("otpInput").value === serverOTP) {
-            displayStatus();
-        } else {
-            showCustomAlert("The security code entered is incorrect. Please check your registered email.");
+        try {
+            const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reg_no: regNo, otp: otpInput })
+            });
+
+            if (response.ok) {
+                displayStatus(); // Show the digital pass
+            } else {
+                showCustomAlert("Invalid or expired OTP. Please try again.");
+            }
+        } catch (err) {
+            showCustomAlert("Connection error. Try again later.");
         }
     }
 
@@ -520,6 +547,17 @@ try {
             setTimeout(() => wrapper.classList.add('visible'), 50);
         }, 400);
     }
+    async function handleResendLogic() {
+    const resendBtn = document.getElementById("resendBtnLink");
+    resendBtn.style.pointerEvents = "none"; // Prevent double clicks
+    resendBtn.textContent = "Sending...";
+    
+    // Simply call handleSendOTP, it will handle the API call and restart the timer
+    await handleSendOTP();
+    
+    resendBtn.style.pointerEvents = "auto";
+    resendBtn.textContent = "Resend OTP Now";
+}
 </script>
 </body>
 </html>

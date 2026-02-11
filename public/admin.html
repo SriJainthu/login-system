@@ -523,6 +523,13 @@ th, td {
     </div>
 </div>
 <script>
+    (function() {
+            const isLoggedIn = localStorage.getItem("adminLoggedIn");
+            if (isLoggedIn !== "true") {
+                // Not logged in? Redirect to login page immediately
+                window.location.replace("admin-login.html");
+            }
+        })();
     // Add this at the top of your script
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
@@ -531,7 +538,12 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     let eventsList = [];
     let currentIsGroupView = false;
     let eventToDeleteIndex = null;
-
+function logoutAdmin() {
+    // Clear the login flag
+    localStorage.removeItem("adminLoggedIn");
+    // Redirect to login
+    window.location.replace("admin-login.html");
+}
     // --- 1. INITIALIZATION & SYNC ---
     async function fetchEventsFromServer() {
         try {

@@ -82,38 +82,47 @@ async function initiateRegistrationOTP() {
         const response = await fetch(`${API_BASE_URL}/register/send-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: fields.email, reg_no: fields.reg_no }) 
+            // ADDED phone: fields.phone BELOW
+            body: JSON.stringify({ 
+                email: fields.email, 
+                reg_no: fields.reg_no, 
+                phone: fields.phone 
+            }) 
         });
 
-        let data;
-try {
-  data = await response.json();
-} catch {
-  throw new Error("Server error. Please try again.");
+        const data = await response.json();
+        if (!response.ok) {
+    // This will show you the exact error message from the backend 'details'
+    showCustomAlert(data.details || data.message || "An error occurred");
+    resetBtn();
+    return;
 }
-
-
         if (response.status === 409) {
-            // Handled via your custom tooltip alert
-            showCustomAlert(data.message || "This Email or Register Number is already registered.");
+            showCustomAlert(data.message || "Already registered.");
             resetBtn(); 
         } else if (response.ok && data.success) {
-            // Success logic
-            localStorage.setItem("studentData", JSON.stringify(fields));
-            const otpOverlay = document.getElementById('otpOverlay');
-            if (otpOverlay) {
-                otpOverlay.style.display = 'flex';
-                setTimeout(() => { otpOverlay.style.opacity = "1"; }, 10);
-            }
-        } else {
-            // Handle 500 errors using your custom alert instead of the missing div
-            showCustomAlert(data.message || "Server error. Please try again.");
+    localStorage.setItem("studentData", JSON.stringify(fields));
+    
+    const otpOverlay = document.getElementById('otpOverlay');
+    const otpMessage = document.getElementById('otpMessage'); // Ensure this ID exists in your HTML
+
+    if (otpOverlay) {
+        // Update the message text to show the masked email specifically
+        if (otpMessage) {
+            otpMessage.innerHTML = `OTP Verification code sent to:<br>
+                <b style="color:var(--primary-blue)">${maskEmail(fields.email)}</b><br>`;
+        }
+
+        otpOverlay.style.display = 'flex';
+        setTimeout(() => { otpOverlay.style.opacity = "1"; }, 10);
+    }
+}else {
+            // This will now tell you the EXACT error from the server
+            showCustomAlert(`Server Error: ${data.details || data.message || "Failed to send OTP"}`);
             resetBtn();
         }
     } catch (error) {
-        console.error("Fetch error:", error);
-        // Handle connection timeouts or crashes
-        showCustomAlert("Connection error. Please check your internet or if the server is live.");
+        showCustomAlert("Connection Refused. Is the server running?");
         resetBtn();
     }
 }
@@ -266,6 +275,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // 2. Render Events
         eventsDiv.innerHTML = events.map(e => `
+            <div class="token-section" style="margin-left: 28px; margin-top: 10px; display: none;">
+    <label style="font-size: 11px; color: var(--primary-blue); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Join Team</label>
+    <input type="text" 
+           class="team-token-input" 
+           data-event-id="${e.id}"
+           placeholder="Enter existing token or leave blank" 
+           style="width: 90%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(0,198,255,0.3); border-radius: 8px; color: #fff; outline: none;">
+    <div class="token-status" style="font-size: 10px; margin-top: 5px; height: 12px;"></div>
+</div>
             <div class="event-card" id="card-${e.id}" style="margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.02); transition: 0.3s;">
                 <label style="font-weight: bold; display: flex; align-items: center; cursor: pointer;">
                     <input type="checkbox" class="event-checkbox" value="${e.id}" data-name="${e.event_name}" style="margin-right: 12px; transform: scale(1.2);"> 
@@ -309,6 +327,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }
         });
+        eventsDiv.addEventListener("input", (e) => {
+    if (e.target.classList.contains("team-token-input")) {
+        const statusDisplay = e.target.parentElement.querySelector(".token-status");
+        const eventId = e.target.getAttribute("data-event-id");
+        validateTeamToken(eventId, e.target.value, statusDisplay);
+    }
+});
 
     } catch (err) {
         console.error("Error loading events:", err);
@@ -377,4 +402,33 @@ function submitRegistration() {
         registerBtn.disabled = false;
         registerBtn.innerText = "Submit";
     });
+}async function validateTeamToken(eventId, token, statusDisplay) {
+    if (!token || token.trim() === "") {
+        statusDisplay.textContent = "✓ You will be the Team Leader";
+        statusDisplay.style.color = "#00ffae";
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/validate-token?eventId=${eventId}&token=${token}`);
+        const data = await response.json();
+        
+        statusDisplay.textContent = data.message;
+        statusDisplay.style.color = (data.status === "join") ? "#00ffae" : "#ff4d4d";
+    } catch (err) {
+        console.error("Token check failed");
+    }
+}
+// Function to mask phone number: 9687451243 -> 96*****43
+function maskEmail(email) {
+    if (!email) return "your email";
+    const [user, domain] = email.split("@");
+    // Shows first letter, then stars, then the domain (e.g., j*****@gmail.com)
+    return user.charAt(0) + "*****@" + domain;
+}
+function maskPhone(phone) {
+    if (!phone) return "your number";
+    const str = phone.toString();
+    // Shows first 2 and last 2 digits (e.g., 96*****43)
+    return str.slice(0, 2) + "*****" + str.slice(-2);
 }

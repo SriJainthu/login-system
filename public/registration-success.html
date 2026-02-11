@@ -280,13 +280,36 @@
     </a>
   </div>
 
-  <div style="margin-top: 25px; font-size: 11px; color: #666;">
-    A confirmation email has been sent to your registered address.
-  </div>
-
+  <div style="margin-top: 25px; font-size: 11px; color: #888; line-height: 1.5;">
+    A confirmation message has been sent to your <br>
+    WhatsApp number: <span id="masked-phone" style="color: var(--accent); font-weight: bold;">Updating...</span>
 </div>
 
+</div>
 <script>
+  // Helper to mask phone (e.g., 9687451243 -> 96*****43)
+  function maskPhone(phone) {
+    if (!phone) return "your number";
+    const str = phone.toString();
+    return str.slice(0, 2) + "*****" + str.slice(-2);
+  }
+
+  function displayRegistrationInfo() {
+    // Retrieve the data we saved in the previous step
+    const studentData = JSON.parse(localStorage.getItem("studentData"));
+    const phoneDisplay = document.getElementById('masked-phone');
+
+    if (studentData && studentData.phone) {
+      phoneDisplay.textContent = maskPhone(studentData.phone);
+    } else {
+      phoneDisplay.textContent = "your registered number";
+    }
+
+    // Optional: Clear localStorage if you don't want the data 
+    // to persist after the user sees this page
+    // localStorage.removeItem("studentData"); 
+  }
+
   // Simple Confetti Generator
   function createConfetti() {
     const wrapper = document.getElementById('confetti-wrapper');
@@ -303,7 +326,11 @@
       wrapper.appendChild(conf);
     }
   }
-  window.onload = createConfetti;
+
+  window.onload = () => {
+    createConfetti();
+    displayRegistrationInfo();
+  };
 </script>
 
 </body>

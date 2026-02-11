@@ -412,22 +412,25 @@
             console.error("Sync Error:", err);
         }
     }
-
-    function toggleEvent(el, name) {
-        if (el.classList.contains('selected')) {
-            el.classList.remove('selected');
-            selectedList = selectedList.filter(item => item !== name);
+// Fix 1: Normalize names when tracking validation
+function toggleEvent(el, name) {
+    const normalizedName = name.trim().toLowerCase(); 
+    if (el.classList.contains('selected')) {
+        el.classList.remove('selected');
+        selectedList = selectedList.filter(item => item !== name);
+        delete validatedTokens[normalizedName]; // Clean up
+    } else {
+        if (selectedList.length < adminEventLimit) {
+            el.classList.add('selected');
+            selectedList.push(name);
+            // Default to true because "Leader Mode" (blank) is valid until they type
+            validatedTokens[normalizedName] = true; 
         } else {
-            if (selectedList.length < adminEventLimit) {
-                el.classList.add('selected');
-                selectedList.push(name);
-                validatedTokens[name] = true;
-            } else {
-                openAlert(`Symposium rules allow a maximum of ${adminEventLimit} events.`, "Limit Reached");
-            }
+            openAlert(`Limit reached!`, "Limit Reached");
         }
-        updateState();
     }
+    updateState();
+}
 
     function updateState() {
         document.getElementById('count').textContent = selectedList.length;

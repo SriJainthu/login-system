@@ -1,9 +1,10 @@
 {
   "name": "login-system",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Symposium 2026 Registration System",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,7 +20,11 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "mysql2": "^3.16.2",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.13",
-    "resend": "^6.9.1"
+    "qrcode-terminal": "^0.12.0",
+    "resend": "^6.9.1",
+    "whatsapp-web.js": "^1.34.6",
+    "wwebjs-mysql": "^0.1.4"
   }
 }
