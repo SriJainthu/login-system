@@ -11,10 +11,10 @@ const mysqlPromise = require('mysql2/promise');
 const qrcode = require('qrcode-terminal');
 const cron = require('node-cron');
 
-// 1. INITIALIZE EXPRESS FIRST
+// 1. INITIALIZE EXPRESS
 const app = express(); 
 
-// 2. DATABASE CONFIGURATION
+// 2. DEFINE CONFIG
 const dbConfig = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -27,13 +27,13 @@ const dbConfig = {
     queueLimit: 0
 };
 
-// 3. CREATE POOLS (Needed for WhatsApp Store)
+// 3. CREATE THE POOLS HERE (Crucial Step!)
+const storePool = mysqlPromise.createPool(dbConfig); // <--- THIS MUST BE HERE
 const db = mysql.createPool(dbConfig);
 const promiseDb = db.promise();
 
-
-// 4. INITIALIZE WHATSAPP (Now storePool is defined!)
-const store = new MysqlStore({ pool: storePool });
+// 4. NOW INITIALIZE WHATSAPP (Now storePool is ready to use)
+const store = new MysqlStore({ pool: storePool }); 
 
 const whatsapp = new Client({
     authStrategy: new RemoteAuth({
@@ -43,11 +43,7 @@ const whatsapp = new Client({
     }),
     puppeteer: {
         headless: true,
-        args: [
-            '--no-sandbox', 
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage'
-        ]
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     }
 });
 
@@ -96,7 +92,7 @@ app.use(express.urlencoded({ extended: true }));
 // ... Rest of your routes below (send-otp, register, etc.)
 
 // NEW: Second pool specifically for the WhatsApp session store
-const storePool = mysqlPromise.createPool(dbConfig);
+
 cron.schedule('0 0 * * *', () => {
     console.log("🕛 Midnight: Resetting Daily Email Counter.");
     emailCounter = 0;
