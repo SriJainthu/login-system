@@ -33,7 +33,10 @@ const db = mysql.createPool(dbConfig);
 const promiseDb = db.promise();
 
 // 4. NOW INITIALIZE WHATSAPP (Now storePool is ready to use)
-const store = new MysqlStore({ pool: storePool }); 
+const store = new MysqlStore({ 
+    pool: storePool,
+    table: { name: 'whatsapp_sessions' } // Add this line!
+}); 
 
 const whatsapp = new Client({
     authStrategy: new RemoteAuth({
