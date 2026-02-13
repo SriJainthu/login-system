@@ -30,7 +30,7 @@ const dbConfig = {
 // 3. CREATE POOLS (Needed for WhatsApp Store)
 const db = mysql.createPool(dbConfig);
 const promiseDb = db.promise();
-const storePool = mysqlPromise.createPool(dbConfig);
+
 
 // 4. INITIALIZE WHATSAPP (Now storePool is defined!)
 const store = new MysqlStore({ pool: storePool });
