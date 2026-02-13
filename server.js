@@ -5,19 +5,40 @@ const cors = require("cors");
 const nodemailer = require("nodemailer");
 require('dotenv').config();
 
-// CHANGE HERE: Add the RemoteAuth and MysqlStore imports
 const { Client, RemoteAuth } = require('whatsapp-web.js');
 const { MysqlStore } = require('wwebjs-mysql');
-const mysqlPromise = require('mysql2/promise'); // Added this
+const mysqlPromise = require('mysql2/promise');
 const qrcode = require('qrcode-terminal');
 const cron = require('node-cron');
 
+// 1. INITIALIZE EXPRESS FIRST
+const app = express(); 
+
+// 2. DATABASE CONFIGURATION
+const dbConfig = {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    ssl: { rejectUnauthorized: false }, 
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+};
+
+// 3. CREATE POOLS (Needed for WhatsApp Store)
+const db = mysql.createPool(dbConfig);
+const promiseDb = db.promise();
+const storePool = mysqlPromise.createPool(dbConfig);
+
+// 4. INITIALIZE WHATSAPP (Now storePool is defined!)
 const store = new MysqlStore({ pool: storePool });
 
 const whatsapp = new Client({
     authStrategy: new RemoteAuth({
         store: store,
-        backupSyncIntervalMs: 300000, // Syncs session to Aiven every 5 mins
+        backupSyncIntervalMs: 300000,
         clientId: 'symposium_2026'
     }),
     puppeteer: {
@@ -29,23 +50,24 @@ const whatsapp = new Client({
         ]
     }
 });
+
+// 5. WHATSAPP EVENTS
 whatsapp.on('remote_session_saved', () => {
     console.log('✅ WhatsApp session successfully backed up to Aiven Cloud!');
 });
-// Event: Generate QR Code in Terminal
+
 whatsapp.on('qr', (qr) => {
     console.log('SCAN THIS QR CODE WITH YOUR WHATSAPP:');
     qrcode.generate(qr, { small: true });
 });
 
-// Event: Successfully Logged In
 whatsapp.on('ready', () => {
     console.log('WhatsApp Client is ready!');
 });
 
-// Start the client
 whatsapp.initialize();
-/* ---------- EMAIL CONFIGURATION (NODEMAILER) ---------- */
+
+// 6. EMAIL CONFIGURATION
 const transporter1 = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.EMAIL_USER_1, pass: process.env.EMAIL_PASS_1 }
@@ -56,45 +78,22 @@ const transporter2 = nodemailer.createTransport({
     auth: { user: process.env.EMAIL_USER_2, pass: process.env.EMAIL_PASS_2 }
 });
 
-transporter1.verify((err) => {
-    if (err) console.error("❌ Email 1 Error:", err);
-    else console.log("✅ Email 1 Ready");
-});
-transporter2.verify((err) => {
-    if (err) console.error("❌ Email 2 Error:", err);
-    else console.log("✅ Email 2 Ready");
-});
-
-/* ---------- GLOBAL SETTINGS ---------- */
+/* ---------- GLOBAL SETTINGS & MIDDLEWARE ---------- */
 let globalSettings = { 
     event_selection_limit: 3,
     registration_deadline: "2026-03-15T09:00:00" 
 };
 
-/* ---------- MIDDLEWARE ---------- */
+let emailCounter = 0; // Added missing variable
+const EMAIL_LIMIT = 450; // Added missing variable
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
-// Add these BEFORE your routes
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-/* ---------- DATABASE (POOL) ---------- */
-// NEW: Database configuration object (used by both pools)
-const dbConfig = {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    ssl: { rejectUnauthorized: false }, // CRITICAL for Aiven
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-};
-
-const db = mysql.createPool(dbConfig);
-const promiseDb = db.promise();
+// ... Rest of your routes below (send-otp, register, etc.)
 
 // NEW: Second pool specifically for the WhatsApp session store
 const storePool = mysqlPromise.createPool(dbConfig);
