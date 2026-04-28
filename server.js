@@ -8,10 +8,10 @@ let emailCounter = 0;
 const EMAIL_LIMIT = 450; // Set slightly below 500 for safety
 const app = express();
 /*const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
+const qrcode = require('qrcode-terminal');*/
 const cron = require('node-cron');
 
-// Initialize WhatsApp Client
+/*// Initialize WhatsApp Client
 const whatsapp = new Client({
     authStrategy: new LocalAuth(), // This saves your session so you don't scan every time
     puppeteer: {
