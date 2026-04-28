@@ -1,0 +1,41 @@
+body{
+  background:linear-gradient(120deg,#6a11cb,#2575fc);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Arial;
+}
+
+.card{
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  width:350px;
+}
+
+.card.wide{ width:90%; }
+
+input,button{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  color:black;
+}
+
+button{
+  background:#2575fc;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+td,th{
+  border:1px solid #ccc;
+  padding:8px;
+}
