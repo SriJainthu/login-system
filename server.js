@@ -35,13 +35,29 @@ whatsapp.on('ready', () => {
 whatsapp.initialize();*/
 /* ---------- EMAIL CONFIGURATION (NODEMAILER) ---------- */
 const transporter1 = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: process.env.EMAIL_USER_1, pass: process.env.EMAIL_PASS_1 }
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Use TLS
+    auth: { 
+        user: process.env.EMAIL_USER_1, 
+        pass: process.env.EMAIL_PASS_1 
+    },
+    tls: {
+        rejectUnauthorized: false // Helps avoid connection drops
+    }
 });
 
 const transporter2 = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: process.env.EMAIL_USER_2, pass: process.env.EMAIL_PASS_2 }
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: { 
+        user: process.env.EMAIL_USER_2, 
+        pass: process.env.EMAIL_PASS_2 
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
 });
 
 transporter1.verify((err) => {
@@ -541,6 +557,15 @@ app.post('/admin/add-event', (req, res) => {
         if (err) return res.status(500).json({ success: false, error: err.sqlMessage });
         res.json({ success: true });
     });
+});
+/* ---------- DATABASE CONNECTION TEST ---------- */
+db.getConnection((err, connection) => {
+    if (err) {
+        console.error("❌ MySQL Connection Failed:", err.message);
+    } else {
+        console.log("✅ MySQL Connected Successfully to Railway!");
+        connection.release(); // Always release the connection back to the pool
+    }
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));
