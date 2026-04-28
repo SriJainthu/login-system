@@ -37,27 +37,35 @@ whatsapp.initialize();*/
 const transporter1 = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: false, // Use TLS
+    secure: false, 
     auth: { 
         user: process.env.EMAIL_USER_1, 
         pass: process.env.EMAIL_PASS_1 
     },
     tls: {
-        rejectUnauthorized: false // Helps avoid connection drops
-    }
+        // This forces the connection to stay open and ignore local network quirks
+        rejectUnauthorized: false,
+        minVersion: "TLSv1.2"
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000
 });
 
 const transporter2 = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: false,
+    secure: false, 
     auth: { 
         user: process.env.EMAIL_USER_2, 
         pass: process.env.EMAIL_PASS_2 
     },
     tls: {
-        rejectUnauthorized: false
-    }
+        // This forces the connection to stay open and ignore local network quirks
+        rejectUnauthorized: false,
+        minVersion: "TLSv1.2"
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000
 });
 
 transporter1.verify((err) => {
