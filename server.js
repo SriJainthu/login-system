@@ -77,10 +77,11 @@ let globalSettings = {
 
 /* ---------- MIDDLEWARE ---------- */
 app.use(cors({
-    origin: "*",   // allow all (for now)
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"],
+    origin: "https://login-system-1-nowr.onrender.com",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
 }));
+app.options('*', cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
 // Add these BEFORE your routes
