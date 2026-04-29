@@ -76,8 +76,14 @@ let globalSettings = {
 };
 
 /* ---------- MIDDLEWARE ---------- */
-app.use(cors());
-
+app.use(cors({
+    origin: [
+        "https://login-system-1-nowr.onrender.com",
+        "http://localhost:5500"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
 app.use(bodyParser.json());
 
 // Add these BEFORE your routes
