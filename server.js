@@ -79,7 +79,7 @@ let globalSettings = {
 app.use(cors());
 
 app.use(bodyParser.json());
-app.use(express.static("public"));
+
 // Add these BEFORE your routes
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
@@ -568,5 +568,6 @@ db.getConnection((err, connection) => {
         connection.release(); // Always release the connection back to the pool
     }
 });
+app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));
