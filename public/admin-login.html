@@ -355,7 +355,7 @@
 <script>
     const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
-    : 'https://login-system-1-vcj6.onrender.com';
+    : '';  // SAME DOMAIN
     gsap.registerPlugin(MorphSVGPlugin);
 
     // Updated Selectors to match your HTML IDs
@@ -459,7 +459,7 @@
         }
     }
 
-    
+
     function onEmailFocus() { activeElement = "email"; onEmailInput(); }
     function onEmailBlur() { activeElement = null; setTimeout(() => { if (activeElement !== "email") resetFace(); }, 100); }
     function onPasswordFocus() { activeElement = "password"; if (!eyesCovered) coverEyes(); }
