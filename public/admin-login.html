@@ -459,6 +459,7 @@
         }
     }
 
+    
     function onEmailFocus() { activeElement = "email"; onEmailInput(); }
     function onEmailBlur() { activeElement = null; setTimeout(() => { if (activeElement !== "email") resetFace(); }, 100); }
     function onPasswordFocus() { activeElement = "password"; if (!eyesCovered) coverEyes(); }

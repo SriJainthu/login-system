@@ -77,11 +77,9 @@ let globalSettings = {
 
 /* ---------- MIDDLEWARE ---------- */
 app.use(cors({
-    origin: [
-        "https://login-system-1-nowr.onrender.com"
-    ],
+    origin: "*",   // allow all (for now)
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
+    allowedHeaders: ["Content-Type"],
 }));
 app.use(bodyParser.json());
 app.use(express.static("public"));
