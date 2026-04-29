@@ -36,7 +36,9 @@ whatsapp.on('ready', () => {
 whatsapp.initialize();*/
 /* ---------- EMAIL CONFIGURATION (NODEMAILER) ---------- */
 const transporter1 = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // IMPORTANT
     auth: {
         user: process.env.EMAIL_USER_1,
         pass: process.env.EMAIL_PASS_1
@@ -44,7 +46,9 @@ const transporter1 = nodemailer.createTransport({
 });
 
 const transporter2 = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // IMPORTANT
     auth: {
         user: process.env.EMAIL_USER_2,
         pass: process.env.EMAIL_PASS_2
