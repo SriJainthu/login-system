@@ -36,29 +36,19 @@ whatsapp.on('ready', () => {
 whatsapp.initialize();*/
 /* ---------- EMAIL CONFIGURATION (NODEMAILER) ---------- */
 const transporter1 = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // Use SSL for port 465
+    service: "gmail",
     auth: {
         user: process.env.EMAIL_USER_1,
         pass: process.env.EMAIL_PASS_1
-    },
-    pool: true, // This keeps the connection open for multiple emails
-    maxConnections: 5,
-    maxMessages: 100
+    }
 });
 
 const transporter2 = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
+    service: "gmail",
     auth: {
         user: process.env.EMAIL_USER_2,
         pass: process.env.EMAIL_PASS_2
-    },
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 100
+    }
 });
 transporter1.verify((err) => {
     if (err) console.error("❌ Email 1 Error:", err);
