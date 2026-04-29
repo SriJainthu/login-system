@@ -1,6 +1,6 @@
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
-    : 'https://login-system-1-vcj6.onrender.com';
+    : 'https://login-system-1-nowr.onrender.com';
 const validators = {
     name: value => /^[A-Za-z\s]+$/.test(value),
     college: value => /^[A-Za-z\s]+$/.test(value),

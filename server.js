@@ -1,5 +1,6 @@
 const express = require("express");
-const mysql = require("mysql2");
+const db = require('./db');
+//const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const nodemailer = require("nodemailer"); // Added Nodemailer
@@ -83,7 +84,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* ---------- DATABASE (POOL) ---------- */
-const db = mysql.createPool({
+/*const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
@@ -93,7 +94,7 @@ const db = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0
 });
-
+*/
 const promiseDb = db.promise();
 cron.schedule('0 0 * * *', () => {
     console.log("🕛 Midnight: Resetting Daily Email Counter.");
@@ -562,7 +563,7 @@ db.getConnection((err, connection) => {
     if (err) {
         console.error("❌ MySQL Connection Failed:", err.message);
     } else {
-        console.log("✅ MySQL Connected Successfully to Railway!");
+       console.log("✅ MySQL Connected Successfully to Aiven!");
         connection.release(); // Always release the connection back to the pool
     }
 });
