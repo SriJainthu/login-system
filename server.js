@@ -319,7 +319,7 @@ app.post("/send-otp", async (req, res) => {
 
  
 
-       if (currentCount >= 1) {
+      if (currentCount >= 3) {
             console.log(`🚫 Blocked: ${reg_no} reached daily limit of 3.`);
             return res.status(429).json({ 
                 success: false, 
