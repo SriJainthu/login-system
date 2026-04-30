@@ -3,7 +3,7 @@ const db = require('./db');
 //const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const nodemailer = require("nodemailer"); // Added Nodemailer
+const axios = require('axios'); // Added Nodemailer
 require('dotenv').config();
 let emailCounter = 0;
 const EMAIL_LIMIT = 450; // Set slightly below 500 for safety
@@ -35,33 +35,11 @@ whatsapp.on('ready', () => {
 // Start the client
 whatsapp.initialize();*/
 /* ---------- EMAIL CONFIGURATION (NODEMAILER) ---------- */
-const transporter1 = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // IMPORTANT
-    auth: {
-        user: process.env.EMAIL_USER_1,
-        pass: process.env.EMAIL_PASS_1
-    }
-});
-
-const transporter2 = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // IMPORTANT
-    auth: {
-        user: process.env.EMAIL_USER_2,
-        pass: process.env.EMAIL_PASS_2
-    }
-});
-transporter1.verify((err) => {
-    if (err) console.error("❌ Email 1 Error:", err);
-    else console.log("✅ Email 1 Ready");
-});
-transporter2.verify((err) => {
-    if (err) console.error("❌ Email 2 Error:", err);
-    else console.log("✅ Email 2 Ready");
-});
+const BREVO_ACCOUNTS = [
+    { apiKey: process.env.BREVO_API_KEY_1, email: process.env.BREVO_EMAIL_1, limit: 300 },
+    { apiKey: process.env.BREVO_API_KEY_2, email: process.env.BREVO_EMAIL_2, limit: 300 },
+];
+console.log("✅ Brevo Email Service Ready");
 
 /* ---------- GLOBAL SETTINGS ---------- */
 let globalSettings = { 
@@ -102,31 +80,39 @@ cron.schedule('0 0 * * *', () => {
     emailCounter = 0;
 });
 
-/* ---------- IMPROVED EMAIL SWITCHER ---------- */
 async function sendSymposiumEmail(mailOptions) {
     emailCounter++;
-    
-    let activeTransporter;
-    let activeEmail;
 
-    if (emailCounter <= EMAIL_LIMIT) {
-        // Use Account 1 (0 to 450)
-        activeTransporter = transporter1;
-        activeEmail = process.env.EMAIL_USER_1;
-    } else if (emailCounter > EMAIL_LIMIT && emailCounter <= (EMAIL_LIMIT * 2)) {
-        // Use Account 2 (451 to 900)
-        activeTransporter = transporter2;
-        activeEmail = process.env.EMAIL_USER_2;
-    } else {
-        // Critical: Both accounts exhausted (900+ emails)
-        console.error("🚨 CRITICAL: Daily limit reached for ALL email accounts!");
+    let accountIndex = -1;
+    let cumulative = 0;
+    for (let i = 0; i < BREVO_ACCOUNTS.length; i++) {
+        cumulative += BREVO_ACCOUNTS[i].limit;
+        if (emailCounter <= cumulative) { accountIndex = i; break; }
+    }
+
+    if (accountIndex === -1) {
         throw new Error("Daily registration limit reached. Please contact admin.");
     }
 
-    console.log(`[Email Log] Using: ${activeEmail} | Today's Total: ${emailCounter}`);
+    const account = BREVO_ACCOUNTS[accountIndex];
+    console.log(`[Email] Account ${accountIndex + 1}: ${account.email} | Total: ${emailCounter}`);
 
-    mailOptions.from = `"Symposium 2026" <${activeEmail}>`;
-    return activeTransporter.sendMail(mailOptions);
+    const response = await axios.post(
+        'https://api.brevo.com/v3/smtp/email',
+        {
+            sender: { name: "Symposium 2026", email: account.email },
+            to: [{ email: mailOptions.to }],
+            subject: mailOptions.subject,
+            htmlContent: mailOptions.html,
+        },
+        {
+            headers: {
+                'api-key': account.apiKey,
+                'Content-Type': 'application/json',
+            }
+        }
+    );
+    return response.data;
 }
 app.post("/register/send-otp", async (req, res) => {
     const { email, reg_no } = req.body; 
