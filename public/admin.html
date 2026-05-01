@@ -1213,7 +1213,7 @@ async function confirmDeleteAllFromModal() {
 
     try {
         const res = await fetch(`${API_BASE_URL}/admin/delete-all-students`, {
-            method: "DELETE",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
