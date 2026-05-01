@@ -247,42 +247,50 @@
         });
 
         // --- UPDATED DYNAMIC LOADING ---
-        const loadDynamicEvents = async () => {
-            const grid = document.getElementById("eventGrid");
-            
-            try {
-                // Fetch events from your Node.js server
-                const response = await fetch(`${API_BASE_URL}/events`);
-                const adminEvents = await response.json();
+       const loadDynamicEvents = async () => {
+    const grid = document.getElementById("eventGrid");
 
-                if (adminEvents && adminEvents.length > 0) {
-                    grid.innerHTML = ""; 
-                    
-                    adminEvents.forEach((event, index) => {
-                        const card = document.createElement("div");
-                        card.className = "event-card";
-                        card.style.animationDelay = `${(index + 1) * 0.1}s`;
-                        
-                        // Note: Using 'event_name' and 'description' to match 
-                        // your MySQL column names exactly
-                        card.innerHTML = `
-                            <h3>${event.event_name}</h3>
-                            <p>${event.description || "No description available."}</p>
-                            <div style="margin-top:15px; font-size:12px; color:var(--accent);">
-                                Max Team Size: ${event.max_team_size}
-                            </div>
-                        `;
-                        grid.appendChild(card);
-                    });
-                } else {
-                    grid.innerHTML = "<p style='grid-column: 1/-1; color: #666;'>No events are currently listed.</p>";
-                }
-            } catch (error) {
-                console.error("Error fetching events:", error);
-                grid.innerHTML = "<p style='grid-column: 1/-1; color: #ff4d4d;'>Failed to load events from server.</p>";
-            }
-        };
+    try {
+        const response = await fetch(`${API_BASE_URL}/events`);
 
+        if (!response.ok) throw new Error("Server error");
+
+        const adminEvents = await response.json();
+
+        if (adminEvents && adminEvents.length > 0) {
+            grid.innerHTML = "";
+
+            adminEvents.forEach((event, index) => {
+                const card = document.createElement("div");
+                card.className = "event-card";
+                card.style.animationDelay = `${(index + 1) * 0.1}s`;
+
+                card.innerHTML = `
+                    <h3>${event.event_name}</h3>
+                    <p>${event.description || "No description available."}</p>
+                    <div style="margin-top:15px; font-size:12px; color:var(--accent);">
+                        Max Team Size: ${event.max_team_size}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+        } else {
+            grid.innerHTML = "<p style='grid-column: 1/-1; color: #666;'>No events available.</p>";
+        }
+
+    } catch (error) {
+        console.error(error);
+
+        grid.innerHTML = `
+            <p style="grid-column:1/-1; color:#ff4d4d;">
+                Failed to load events.<br>
+                <button onclick="location.reload()">Retry</button>
+            </p>
+        `;
+    }
+};
         loadDynamicEvents();
     });
 </script>

@@ -72,8 +72,11 @@ app.use(express.urlencoded({ extended: true }));
 */
 const promiseDb = db.promise();
 cron.schedule('0 0 * * *', () => {
-    console.log("🕛 Midnight: Resetting Daily Email Counter.");
+    console.log("🕛 Midnight IST: Resetting Daily Email Counter.");
     emailCounter = 0;
+}, {
+    scheduled: true,
+    timezone: "Asia/Kolkata"
 });
 
 async function sendSymposiumEmail(mailOptions) {
@@ -296,7 +299,6 @@ app.post("/send-otp", async (req, res) => {
     const { reg_no } = req.body;
     
     try {
-        // 1. Check if the student exists in the database
         const [students] = await promiseDb.query(
             "SELECT id, email, name, otp_count, last_otp_date FROM students WHERE reg_no = ?", 
             [reg_no]
@@ -307,22 +309,28 @@ app.post("/send-otp", async (req, res) => {
         }
 
         const student = students[0];
-        // This gets the current date in YYYY-MM-DD format based on the server time
-        const today = new Date().toISOString().split('T')[0]; 
+
+        // --- UPDATED DATE LOGIC FOR IST ---
+        // 'en-CA' gives YYYY-MM-DD which matches MySQL DATE format perfectly
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); 
+        
+        // Convert the DB date to the same YYYY-MM-DD format for a fair comparison
         const dbDateString = student.last_otp_date ? 
-            new Date(student.last_otp_date).toISOString().split('T')[0] : null;
+            new Date(student.last_otp_date).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }) : null;
+        
         let currentCount = (dbDateString === today) ? (student.otp_count || 0) : 0;
+        // ----------------------------------
 
- 
-
-      if (currentCount >= 3) {
-            console.log(`🚫 Blocked: ${reg_no} reached daily limit of 3.`);
+        if (currentCount >= 3) {
             return res.status(429).json({ 
                 success: false, 
                 message: "Daily limit reached. You can only request 3 OTPs per day." 
             });
         }
+
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Save the updated count and today's IST date back to the DB
         await promiseDb.query(
             "UPDATE students SET otp_count = ?, last_otp_date = ? WHERE reg_no = ?",
             [currentCount + 1, today, reg_no]
