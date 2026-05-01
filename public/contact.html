@@ -177,37 +177,37 @@
     <div class="main-content">
         <div class="contact-info-card">
             <h2>Venue & Support</h2>
-            <p>University College of Engineering Nagercoil, Konam, Kanyakumari District.</p>
-            
+           <p id="contactMainLocation">Loading...</p>
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="icon">V</div>
-                    <b>Location</b>
-                    <span>UCE Nagercoil,<br>Konam, Nagercoil</span>
-                </div>
-                <div class="info-item">
-                    <div class="icon">E</div>
-                    <b>Email Us</b>
-                    <span>symposium@ucen.ac.in</span>
-                </div>
-                <div class="info-item">
-                    <div class="icon">C</div>
-                    <b>Call Support</b>
-                    <span>+91 04652 260511</span>
-                </div>
+    <div class="icon">V</div>
+    <b>Location</b>
+    <span id="contactLocation">Loading...</span>
+</div>
+
+<div class="info-item">
+    <div class="icon">E</div>
+    <b>Email Us</b>
+    <span id="contactEmail">Loading...</span>
+</div>
+
+<div class="info-item">
+    <div class="icon">C</div>
+    <b>Call Support</b>
+    <span id="contactPhone">Loading...</span>
+</div>
             </div>
         </div>
 
         <div class="map-wrapper">
     <iframe 
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3949.332349079933!2d77.4120586757657!3d8.166835391863923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b04f0e513adaba1%3A0xe22e3eb86c9146bf!2sUniversity%20College%20of%20Engineering%2CNagercoil!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
-        width="100%" 
-        height="100%" 
-        style="border:0;" 
-        allowfullscreen="" 
-        loading="lazy" 
-        referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
+    id="mapFrame"
+    width="100%" 
+    height="100%" 
+    style="border:0;" 
+    allowfullscreen="" 
+    loading="lazy">
+</iframe>
 </div>
     </div>
 
@@ -229,6 +229,17 @@
                 }
             });
         });
+        async function loadContact() {
+    const res = await fetch("/api/contact");
+    const data = await res.json();
+
+    document.getElementById("contactLocation").innerText = data.contact_location;
+    document.getElementById("contactEmail").innerText = data.contact_email;
+    document.getElementById("contactPhone").innerText = data.contact_phone;
+    document.getElementById("mapFrame").src = data.contact_map_embed;
+}
+
+loadContact();
     </script>
 </body>
 </html>

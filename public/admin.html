@@ -631,6 +631,21 @@ th, td {
         Save Title
     </button>
 </div>
+<div class="admin-config-box">
+    <label style="font-size: 11px; color: #00c6ff; font-weight: bold;">
+        Contact Page Settings
+    </label>
+
+    <input type="text" id="adminEmail" placeholder="Email">
+    <input type="text" id="adminPhone" placeholder="Phone">
+    <textarea id="adminLocation" placeholder="Location"></textarea>
+    <textarea id="adminMap" placeholder="Google Map Embed URL"></textarea>
+
+    <button class="btn btn-confirm" onclick="updateContactDetails()">
+        Save Contact Info
+    </button>
+</div>
+
                         <label style="font-size: 11px; color: #00c6ff; text-transform: uppercase; font-weight: bold;">Selection Limit</label>
                         <p id="limitStatus" style="font-size: 10px; color: #aaa; margin: 4px 0;">Max events per student</p>
                         <input type="number" id="adminLimitInput" min="1" max="6" placeholder="Limit (e.g. 3)" style="margin-top:5px; padding: 5px;" oninput="handleLimitChange()">
@@ -1288,6 +1303,25 @@ async function updateHomepageText() {
 }
 function handleHomepageTextChange() {
     document.querySelector("#homepageTextContainer .btn-confirm").style.display = "block";
+}
+async function updateContactDetails() {
+    const email = document.getElementById("adminEmail").value;
+    const phone = document.getElementById("adminPhone").value;
+    const location = document.getElementById("adminLocation").value;
+    const map = document.getElementById("adminMap").value;
+
+    await fetch("/api/update-contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            email,
+            phone,
+            location,
+            map
+        })
+    });
+
+    showToast("Contact details updated!");
 }
 </script>
 </body>
