@@ -243,6 +243,36 @@
     0% { transform: translateY(0) rotate(0deg); opacity: 1; }
     100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
   }
+  /* ---------- MOBILE RESPONSIVE ---------- */
+@media (max-width: 600px) {
+    body {
+        align-items: flex-start;
+        padding: 20px 15px;
+        box-sizing: border-box;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
+
+    .container {
+        width: 100%;
+        padding: 30px 20px;
+        box-sizing: border-box;
+        margin-top: 20px;
+    }
+
+    .success-icon {
+        font-size: 50px;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+    }
+
+    .progress {
+        margin-bottom: 25px;
+    }
+}
 </style>
 </head>
 <body>
