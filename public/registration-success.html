@@ -5,160 +5,109 @@
 <title>Registration Successful | Symposium 2026</title>
 
 <style>
-  :root {
-    --primary: #00c6ff;
-    --accent: #00ffae;
-    --deep-bg: #0f2027;
-  }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 12px;
+  box-sizing: border-box;
+}
 
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-    overflow-x: hidden; /* Prevent horizontal scroll */
-  }
+/* Container */
+.container {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(15px);
+  padding: 28px 20px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+  text-align: center;
+}
+
+/* Progress bar fix */
+.progress {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.progress::before,
+.progress::after {
+  left: 10%;
+  width: 80%;
+}
+
+/* Circle */
+.circle {
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  font-size: 12px;
+}
+
+/* Text */
+h2 {
+  font-size: 1.3rem;
+}
+
+p {
+  font-size: 13px;
+  padding: 0;
+}
+
+/* Buttons */
+.primary-btn {
+  padding: 14px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.outline-btn {
+  padding: 12px;
+  font-size: 12px;
+}
+
+/* Footer text */
+.container div[style] {
+  font-size: 10px !important;
+}
+
+/* 📱 Extra Mobile Optimization */
+@media (max-width: 400px) {
 
   .container {
-    background: rgba(255, 255, 255, 0.07);
-    backdrop-filter: blur(15px);
-    padding: 40px 30px;
-    border-radius: 24px;
-    width: 100%;
-    max-width: 450px; /* Slightly wider for better text flow */
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    z-index: 10; /* High z-index to ensure buttons are clickable */
-    animation: entranceEffect 0.8s ease-out forwards;
+    padding: 24px 16px;
   }
 
-  /* --- Progress Bar Fix --- */
-  .progress {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 35px;
-    position: relative;
+  h2 {
+    font-size: 1.2rem;
   }
 
-  .progress::before {
-    content: "";
-    position: absolute;
-    top: 15px;
-    left: 15%;
-    width: 70%;
-    height: 2px;
-    background: rgba(255,255,255,0.1);
-  }
-
-  .progress::after {
-    content: "";
-    position: absolute;
-    top: 15px;
-    left: 15%;
-    width: 70%;
-    height: 2px;
-    background: var(--primary);
-    box-shadow: 0 0 10px var(--primary);
-    animation: fillBar 1.2s ease-in-out;
-  }
-
-  @keyframes fillBar { from { width: 0; } to { width: 70%; } }
-
-  .step { width: 33%; position: relative; z-index: 2; }
-  .circle {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: var(--primary);
-    margin: 0 auto 8px;
-    line-height: 30px;
-    color: #000;
-    font-weight: bold;
-    font-size: 14px;
-  }
-  .label { font-size: 10px; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
-
-  /* --- Content Styling --- */
   .success-icon {
-    font-size: 60px;
-    color: var(--accent);
-    margin: 10px 0 20px;
-    text-shadow: 0 0 20px rgba(0, 255, 174, 0.3);
+    font-size: 48px;
   }
 
-  h2 { font-size: 1.6rem; margin: 0 0 10px; font-weight: 300; }
-  h2 span { color: var(--accent); font-weight: 700; }
-  p { font-size: 14px; color: #aaa; line-height: 1.6; margin-bottom: 30px; padding: 0 10px; }
+  .label {
+    font-size: 8px;
+  }
 
-  /* --- Buttons Fix --- */
-  .btn-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
+  .circle {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
   }
 
   .primary-btn {
-    width: 100%;
-    padding: 16px; /* Larger hit area for thumbs */
-    background: linear-gradient(90deg, #00c6ff, #0072ff);
-    border: none;
-    border-radius: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: 0.3s;
-    font-size: 14px;
+    padding: 12px;
   }
-
-  .outline-btn {
-    width: 100%;
-    padding: 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    color: #ccc;
-    font-size: 13px;
-    text-decoration: none;
-    text-align: center;
-    box-sizing: border-box;
-  }
-
-  /* --- MOBILE SPECIFIC FIXES --- */
-  @media (max-width: 480px) {
-    body { padding: 10px; }
-    .container {
-      padding: 30px 20px;
-      border-radius: 20px;
-    }
-    h2 { font-size: 1.4rem; }
-    p { font-size: 13px; }
-    .circle { width: 26px; height: 26px; line-height: 26px; font-size: 12px; }
-    .label { font-size: 9px; }
-  }
-
-  /* Confetti Styling */
-  .confetti {
-    position: absolute;
-    top: -10px;
-    opacity: 0;
-    pointer-events: none;
-    animation: fall 3s linear forwards;
-  }
-  @keyframes fall {
-    to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-    0% { opacity: 1; }
-  }
+}
 </style>
 </head>
 <body>
@@ -184,7 +133,7 @@
 
   <div class="success-icon">✦</div>
   <h2>Registration <span>Successful</span></h2>
-  <p>Your details and event selections have been securely recorded. You can see your live status of team memebers</p>
+  <p>Your details and event selections have been securely recorded. You can see your live status of team members</p>
 
   <div class="btn-group">
     <button class="primary-btn" onclick="window.location.href='view-registration.html'">
