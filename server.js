@@ -639,24 +639,36 @@ app.post("/admin/delete-all-students", async (req, res) => {
     }
 });
 app.post("/api/update-contact", async (req, res) => {
-    const { email, phone, location, map } = req.body;
+    try {
+        const { email, phone, location, map } = req.body;
 
-    await db.query(`
-        UPDATE symposium_settings
-        SET 
-            contact_email = ?, 
-            contact_phone = ?, 
-            contact_location = ?, 
-            contact_map_embed = ?
-        WHERE id = 1
-    `, [email, phone, location, map]);
+        await promiseDb.query(`
+            UPDATE symposium_settings
+            SET 
+                contact_email = ?, 
+                contact_phone = ?, 
+                contact_location = ?, 
+                contact_map_embed = ?
+            WHERE id = 1
+        `, [email, phone, location, map]);
 
-    res.json({ success: true });
+        res.json({ success: true });
+
+    } catch (err) {
+        console.error("❌ Contact update error:", err);
+        res.status(500).json({ error: "Update failed" });
+    }
 });
-
 app.get("/api/contact", async (req, res) => {
-    const [rows] = await db.query("SELECT * FROM symposium_settings WHERE id = 1");
-    res.json(rows[0]);
+    try {
+        const [rows] = await promiseDb.query(
+            "SELECT * FROM symposium_settings WHERE id = 1"
+        );
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("❌ Contact fetch error:", err);
+        res.status(500).json({ error: "Failed to load contact" });
+    }
 });
 app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
