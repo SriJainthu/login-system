@@ -636,10 +636,10 @@ th, td {
         Contact Page Settings
     </label>
 
-    <input type="text" id="adminEmail" placeholder="Email" onclick="updateHomepageText()">
-    <input type="text" id="adminPhone" placeholder="Phone" onclick="updateHomepageText()">
-    <textarea id="adminLocation" placeholder="Location" onclick="updateHomepageText()"></textarea>
-    <textarea id="adminMap" placeholder="Google Map Embed URL" onclick="updateHomepageText()"></textarea>
+    <input type="text" id="adminEmail" placeholder="Email" oninput="handleHomepageTextChange()">
+    <input type="text" id="adminPhone" placeholder="Phone" oninput="handleHomepageTextChange()">
+    <textarea id="adminLocation" placeholder="Location" oninput="handleHomepageTextChange()"></textarea>
+    <textarea id="adminMap" placeholder="Google Map Embed URL" oninput="handleHomepageTextChange()"></textarea>
 
     <button class="btn btn-confirm" onclick="updateContactDetails()">
         Save Contact Info
