@@ -244,8 +244,8 @@
     </div>
 
     <section class="hero">
-        <p>DEPARTMENT OF COMPUTER SCIENCE PRESENTS</p>
-        <h1>SYMPOSIUM '26</h1>
+        <p id="headerText">DEPARTMENT OF COMPUTER SCIENCE PRESENTS</p>
+<h1 id="symposiumTitle">SYMPOSIUM '26</h1>
         
         <div class="countdown" id="timer">
             <div class="time-box"><span id="days">00</span><label>Days</label></div>
@@ -336,6 +336,20 @@ async function updateTimer() {
         document.getElementById("secs").innerText = s < 10 ? "0"+s : s;
     }
 }
+async function loadHomepageText() {
+    const res = await fetch("/api/settings");
+    const data = await res.json();
+
+    if (data) {
+        document.getElementById("headerText").innerText =
+            data.header_text || "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
+
+        document.getElementById("symposiumTitle").innerText =
+            data.symposium_title || "SYMPOSIUM '26";
+    }
+}
+
+loadHomepageText();
 
 // Initial Sync
 syncDeadline();

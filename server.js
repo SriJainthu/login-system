@@ -514,23 +514,43 @@ app.get("/api/settings", async (req, res) => {
 
 app.post("/api/settings", async (req, res) => {
     try {
-        const { limit, deadline } = req.body;
+        const { limit, deadline, header_text, symposium_title } = req.body;
+
         if (limit) {
             await promiseDb.query(
                 "UPDATE symposium_settings SET event_selection_limit = ? WHERE id = 1",
                 [parseInt(limit)]
             );
         }
+
         if (deadline) {
             await promiseDb.query(
                 "UPDATE symposium_settings SET registration_deadline = ? WHERE id = 1",
                 [deadline]
             );
         }
+
+        // 🔥 NEW
+        if (header_text) {
+            await promiseDb.query(
+                "UPDATE symposium_settings SET header_text = ? WHERE id = 1",
+                [header_text]
+            );
+        }
+
+        if (symposium_title) {
+            await promiseDb.query(
+                "UPDATE symposium_settings SET symposium_title = ? WHERE id = 1",
+                [symposium_title]
+            );
+        }
+
         const [rows] = await promiseDb.query(
             "SELECT * FROM symposium_settings WHERE id = 1"
         );
+
         res.json({ success: true, settings: rows[0] });
+
     } catch (err) {
         console.error("Settings update error:", err);
         res.status(500).json({ error: "Could not update settings" });

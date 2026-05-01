@@ -598,6 +598,37 @@ th, td {
                     </div>
 
                     <div class="admin-config-box" id="limitContainer">
+                        <div class="admin-config-box" id="homepageTextContainer">
+    <label style="font-size: 11px; color: #00c6ff; text-transform: uppercase; font-weight: bold;">
+        Homepage Title
+    </label>
+
+    <p style="font-size: 10px; color: #aaa; margin: 4px 0;">
+        Edit landing page heading
+    </p>
+
+    <input 
+        type="text" 
+        id="adminHeaderText" 
+        placeholder="Department Name"
+        style="margin-top:5px; padding:5px;"
+    >
+
+    <input 
+        type="text" 
+        id="adminSymposiumTitle" 
+        placeholder="Symposium Title"
+        style="margin-top:5px; padding:5px;"
+    >
+
+    <button 
+        class="btn btn-confirm" 
+        style="margin-top:8px;"
+        onclick="updateHomepageText()"
+    >
+        Save Title
+    </button>
+</div>
                         <label style="font-size: 11px; color: #00c6ff; text-transform: uppercase; font-weight: bold;">Selection Limit</label>
                         <p id="limitStatus" style="font-size: 10px; color: #aaa; margin: 4px 0;">Max events per student</p>
                         <input type="number" id="adminLimitInput" min="1" max="6" placeholder="Limit (e.g. 3)" style="margin-top:5px; padding: 5px;" oninput="handleLimitChange()">
@@ -1232,6 +1263,25 @@ async function confirmDeleteAllFromModal() {
 
     } catch (err) {
         alert("Server error");
+    }
+}
+async function updateHomepageText() {
+    const header = document.getElementById("adminHeaderText").value;
+    const title = document.getElementById("adminSymposiumTitle").value;
+
+    const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            header_text: header,
+            symposium_title: title
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        showToast("✅ Homepage updated!");
     }
 }
 </script>
