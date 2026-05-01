@@ -250,8 +250,13 @@ async function loadContactData() {
         document.getElementById("contactPhone").innerText =
             data.contact_phone || "Not available";
 
-        // FIXED MAP
-        document.getElementById("mapFrame").src = data.contact_map_embed;
+       const lat = data.contact_lat;
+const lng = data.contact_lng;
+
+if (lat && lng) {
+    document.getElementById("mapFrame").src =
+        `https://www.google.com/maps?q=${lat},${lng}&hl=en&z=16&output=embed`;
+}
 
     } catch (err) {
         console.error("Failed to load contact data:", err);

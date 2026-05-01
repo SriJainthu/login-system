@@ -638,7 +638,8 @@ th, td {
 <input type="text" id="adminEmail" placeholder="adminemail" oninput="handleContactChange()">
 <input type="text" id="adminPhone" placeholder="adminphonenumber" oninput="handleContactChange()">
 <textarea id="adminLocation" placeholder="Location" oninput="handleContactChange()"></textarea>
-<textarea id="adminMap" placeholder="Map URL"  oninput="handleContactChange()"></textarea>
+<input type="text" id="adminLat" placeholder="Latitude (e.g. 8.194019)" oninput="handleContactChange()">
+<input type="text" id="adminLng" placeholder="Longitude (e.g. 77.434175)" oninput="handleContactChange()">
 
     <button class="btn btn-confirm" onclick="updateContactDetails()">
         Save Contact Info
@@ -1310,14 +1311,15 @@ async function updateContactDetails() {
     const email = document.getElementById("adminEmail").value;
     const phone = document.getElementById("adminPhone").value;
     const location = document.getElementById("adminLocation").value;
-    const map = document.getElementById("adminMap").value;
+    const lat = document.getElementById("adminLat").value;
+    const lng = document.getElementById("adminLng").value;
 
     await fetch(`${API_BASE_URL}/api/update-contact`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email, phone, location, map })
+        body: JSON.stringify({ email, phone, location, lat, lng })
     });
 
     showToast("✅ Contact updated!");

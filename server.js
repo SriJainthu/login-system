@@ -640,7 +640,7 @@ app.post("/admin/delete-all-students", async (req, res) => {
 });
 app.post("/api/update-contact", async (req, res) => {
     try {
-        const { email, phone, location, map } = req.body;
+        const { email, phone, location, lat, lng } = req.body;
 
         await promiseDb.query(`
             UPDATE symposium_settings
@@ -648,14 +648,15 @@ app.post("/api/update-contact", async (req, res) => {
                 contact_email = ?, 
                 contact_phone = ?, 
                 contact_location = ?, 
-                contact_map_embed = ?
+                contact_lat = ?, 
+                contact_lng = ?
             WHERE id = 1
-        `, [email, phone, location, map]);
+        `, [email, phone, location, lat, lng]);
 
         res.json({ success: true });
 
     } catch (err) {
-        console.error("❌ Contact update error:", err);
+        console.error(err);
         res.status(500).json({ error: "Update failed" });
     }
 });
