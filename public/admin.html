@@ -483,6 +483,10 @@ th, td {
         grid-template-columns: 1fr;
     }
 }
+#adminPasswordInput:focus {
+    border-color: #ff4b2b;
+    box-shadow: 0 0 10px rgba(255,75,43,0.5);
+}
 
 /* Remove the specific .col-token { width: 180px; } etc. if they exist */
     </style>
@@ -492,13 +496,29 @@ th, td {
 <div id="toast">✅ Action Successful!</div>
 
 <div class="modal-overlay" id="confirmModal">
-    <div class="modal-box">
-        <h2 style="color: #ff4b2b; margin-top: 0;">Confirm Delete?</h2>
-        <p>This event will be permanently removed from the system and all student registrations.</p>
+    <div class="modal-box" style="max-width:420px;">
+        
+        <h2 style="color:#ff4b2b; margin-top:0;">⚠ Danger Zone</h2>
+        
+        <p style="color:#ccc; font-size:14px;">
+            This will permanently delete <b>ALL student data</b>.  
+            This action cannot be undone.
+        </p>
+
+        <input 
+            type="password" 
+            id="adminPasswordInput" 
+            placeholder="Enter Admin Password"
+            style="margin-top:15px;"
+        >
+
         <div class="modal-btns">
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn" style="background: #ff4b2b;" id="modalConfirmBtn">Yes, Delete</button>
+            <button class="btn" style="background:#ff4b2b;" onclick="confirmDeleteAllFromModal()">
+                Delete Everything
+            </button>
         </div>
+
     </div>
 </div>
 
@@ -602,7 +622,7 @@ th, td {
 <!-- 🔥 DANGER ZONE -->
 <div style="margin-top:15px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.2); text-align:center;">
     <div style="font-size:11px; color:#ff7675; margin-bottom:8px;">Danger Zone</div>
-    <button class="btn" style="background:#ff4b2b;" onclick="deleteAllStudents()">
+    <button class="btn" style="background:#ff4b2b;" onclick="openDeleteModal()"
         🗑 Delete All Students
     </button>
 </div>
@@ -1171,12 +1191,23 @@ try {
         fetchEventsFromServer();
     }
 };
-async function deleteAllStudents() {
-    const password = prompt("Enter Admin Password to Delete All Data:");
 
-    if (!password) return;
+function openDeleteModal() {
+    document.getElementById("confirmModal").style.display = "flex";
+    document.getElementById("adminPasswordInput").value = "";
+}
 
-    if (!confirm("⚠ This will permanently delete ALL student data. Continue?")) return;
+function closeModal() {
+    document.getElementById("confirmModal").style.display = "none";
+}
+
+async function confirmDeleteAllFromModal() {
+    const password = document.getElementById("adminPasswordInput").value;
+
+    if (!password) {
+        alert("Please enter password");
+        return;
+    }
 
     try {
         const res = await fetch(`${API_BASE_URL}/admin/delete-all-students`, {
@@ -1191,9 +1222,10 @@ async function deleteAllStudents() {
 
         if (data.success) {
             showToast("🗑 All student data deleted");
+            closeModal();
             loadStudents();
         } else {
-            alert("❌ Wrong password");
+            showToast("❌ Wrong password");
         }
 
     } catch (err) {
