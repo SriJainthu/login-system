@@ -213,6 +213,9 @@
     </div>
 
     <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-nowr.onrender.com';
         document.addEventListener("DOMContentLoaded", () => {
             const menuToggle = document.getElementById("menuToggle");
             const sideMenu = document.getElementById("sideMenu");
@@ -230,26 +233,34 @@
                 }
             });
         });
-      async function loadContactData() {
+async function loadContactData() {
     try {
-        const res = await fetch("https://your-backend-url.onrender.com/api/contact");
+        const res = await fetch(`${API_BASE_URL}/api/contact`);
         const data = await res.json();
 
-        // Update text
-        document.getElementById("contactLocationText").innerText = data.contact_location;
-        document.getElementById("contactLocation").innerHTML = data.contact_location.replace(/\n/g, "<br>");
-        document.getElementById("contactEmail").innerText = data.contact_email;
-        document.getElementById("contactPhone").innerText = data.contact_phone;
+        document.getElementById("contactLocationText").innerText =
+            data.contact_location || "Location unavailable";
 
-        // Update map
-        document.getElementById("mapContainer").innerHTML = data.contact_map_embed;
+        document.getElementById("contactLocation").innerHTML =
+            (data.contact_location || "").replace(/\n/g, "<br>");
+
+        document.getElementById("contactEmail").innerText =
+            data.contact_email || "Not available";
+
+        document.getElementById("contactPhone").innerText =
+            data.contact_phone || "Not available";
+
+        // FIXED MAP
+        document.getElementById("mapFrame").src = data.contact_map_embed;
 
     } catch (err) {
-        console.error("❌ Failed to load contact:", err);
+        console.error("Failed to load contact data:", err);
     }
 }
 
 document.addEventListener("DOMContentLoaded", loadContactData);
+
+
     </script>
 </body>
 </html>

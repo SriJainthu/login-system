@@ -635,10 +635,10 @@ th, td {
     <label style="font-size: 11px; color: #00c6ff; font-weight: bold;">
         Contact Page Settings
     </label>
-<input type="text" id="adminEmail" oninput="handleContactChange()">
-<input type="text" id="adminPhone" oninput="handleContactChange()">
-<textarea id="adminLocation" oninput="handleContactChange()"></textarea>
-<textarea id="adminMap" oninput="handleContactChange()"></textarea>
+<input type="text" id="adminEmail" placeholder="adminemail" oninput="handleContactChange()">
+<input type="text" id="adminPhone" placeholder="adminphonenumber" oninput="handleContactChange()">
+<textarea id="adminLocation" placeholder="Location" oninput="handleContactChange()"></textarea>
+<textarea id="adminMap" placeholder="Map URL"  oninput="handleContactChange()"></textarea>
 
     <button class="btn btn-confirm" onclick="updateContactDetails()">
         Save Contact Info
