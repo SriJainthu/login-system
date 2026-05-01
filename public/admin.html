@@ -697,27 +697,11 @@ th, td {
     </div>
 </div>
 <script>
-    (async function () {
-    try {
-        const res = await fetch(`${API_BASE_URL}/admin/verify-session`, {
-            method: "GET",
-            credentials: "include" // 🔥 important for cookies
-        });
+    const token = localStorage.getItem("adminToken");
 
-        if (!res.ok) {
-            throw new Error("Not authenticated");
-        }
-
-        const data = await res.json();
-
-        if (!data.success) {
-            window.location.replace("admin-login.html");
-        }
-
-    } catch (err) {
-        window.location.replace("admin-login.html");
-    }
-})();
+if (!token) {
+    window.location.href = "admin-login.html";
+}
     // Add this at the top of your script
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
@@ -726,13 +710,9 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     let eventsList = [];
     let currentIsGroupView = false;
     let eventToDeleteIndex = null;
-async function logoutAdmin() {
-    await fetch(`${API_BASE_URL}/admin/logout`, {
-        method: "POST",
-        credentials: "include"
-    });
-
-    window.location.replace("admin-login.html");
+function logoutAdmin() {
+    localStorage.removeItem("adminToken");
+    window.location.href = "admin-login.html";
 }
     // --- 1. INITIALIZATION & SYNC ---
     async function fetchEventsFromServer() {
@@ -898,7 +878,11 @@ try {
                     year: document.getElementById("year").value,
                     event: selectedEventName
                 });
-               const res = await fetch(`${API_BASE_URL}/admin/students?` + params.toString());
+               const res = await fetch(`${API_BASE_URL}/admin/students?` , {
+    headers: {
+        "Authorization": "Bearer " + localStorage.getItem("adminToken")
+    }
+}+ params.toString());
                let data;
 try {
   data = await res.json();
@@ -1245,28 +1229,6 @@ try {
     printWindow.document.close();
     setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
 }
-  window.onload = async () => {
-    try {
-        const res = await fetch(`${API_BASE_URL}/admin/verify-session`, {
-            credentials: "include"
-        });
-
-        if (!res.ok) throw new Error();
-
-        const data = await res.json();
-
-        if (!data.success) {
-            window.location.href = "admin-login.html";
-            return;
-        }
-
-        // ✅ Only load data AFTER auth passes
-        fetchEventsFromServer();
-
-    } catch {
-        window.location.href = "admin-login.html";
-    }
-};
 
 function openDeleteModal() {
     document.getElementById("confirmModal").style.display = "flex";

@@ -584,8 +584,9 @@ try {
 }
 
 
+
         if (response.ok && data.success) {
-            localStorage.setItem("adminLoggedIn", "true");
+             localStorage.setItem("adminToken", data.token); 
             // ✅ SUCCESS: Happy Yeti and Redirect
             mouthStatus = "large";
             gsap.to([mouthBG, mouthOutline, mouthMaskPath], 0.3, { morphSVG: mouthLargeBG });
