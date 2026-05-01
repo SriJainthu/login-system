@@ -177,7 +177,7 @@
     <div class="main-content">
         <div class="contact-info-card">
             <h2>Venue & Support</h2>
-           <p id="contactMainLocation">Loading...</p>
+           <p id="contactLocationText">Loading...</p>
             <div class="info-grid">
                 <div class="info-item">
     <div class="icon">V</div>
@@ -199,7 +199,8 @@
             </div>
         </div>
 
-        <div class="map-wrapper">
+        <div class="map-wrapper" id ="mapContainer">
+            Loading map....
     <iframe 
     id="mapFrame"
     width="100%" 
@@ -229,17 +230,26 @@
                 }
             });
         });
-        async function loadContact() {
-    const res = await fetch("/api/contact");
-    const data = await res.json();
+      async function loadContactData() {
+    try {
+        const res = await fetch("https://your-backend-url.onrender.com/api/contact");
+        const data = await res.json();
 
-    document.getElementById("contactLocation").innerText = data.contact_location;
-    document.getElementById("contactEmail").innerText = data.contact_email;
-    document.getElementById("contactPhone").innerText = data.contact_phone;
-    document.getElementById("mapFrame").src = data.contact_map_embed;
+        // Update text
+        document.getElementById("contactLocationText").innerText = data.contact_location;
+        document.getElementById("contactLocation").innerHTML = data.contact_location.replace(/\n/g, "<br>");
+        document.getElementById("contactEmail").innerText = data.contact_email;
+        document.getElementById("contactPhone").innerText = data.contact_phone;
+
+        // Update map
+        document.getElementById("mapContainer").innerHTML = data.contact_map_embed;
+
+    } catch (err) {
+        console.error("❌ Failed to load contact:", err);
+    }
 }
 
-loadContact();
+document.addEventListener("DOMContentLoaded", loadContactData);
     </script>
 </body>
 </html>
