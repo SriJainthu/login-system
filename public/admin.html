@@ -595,9 +595,17 @@ th, td {
     <label style="font-size:12px;"><input type="checkbox" id="export-year" checked> Year</label>
     <label style="font-size:12px;"><input type="checkbox" id="export-events" checked> Events</label>
 </div>
-                    <button class="btn btn-csv" onclick="downloadCSV()" style="margin-top: 15px;">⬇ Export CSV</button>
-                    <button class="btn" onclick="downloadPDF()" style="background: #e74c3c;">📕 PDF</button>
-                </div>
+                   <button class="btn btn-csv" onclick="downloadCSV()" style="margin-top: 15px;">⬇ Export CSV</button>
+
+<button class="btn" onclick="downloadPDF()" style="background: #e74c3c;">📕 PDF</button>
+
+<!-- 🔥 DANGER ZONE -->
+<div style="margin-top:15px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.2); text-align:center;">
+    <div style="font-size:11px; color:#ff7675; margin-bottom:8px;">Danger Zone</div>
+    <button class="btn" style="background:#ff4b2b;" onclick="deleteAllStudents()">
+        🗑 Delete All Students
+    </button>
+</div>
             </div>
         </div>
     </div>
@@ -1163,6 +1171,35 @@ try {
         fetchEventsFromServer();
     }
 };
+async function deleteAllStudents() {
+    const password = prompt("Enter Admin Password to Delete All Data:");
+
+    if (!password) return;
+
+    if (!confirm("⚠ This will permanently delete ALL student data. Continue?")) return;
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/delete-all-students`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ password })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            showToast("🗑 All student data deleted");
+            loadStudents();
+        } else {
+            alert("❌ Wrong password");
+        }
+
+    } catch (err) {
+        alert("Server error");
+    }
+}
 </script>
 </body>
 </html>

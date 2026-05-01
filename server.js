@@ -11,7 +11,7 @@ const app = express();
 /*const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');*/
 const cron = require('node-cron');
-
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 /*// Initialize WhatsApp Client
 const whatsapp = new Client({
     authStrategy: new LocalAuth(), // This saves your session so you don't scan every time
@@ -586,6 +586,21 @@ db.getConnection((err, connection) => {
     } else {
        console.log("✅ MySQL Connected Successfully to Aiven!");
         connection.release(); // Always release the connection back to the pool
+    }
+});
+app.delete('/admin/delete-all-students', async (req, res) => {
+    const { password } = req.body;
+
+    if (password !== process.env.ADMIN_PASSWORD) {
+        return res.status(403).json({ success: false, message: "Wrong password" });
+    }
+
+    try {
+        await pool.query('DELETE FROM students');
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false });
     }
 });
 app.use(express.static("public"));
