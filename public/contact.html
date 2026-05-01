@@ -136,6 +136,39 @@
             .info-grid { grid-template-columns: 1fr; }
             .contact-info-card { padding: 30px 20px; }
         }
+        .map-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(15, 32, 39, 0.8);
+    z-index: 2;
+    font-size: 14px;
+    color: #ccc;
+}
+
+/* 🔄 Spinner */
+.spinner {
+    width: 35px;
+    height: 35px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top: 3px solid #00c6ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
     </style>
 </head>
 <body>
@@ -199,16 +232,24 @@
             </div>
         </div>
 
-        <div class="map-wrapper" id ="mapContainer">
-            Loading map....
+<div class="map-wrapper" id="mapContainer">
+
+    <!-- 🔄 Loader -->
+    <div id="mapLoading" class="map-loading">
+        <div class="spinner"></div>
+        <span>Loading map...</span>
+    </div>
+
+    <!-- 🗺 Map -->
     <iframe 
-    id="mapFrame"
-    width="100%" 
-    height="100%" 
-    style="border:0;" 
-    allowfullscreen="" 
-    loading="lazy">
-</iframe>
+        id="mapFrame"
+        width="100%" 
+        height="100%" 
+        style="border:0; opacity:0; transition: opacity 0.6s ease;"
+        allowfullscreen="" 
+        loading="lazy">
+    </iframe>
+
 </div>
     </div>
 
@@ -235,6 +276,7 @@
         });
 async function loadContactData() {
     try {
+       
         const res = await fetch(`${API_BASE_URL}/api/contact`);
         const data = await res.json();
 
@@ -249,7 +291,15 @@ async function loadContactData() {
 
         document.getElementById("contactPhone").innerText =
             data.contact_phone || "Not available";
+  const iframe = document.getElementById("mapFrame");
 
+iframe.onload = () => {
+    // hide loader
+    document.getElementById("mapLoading").style.display = "none";
+
+    // fade-in map
+    iframe.style.opacity = "1";
+};
        const lat = data.contact_lat;
 const lng = data.contact_lng;
 
