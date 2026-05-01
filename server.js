@@ -591,15 +591,31 @@ db.getConnection((err, connection) => {
 app.post("/admin/delete-all-students", async (req, res) => {
     const { password } = req.body;
 
-    if (password !== "your_admin_password") {
+    if (password !== process.env.ADMIN_PASSWORD) {
         return res.json({ success: false });
     }
 
+    const connection = await db.promise().getConnection();
+
     try {
-        await db.query("DELETE FROM students"); // your table name
+        await connection.beginTransaction();
+
+        // 1. Delete child table FIRST
+        await connection.query("DELETE FROM student_events");
+
+        // 2. Then delete students
+        await connection.query("DELETE FROM students");
+
+        await connection.commit();
+
         res.json({ success: true });
+
     } catch (err) {
+        await connection.rollback();
+        console.error(err);
         res.json({ success: false });
+    } finally {
+        connection.release();
     }
 });
 app.use(express.static("public"));
