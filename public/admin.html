@@ -612,6 +612,7 @@ th, td {
         id="adminHeaderText" 
         placeholder="Department Name"
         style="margin-top:5px; padding:5px;"
+        oninput="handleHomepageTextChange()"
     >
 
     <input 
@@ -619,6 +620,7 @@ th, td {
         id="adminSymposiumTitle" 
         placeholder="Symposium Title"
         style="margin-top:5px; padding:5px;"
+        oninput="handleHomepageTextChange()"
     >
 
     <button 
@@ -1283,6 +1285,9 @@ async function updateHomepageText() {
     if (data.success) {
         showToast("✅ Homepage updated!");
     }
+}
+function handleHomepageTextChange() {
+    document.querySelector("#homepageTextContainer .btn-confirm").style.display = "block";
 }
 </script>
 </body>
