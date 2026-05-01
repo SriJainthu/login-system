@@ -1286,7 +1286,7 @@ async function updateHomepageText() {
     const header = document.getElementById("adminHeaderText").value;
     const title = document.getElementById("adminSymposiumTitle").value;
 
-    const res = await fetch("/api/settings", {
+    const res = await fetch(`${API_BASE_URL}/api/settings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1302,7 +1302,9 @@ async function updateHomepageText() {
     }
 }
 function handleHomepageTextChange() {
-    document.querySelector("#homepageTextContainer .btn-confirm").style.display = "block";
+    document.querySelectorAll(".btn-confirm").forEach(btn => {
+        btn.style.display = "block";
+    });
 }
 async function updateContactDetails() {
     const email = document.getElementById("adminEmail").value;
@@ -1310,7 +1312,7 @@ async function updateContactDetails() {
     const location = document.getElementById("adminLocation").value;
     const map = document.getElementById("adminMap").value;
 
-   await fetch("https://your-backend-url.onrender.com/api/update-contact", {
+    await fetch(`${API_BASE_URL}/api/update-contact`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -1318,10 +1320,25 @@ async function updateContactDetails() {
         body: JSON.stringify({ email, phone, location, map })
     });
 
-    alert("✅ Contact Updated");
-
-    showToast("Contact details updated!");
+    showToast("✅ Contact updated!");
 }
+async function loadAdminSettings() {
+    const res1 = await fetch(`${API_BASE_URL}/api/settings`);
+    const settings = await res1.json();
+
+    document.getElementById("adminHeaderText").value = settings.header_text || "";
+    document.getElementById("adminSymposiumTitle").value = settings.symposium_title || "";
+
+    const res2 = await fetch(`${API_BASE_URL}/api/contact`);
+    const contact = await res2.json();
+
+    document.getElementById("adminEmail").value = contact.contact_email || "";
+    document.getElementById("adminPhone").value = contact.contact_phone || "";
+    document.getElementById("adminLocation").value = contact.contact_location || "";
+    document.getElementById("adminMap").value = contact.contact_map_embed || "";
+}
+
+document.addEventListener("DOMContentLoaded", loadAdminSettings);
 </script>
 </body>
 </html>
