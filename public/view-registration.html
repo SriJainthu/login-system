@@ -218,6 +218,59 @@
         .nav-item.active .nav-text { color: var(--primary-blue); }
         
         #qrcode img { margin: 0 auto; border: 5px solid #fff; border-radius: 10px; }
+        /* ---------- MOBILE RESPONSIVE ---------- */
+@media (max-width: 600px) {
+    .navbar { padding: 15px 20px; }
+
+    .container {
+        padding: 25px 18px;
+        margin: 10px;
+    }
+
+    h2 { font-size: 1.6rem; }
+
+    /* Fix modal going off screen */
+    .modal-overlay { padding: 15px; box-sizing: border-box; }
+
+    .modal-box {
+        padding: 25px 20px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-radius: 20px;
+    }
+
+    .modal-box .icon { font-size: 35px; margin-bottom: 10px; }
+    .modal-box h3 { font-size: 1.2rem; }
+    .modal-box p { font-size: 0.85em; margin: 10px 0 18px; }
+
+    /* Fix status card on mobile */
+    .status-card { padding: 20px 15px; }
+
+    .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    #qrcode img { width: 80px !important; height: 80px !important; }
+
+    .data-label { width: 90px; font-size: 9px; }
+    .data-value { font-size: 13px; }
+
+    .event-item { padding: 12px; }
+
+    /* Fix resend timer text wrapping */
+    .resend-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+        text-align: center;
+        font-size: 13px;
+    }
+}
     </style>
 </head>
 <body>
