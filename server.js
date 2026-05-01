@@ -6,7 +6,7 @@ const cors = require("cors");
 const axios = require('axios'); // Added Nodemailer
 require('dotenv').config();
 let emailCounter = 0;
-const EMAIL_LIMIT = 450; // Set slightly below 500 for safety
+const EMAIL_LIMIT = 250; // Set slightly below 500 for safety
 const app = express();
 /*const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');*/
@@ -41,11 +41,7 @@ const BREVO_ACCOUNTS = [
 ];
 console.log("✅ Brevo Email Service Ready");
 
-/* ---------- GLOBAL SETTINGS ---------- */
-let globalSettings = { 
-    event_selection_limit: 3,
-    registration_deadline: "2026-03-15T09:00:00" 
-};
+
 
 /* ---------- MIDDLEWARE ---------- */
 app.use(cors({
@@ -496,11 +492,41 @@ app.get("/admin/download", (req, res) => {
     });
 });
 
-app.get("/api/settings", (req, res) => res.json(globalSettings));
-app.post("/api/settings", (req, res) => {
-    if (req.body.limit) globalSettings.event_selection_limit = parseInt(req.body.limit);
-    if (req.body.deadline) globalSettings.registration_deadline = req.body.deadline;
-    res.json({ success: true, settings: globalSettings });
+app.get("/api/settings", async (req, res) => {
+    try {
+        const [rows] = await promiseDb.query(
+            "SELECT * FROM symposium_settings WHERE id = 1"
+        );
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Settings fetch error:", err);
+        res.status(500).json({ error: "Could not load settings" });
+    }
+});
+
+app.post("/api/settings", async (req, res) => {
+    try {
+        const { limit, deadline } = req.body;
+        if (limit) {
+            await promiseDb.query(
+                "UPDATE symposium_settings SET event_selection_limit = ? WHERE id = 1",
+                [parseInt(limit)]
+            );
+        }
+        if (deadline) {
+            await promiseDb.query(
+                "UPDATE symposium_settings SET registration_deadline = ? WHERE id = 1",
+                [deadline]
+            );
+        }
+        const [rows] = await promiseDb.query(
+            "SELECT * FROM symposium_settings WHERE id = 1"
+        );
+        res.json({ success: true, settings: rows[0] });
+    } catch (err) {
+        console.error("Settings update error:", err);
+        res.status(500).json({ error: "Could not update settings" });
+    }
 });
 app.get("/admin/grouped-teams", async (req, res) => {
     const { eventName, college, token } = req.query;
