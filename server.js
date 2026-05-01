@@ -8,6 +8,9 @@ require('dotenv').config();
 let emailCounter = 0;
 const EMAIL_LIMIT = 250; // Set slightly below 500 for safety
 const app = express();
+const jwt = require("jsonwebtoken");
+
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 /*const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');*/
 const cron = require('node-cron');
@@ -53,7 +56,23 @@ app.use(cors({
     credentials: true
 }));
 app.use(bodyParser.json());
+function verifyAdmin(req, res, next) {
+    const authHeader = req.headers.authorization;
 
+    if (!authHeader) {
+        return res.status(403).json({ message: "No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.admin = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ message: "Invalid token" });
+    }
+}
 // Add these BEFORE your routes
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
@@ -453,11 +472,23 @@ app.get("/validate-token", (req, res) => {
 
 app.post("/admin/login", (req, res) => {
     const { username, password } = req.body;
-    if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) res.json({ success: true, redirect: "admin.html" });
-    else res.status(401).json({ success: false });
+
+    if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
+
+        const token = jwt.sign(
+            { user: username },
+            JWT_SECRET,
+            { expiresIn: "2h" }
+        );
+
+        res.json({ success: true, token });
+
+    } else {
+        res.status(401).json({ success: false });
+    }
 });
 
-app.get("/admin/students", (req, res) => {
+app.get("/admin/students", verifyAdmin, (req, res) => {
     const { year, department, college, event, reg_no } = req.query;
     
     let sql = `
@@ -489,7 +520,7 @@ app.get("/admin/students", (req, res) => {
     });
 });
 
-app.get("/admin/download", (req, res) => {
+app.get("/admin/download", verifyAdmin,(req, res) => {
     db.query("SELECT s.name, s.reg_no, s.college, s.department, s.year FROM students s", (err, rows) => {
         if (err) return res.status(500).json({ error: "Download failed" });
         let csv = "Name,Register No,College,Department,Year\n";
@@ -500,7 +531,7 @@ app.get("/admin/download", (req, res) => {
     });
 });
 
-app.get("/api/settings", async (req, res) => {
+app.get("/api/settings", verifyAdmin, async (req, res) => {
     try {
         const [rows] = await promiseDb.query(
             "SELECT * FROM symposium_settings WHERE id = 1"
@@ -512,7 +543,7 @@ app.get("/api/settings", async (req, res) => {
     }
 });
 
-app.post("/api/settings", async (req, res) => {
+app.post("/api/settings",  verifyAdmin,async (req, res) => {
     try {
         const { limit, deadline, header_text, symposium_title } = req.body;
 
@@ -556,7 +587,7 @@ app.post("/api/settings", async (req, res) => {
         res.status(500).json({ error: "Could not update settings" });
     }
 });
-app.get("/admin/grouped-teams", async (req, res) => {
+app.get("/admin/grouped-teams",  verifyAdmin, async (req, res) => {
     const { eventName, college, token } = req.query;
     
     let sql = `
@@ -583,14 +614,14 @@ app.get("/admin/grouped-teams", async (req, res) => {
         res.json(grouped);
     });
 });
-app.delete("/admin/delete-event", (req, res) => {
+app.delete("/admin/delete-event", verifyAdmin, (req, res) => {
     const eventName = req.query.name;
     db.query("DELETE FROM events WHERE event_name = ?", [eventName], (err) => {
         if (err) return res.status(500).json({ success: false });
         res.json({ success: true });
     });
 });
-app.post('/admin/add-event', (req, res) => {
+app.post('/admin/add-event',  verifyAdmin, (req, res) => {
     const { name, description, type, max_team_size } = req.body;
     if (!name || !type) return res.status(400).json({ success: false, error: "Missing fields" });
     const sql = "INSERT INTO events (event_name, description, event_type, max_team_size) VALUES (?, ?, ?, ?)";
@@ -608,7 +639,7 @@ db.getConnection((err, connection) => {
         connection.release(); // Always release the connection back to the pool
     }
 });
-app.post("/admin/delete-all-students", async (req, res) => {
+app.post("/admin/delete-all-students", verifyAdmin, async (req, res) => {
     const { password } = req.body;
 
     if (password !== process.env.ADMIN_PASSWORD) {
@@ -638,7 +669,7 @@ app.post("/admin/delete-all-students", async (req, res) => {
         connection.release();
     }
 });
-app.post("/api/update-contact", async (req, res) => {
+app.post("/api/update-contact",  verifyAdmin,async (req, res) => {
     try {
         const { email, phone, location, lat, lng } = req.body;
 
@@ -660,7 +691,7 @@ app.post("/api/update-contact", async (req, res) => {
         res.status(500).json({ error: "Update failed" });
     }
 });
-app.get("/api/contact", async (req, res) => {
+app.get("/api/contact",  verifyAdmin,async (req, res) => {
     try {
         const [rows] = await promiseDb.query(
             "SELECT * FROM symposium_settings WHERE id = 1"
@@ -669,6 +700,13 @@ app.get("/api/contact", async (req, res) => {
     } catch (err) {
         console.error("❌ Contact fetch error:", err);
         res.status(500).json({ error: "Failed to load contact" });
+    }
+});
+app.get('/admin/verify-session', (req, res) => {
+    if (req.session && req.session.admin) {
+        return res.json({ success: true });
+    } else {
+        return res.status(401).json({ success: false });
     }
 });
 app.use(express.static("public"));

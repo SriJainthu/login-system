@@ -697,13 +697,27 @@ th, td {
     </div>
 </div>
 <script>
-    (function() {
-            const isLoggedIn = localStorage.getItem("adminLoggedIn");
-            if (isLoggedIn !== "true") {
-                // Not logged in? Redirect to login page immediately
-                window.location.replace("admin-login.html");
-            }
-        })();
+    (async function () {
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/verify-session`, {
+            method: "GET",
+            credentials: "include" // 🔥 important for cookies
+        });
+
+        if (!res.ok) {
+            throw new Error("Not authenticated");
+        }
+
+        const data = await res.json();
+
+        if (!data.success) {
+            window.location.replace("admin-login.html");
+        }
+
+    } catch (err) {
+        window.location.replace("admin-login.html");
+    }
+})();
     // Add this at the top of your script
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
@@ -712,10 +726,12 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     let eventsList = [];
     let currentIsGroupView = false;
     let eventToDeleteIndex = null;
-function logoutAdmin() {
-    // Clear the login flag
-    localStorage.removeItem("adminLoggedIn");
-    // Redirect to login
+async function logoutAdmin() {
+    await fetch(`${API_BASE_URL}/admin/logout`, {
+        method: "POST",
+        credentials: "include"
+    });
+
     window.location.replace("admin-login.html");
 }
     // --- 1. INITIALIZATION & SYNC ---
@@ -1229,16 +1245,26 @@ try {
     printWindow.document.close();
     setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
 }
-    window.onload = () => {
-    const isAdmin = localStorage.getItem("adminLoggedIn");
-    
-    // Check: If no badge AND we aren't testing locally, kick them out
-    if (!isAdmin && window.location.hostname !== 'localhost') {
-        alert("🔒 Access Denied. Please Login.");
-        window.location.href = "admin-login.html"; // Redirect to login page
-    } else {
-        // If they have the badge, proceed to load data
+  window.onload = async () => {
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/verify-session`, {
+            credentials: "include"
+        });
+
+        if (!res.ok) throw new Error();
+
+        const data = await res.json();
+
+        if (!data.success) {
+            window.location.href = "admin-login.html";
+            return;
+        }
+
+        // ✅ Only load data AFTER auth passes
         fetchEventsFromServer();
+
+    } catch {
+        window.location.href = "admin-login.html";
     }
 };
 
