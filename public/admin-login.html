@@ -592,7 +592,9 @@ try {
             gsap.to([mouthBG, mouthOutline, mouthMaskPath], 0.3, { morphSVG: mouthLargeBG });
             
             gsap.to(".glass-form", { opacity: 0, y: -20, duration: 0.5, onComplete: () => {
-                window.location.href = "admin.html";
+               setTimeout(() => {
+        window.location.href = "admin.html";
+    }, 100);
             }});
         } else {
             // ❌ FAILURE: Wrong Password
