@@ -49,31 +49,31 @@
     /* ─── CUSTOM CURSOR ─── */
     #cursor {
       position: fixed;
-      width: 10px; height: 10px;
+      width: 8px; height: 8px;
       background: var(--accent);
       border-radius: 50%;
       pointer-events: none;
       z-index: 99999;
-      transform: translate(-50%, -50%);
-      transition: width 0.2s var(--ease), height 0.2s var(--ease), background 0.2s;
-      mix-blend-mode: difference;
+      /* NO transition — snaps instantly to mouse, rAF handles position */
+      will-change: transform;
     }
 
     #cursor-ring {
       position: fixed;
-      width: 36px; height: 36px;
-      border: 1.5px solid rgba(0,229,190,0.5);
+      width: 34px; height: 34px;
+      border: 1.5px solid rgba(0,229,190,0.45);
       border-radius: 50%;
       pointer-events: none;
       z-index: 99998;
-      transform: translate(-50%, -50%);
-      transition: width 0.35s var(--ease), height 0.35s var(--ease), transform 0.1s, border-color 0.3s;
+      will-change: transform;
+      /* Size/color transitions only, NOT position */
+      transition: width 0.25s var(--ease), height 0.25s var(--ease), border-color 0.25s, opacity 0.25s;
     }
 
-    body:has(button:hover) #cursor,
-    body:has(a:hover) #cursor { width: 18px; height: 18px; }
-    body:has(button:hover) #cursor-ring,
-    body:has(a:hover) #cursor-ring { width: 56px; height: 56px; border-color: rgba(0,229,190,0.8); }
+    #cursor-ring.hovering {
+      width: 52px; height: 52px;
+      border-color: rgba(0,229,190,0.8);
+    }
 
     /* ─── CANVAS BACKGROUND ─── */
     #bg-canvas {
@@ -174,24 +174,6 @@
       align-items: center;
       gap: 6px;
     }
-
-    .nav-pill {
-      font-family: var(--syne);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      border-radius: 30px;
-      border: 1px solid transparent;
-      color: var(--muted);
-      cursor: pointer;
-      background: transparent;
-      transition: all 0.25s var(--ease);
-    }
-
-    .nav-pill:hover { color: var(--text); border-color: var(--border); }
-    .nav-pill.active { color: var(--accent); background: rgba(0,229,190,0.08); border-color: rgba(0,229,190,0.25); }
 
     .topbar-right {
       display: flex;
@@ -1021,12 +1003,6 @@
     <span class="brand-name">Sym<span>Admin</span></span>
   </div>
 
-  <div class="topbar-center">
-    <button class="nav-pill active">Overview</button>
-    <button class="nav-pill">Events</button>
-    <button class="nav-pill">Reports</button>
-  </div>
-
   <div class="topbar-right">
     <span class="live-dot">Live</span>
     <button class="btn btn-ghost" style="padding:7px 16px; font-size:9px;" onclick="logoutAdmin()">Logout</button>
@@ -1212,20 +1188,38 @@ const API_BASE_URL = window.location.hostname === 'localhost'
 let eventChart, eventsList = [], currentIsGroupView = false, eventToDeleteIndex = null;
 
 /* ─── CURSOR ─── */
-const cur = document.getElementById('cursor');
+const cur  = document.getElementById('cursor');
 const ring = document.getElementById('cursor-ring');
-let cx = 0, cy = 0, rx = 0, ry = 0;
 
-document.addEventListener('mousemove', e => {
-  cx = e.clientX; cy = e.clientY;
-  cur.style.left = cx + 'px'; cur.style.top = cy + 'px';
+let mx = window.innerWidth / 2,  my = window.innerHeight / 2;  // real mouse
+let rx = mx, ry = my;                                            // ring (lerped)
+
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+// Hover detection for ring size
+document.addEventListener('mouseover', e => {
+  if (e.target.closest('button, a, input, select, textarea, label, [data-magnet]')) {
+    ring.classList.add('hovering');
+  }
+});
+document.addEventListener('mouseout', e => {
+  if (e.target.closest('button, a, input, select, textarea, label, [data-magnet]')) {
+    ring.classList.remove('hovering');
+  }
 });
 
-(function animRing() {
-  rx += (cx - rx) * 0.12;
-  ry += (cy - ry) * 0.12;
-  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-  requestAnimationFrame(animRing);
+(function animCursor() {
+  // Dot: snap to exact mouse position
+  cur.style.transform  = `translate(${mx - 4}px, ${my - 4}px)`;
+
+  // Ring: smooth lerp
+  rx += (mx - rx) * 0.13;
+  ry += (my - ry) * 0.13;
+  const rw = ring.classList.contains('hovering') ? 26 : 17;
+  const rh = ring.classList.contains('hovering') ? 26 : 17;
+  ring.style.transform = `translate(${rx - rw}px, ${ry - rh}px)`;
+
+  requestAnimationFrame(animCursor);
 })();
 
 /* ─── MAGNETIC STAT CARDS ─── */
