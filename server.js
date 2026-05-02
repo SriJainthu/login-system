@@ -457,7 +457,7 @@ app.post("/admin/login", (req, res) => {
         const token = jwt.sign(
             { user: username },
             JWT_SECRET,
-            { expiresIn: "2h" }
+            { expiresIn: "1m" }
         );
 
         res.json({ success: true, token });
