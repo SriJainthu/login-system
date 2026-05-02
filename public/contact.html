@@ -169,10 +169,57 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+/* ---------- SKELETON LOADER ---------- */
+#contactLoader {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.skeleton-line {
+    background: linear-gradient(90deg, #1a2a33 25%, #2c5364 50%, #1a2a33 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+.skeleton-line.medium {
+    width: 300px;
+    height: 14px;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* ---------- FADE-IN ---------- */
+.fade-text {
+    opacity: 0;
+    transform: translateY(15px);
+    filter: blur(6px);
+    transition: all 0.6s ease;
+}
+
+.fade-text.show {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+#topLoader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #00c6ff, #00ffae);
+    z-index: 9999;
+    transition: width 0.3s ease;
+}
     </style>
 </head>
 <body>
-
+<div id="topLoader"></div>
     <header class="navbar">
         <div class="menu-toggle" id="menuToggle">
             <div class="bar"></div>
@@ -210,24 +257,28 @@
     <div class="main-content">
         <div class="contact-info-card">
             <h2>Venue & Support</h2>
-           <p id="contactLocationText">Loading...</p>
+          <div id="contactLoader">
+    <div class="skeleton-line medium"></div>
+</div>
+
+<p id="contactLocationText" class="fade-text"></p>
             <div class="info-grid">
                 <div class="info-item">
     <div class="icon">V</div>
     <b>Location</b>
-    <span id="contactLocation">Loading...</span>
+   <span id="contactLocation" class="fade-text"></span>
 </div>
 
 <div class="info-item">
     <div class="icon">E</div>
     <b>Email Us</b>
-    <span id="contactEmail">Loading...</span>
+    <span id="contactEmail"  class="fade-text"></span>
 </div>
 
 <div class="info-item">
     <div class="icon">C</div>
     <b>Call Support</b>
-    <span id="contactPhone">Loading...</span>
+    <span id="contactPhone"  class="fade-text"></span>
 </div>
             </div>
         </div>
@@ -275,44 +326,66 @@
             });
         });
 async function loadContactData() {
+    startLoader();
+
     try {
-       
         const res = await fetch(`${API_BASE_URL}/api/contact`);
         const data = await res.json();
 
-        document.getElementById("contactLocationText").innerText =
-            data.contact_location || "Location unavailable";
+        const loader = document.getElementById("contactLoader");
 
-        document.getElementById("contactLocation").innerHTML =
-            (data.contact_location || "").replace(/\n/g, "<br>");
+        const locationText = document.getElementById("contactLocationText");
+        const location = document.getElementById("contactLocation");
+        const email = document.getElementById("contactEmail");
+        const phone = document.getElementById("contactPhone");
 
-        document.getElementById("contactEmail").innerText =
-            data.contact_email || "Not available";
+        // Set values
+        locationText.innerText = data.contact_location || "Location unavailable";
+        location.innerHTML = (data.contact_location || "").replace(/\n/g, "<br>");
+        email.innerText = data.contact_email || "Not available";
+        phone.innerText = data.contact_phone || "Not available";
 
-        document.getElementById("contactPhone").innerText =
-            data.contact_phone || "Not available";
-  const iframe = document.getElementById("mapFrame");
+        // Remove skeleton
+        if (loader) loader.style.display = "none";
 
-iframe.onload = () => {
-    // hide loader
-    document.getElementById("mapLoading").style.display = "none";
+        // Animate text
+        setTimeout(() => {
+            locationText.classList.add("show");
+            location.classList.add("show");
+            email.classList.add("show");
+            phone.classList.add("show");
+        }, 100);
 
-    // fade-in map
-    iframe.style.opacity = "1";
-};
-       const lat = data.contact_lat;
-const lng = data.contact_lng;
+        // MAP
+        const iframe = document.getElementById("mapFrame");
 
-if (lat && lng) {
-    document.getElementById("mapFrame").src =
-        `https://www.google.com/maps?q=${lat},${lng}&hl=en&z=16&output=embed`;
-}
+        iframe.onload = () => {
+            document.getElementById("mapLoading").style.display = "none";
+            iframe.style.opacity = "1";
+        };
+
+        if (data.contact_lat && data.contact_lng) {
+            iframe.src =
+                `https://www.google.com/maps?q=${data.contact_lat},${data.contact_lng}&hl=en&z=16&output=embed`;
+        }
 
     } catch (err) {
         console.error("Failed to load contact data:", err);
+    } finally {
+        finishLoader();
     }
 }
+function startLoader() {
+    const bar = document.getElementById("topLoader");
+    bar.style.width = "30%";
+    setTimeout(() => bar.style.width = "70%", 300);
+}
 
+function finishLoader() {
+    const bar = document.getElementById("topLoader");
+    bar.style.width = "100%";
+    setTimeout(() => bar.style.opacity = "0", 300);
+}
 document.addEventListener("DOMContentLoaded", loadContactData);
 
 
