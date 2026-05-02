@@ -17,9 +17,9 @@
         /* ---------- Existing Body & Layout ---------- */
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #0e141b;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             color: #fff;
-            padding: 0px;
+            padding: 30px;
             margin: 0;
             min-height: 100vh;
         }
@@ -34,10 +34,9 @@
         }
 
         .main-container {
-            max-width: 1300px;
-            margin: auto;
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-             padding: 30px;
             flex-direction: column;
             gap: 25px;
         }
@@ -50,25 +49,20 @@
             margin-bottom: 10px;
         }
 
-      .stat-card {
-    background: #1a232d;
-    border-radius: 14px;
-    padding: 20px;
-    text-align: left;
-    border: 1px solid rgba(255,255,255,0.05);
-}
+        .stat-card {
+            background: rgba(0, 198, 255, 0.1);
+            border: 1px solid rgba(0, 198, 255, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease;
+        }
         .stat-card:hover { transform: translateY(-5px); }
 
-     .stat-card h3 {
-    font-size: 12px;
-    color: #888;
-}
+        .stat-card h3 { margin: 0; font-size: 14px; text-transform: uppercase; color: #aaa; }
+        .stat-card p { margin: 10px 0 0; font-size: 28px; font-weight: bold; color: #00c6ff; }
 
-.stat-card p {
-    font-size: 26px;
-    margin-top: 5px;
-    color: #fff;
-}
         /* ---------- TOAST NOTIFICATION ---------- */
         #toast {
             position: fixed;
@@ -104,13 +98,16 @@
             align-items: stretch;
         }
 
-       .card {
-    background: #1a232d;
-    border-radius: 16px;
-    padding: 20px;
-    border: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+        }
 
         .chart-header, .section-header {
             margin-bottom: 20px;
@@ -175,11 +172,17 @@
             transform: scale(1.01);
         }
 
-       .btn {
-    background: #0072ff;
-    border-radius: 8px;
-    font-weight: 500;
-}
+        .btn {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         .btn:hover { 
             filter: brightness(1.2); 
@@ -268,25 +271,28 @@
         .btn-secondary { background: #444; color: white; border: none; cursor: pointer; }
 
         /* ---------- TABLE ---------- */
-      .table-container {
-    background: #1a232d;
-    border-radius: 12px;
-    padding: 10px;
-    overflow-x: auto;
-}
+        .table-container {
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            min-height: 200px;
+        }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0; color: #333; }
-       th {
-    background: #111820;
-    color: #00c6ff;
-}
-
-td {
-    color: #ddd;
-}
-tbody tr:hover {
-    background: rgba(255,255,255,0.05);
-}
+        th { 
+            background: #1a2a33; 
+            color: #00c6ff; 
+            padding: 18px; 
+            text-align: center; 
+            text-transform: uppercase; 
+            font-size: 13px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        td { padding: 15px; border-bottom: 1px solid #eee; text-align: center; }
+        
         /* Group View Rowspan Column styling */
         td[rowspan] {
             background: rgba(0, 198, 255, 0.08);
@@ -429,7 +435,6 @@ th, td {
 
     /* Fix cards spacing */
     .card {
-         margin-bottom: 10px;
         padding: 18px;
     }
 
@@ -488,51 +493,12 @@ th, td {
     border-color: #ff4b2b;
     box-shadow: 0 0 10px rgba(255,75,43,0.5);
 }
-.navbar {
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background: rgba(10, 20, 30, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    box-sizing: border-box;
-}
 
-.navbar h2 {
-    margin: 0;
-    font-size: 18px;
-    color: #00c6ff;
-}
-
-.logout-btn {
-    background: #ff4b2b;
-}
-.loading {
-    padding: 20px;
-    text-align: center;
-    color: #aaa;
-}
-.hidden {
-    display: none;
-}
 /* Remove the specific .col-token { width: 180px; } etc. if they exist */
     </style>
 </head>
 <body>
-<div class="navbar">
-    <div class="nav-left">
-        <h2>Admin Panel</h2>
-    </div>
-    <div class="nav-right">
-        <button class="btn logout-btn" onclick="logoutAdmin()">Logout</button>
-    </div>
-</div>
+
 <div id="toast">✅ Action Successful!</div>
 
 <div class="modal-overlay" id="confirmModal">
@@ -721,7 +687,6 @@ th, td {
     </div>
 
     <div class="table-container">
-        <div id="loadingState" class="loading hidden">Loading data...</div>
         <table id="mainDataTable">
             <thead>
                 <tr>
@@ -902,7 +867,6 @@ async function fetchEventsFromServer() {
 
     // --- 4. DATA LOADING & RENDERING ---
     async function loadStudents() {
-        document.getElementById("loadingState").classList.remove("hidden");
         const btn = document.getElementById("filterBtn");
         const selectedEventName = document.getElementById("event").value;
         const selectedEventObj = eventsList.find(e => e.name === selectedEventName);
@@ -952,7 +916,6 @@ try {
             btn.innerText = "Apply Filters";
             btn.disabled = false;
         }
-        document.getElementById("loadingState").classList.add("hidden");
     }
 
   function updateTableHeaders(isGroupView) {
