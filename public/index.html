@@ -229,6 +229,51 @@
         box-sizing: border-box;
     }
 }
+/* ---------- HERO LOADER ---------- */
+#heroLoader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Skeleton lines */
+.skeleton-line {
+    background: linear-gradient(90deg, #1a2a33 25%, #2c5364 50%, #1a2a33 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+/* Sizes */
+.skeleton-line.short {
+    width: 250px;
+    height: 12px;
+}
+
+.skeleton-line.title {
+    width: 400px;
+    height: 60px;
+    border-radius: 12px;
+}
+
+/* shimmer animation */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Fade-in text */
+.fade-text {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+
+.fade-text.show {
+    opacity: 1;
+    transform: translateY(0);
+}
     </style>
 </head>
 <body>
@@ -244,8 +289,13 @@
     </div>
 
     <section class="hero">
-       <p id="headerText"></p>
-    <h1 id="symposiumTitle">Loading...</h1>
+ <div id="heroLoader">
+    <div class="skeleton-line short"></div>
+    <div class="skeleton-line title"></div>
+</div>
+
+<p id="headerText" class="fade-text"></p>
+<h1 id="symposiumTitle" class="fade-text"></h1>
         
         <div class="countdown" id="timer">
             <div class="time-box"><span id="days">00</span><label>Days</label></div>
@@ -341,11 +391,25 @@ async function loadHomepageText() {
         const res = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await res.json();
         if (data) {
-            document.getElementById("headerText").innerText =
-                data.header_text || "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
-            document.getElementById("symposiumTitle").innerText =
-                data.symposium_title || "SYMPOSIUM '26";
-        }
+
+    const header = document.getElementById("headerText");
+    const title = document.getElementById("symposiumTitle");
+    const loader = document.getElementById("heroLoader");
+
+    header.innerText =
+        data.header_text || "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
+    title.innerText =
+        data.symposium_title || "SYMPOSIUM '26";
+
+    // remove loader
+    loader.style.display = "none";
+
+    // animate text
+    setTimeout(() => {
+        header.classList.add("show");
+        title.classList.add("show");
+    }, 100);
+}
     } catch(err) {
         console.error("Homepage text load failed:", err);
         document.getElementById("headerText").innerText = "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
