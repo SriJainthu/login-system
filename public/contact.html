@@ -401,9 +401,10 @@ async function loadContactData() {
         const email = document.getElementById("contactEmail");
         const phone = document.getElementById("contactPhone");
         const whatsappBtn = document.getElementById("whatsappBtn");
-        if (data.contact_phone) {
-    const phoneNumber = data.contact_phone.replace(/\D/g, ""); // remove spaces
-    whatsappBtn.href = `https://wa.me/${phoneNumber}`;
+ if (data.contact_phone) {
+    const phoneNumber = data.contact_phone.replace(/\D/g, "");
+
+    whatsappBtn.href = `https://wa.me/${phoneNumber}?text=Hello%20I%20want%20details%20about%20Symposium%202026`;
 } else {
     whatsappBtn.style.display = "none";
 }
