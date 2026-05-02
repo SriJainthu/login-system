@@ -15,28 +15,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 const qrcode = require('qrcode-terminal');*/
 const cron = require('node-cron');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-/*// Initialize WhatsApp Client
-const whatsapp = new Client({
-    authStrategy: new LocalAuth(), // This saves your session so you don't scan every time
-    puppeteer: {
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Add these flags for Render
-    }
-});
 
-// Event: Generate QR Code in Terminal
-whatsapp.on('qr', (qr) => {
-    console.log('SCAN THIS QR CODE WITH YOUR WHATSAPP:');
-    qrcode.generate(qr, { small: true });
-});
-
-// Event: Successfully Logged In
-whatsapp.on('ready', () => {
-    console.log('WhatsApp Client is ready!');
-});
-
-// Start the client
-whatsapp.initialize();*/
 /* ---------- EMAIL CONFIGURATION (NODEMAILER) ---------- */
 const BREVO_ACCOUNTS = [
     { apiKey: process.env.BREVO_API_KEY_1, email: process.env.BREVO_EMAIL_1, limit: 300 },

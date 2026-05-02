@@ -738,26 +738,23 @@ function logoutAdmin() {
     window.location.href = "admin-login.html";
 }
     // --- 1. INITIALIZATION & SYNC ---
-    async function fetchEventsFromServer() {
-        try {
-          const res = await adminFetch(`${API_BASE_URL}/events`);
-            let data;
-try {
-  data = await res.json();
-} catch {
-  throw new Error("Server error. Please try again.");
-}
-
-            eventsList = data.map(e => ({
-                name: e.event_name,
-                desc: e.description,
-                type: e.event_type,
-                max_size: e.max_team_size
-            }));
-            renderEvents();
-            loadStudents(); 
-        } catch (err) { console.error("Fetch Events Error:", err); }
+async function fetchEventsFromServer() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/events`); // Use regular fetch, it's public
+        if (!res.ok) throw new Error("Failed to fetch events");
+        const data = await res.json();
+        eventsList = data.map(e => ({
+            name: e.event_name,
+            desc: e.description,
+            type: e.event_type,
+            max_size: e.max_team_size
+        }));
+        renderEvents();
+        loadStudents();
+    } catch (err) { 
+        console.error("Fetch Events Error:", err); 
     }
+}
 
     function renderEvents() {
         const listContainer = document.getElementById("addedEventsList");
@@ -1059,11 +1056,7 @@ try {
 }
 
     // --- 6. EXISTING UTILS ---
-    function openModal(index) {
-        eventToDeleteIndex = index;
-        document.getElementById("confirmModal").style.display = "flex";
-        document.getElementById("modalConfirmBtn").onclick = deleteEvent;
-    }
+   
     function closeModal() { document.getElementById("confirmModal").style.display = "none"; }
 
     async function deleteEvent() {
@@ -1249,11 +1242,30 @@ try {
     setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
 }
 
-function openDeleteModal() {
+
+function openModal(index) {
+    eventToDeleteIndex = index;
+    // Change modal content for event deletion
+    document.querySelector("#confirmModal h2").textContent = "⚠ Delete Event?";
+    document.querySelector("#confirmModal p").textContent = `Delete "${eventsList[index].name}"? This cannot be undone.`;
+    document.getElementById("adminPasswordInput").style.display = "none";
     document.getElementById("confirmModal").style.display = "flex";
-    document.getElementById("adminPasswordInput").value = "";
+    
+    // Override the delete button to call deleteEvent
+    document.querySelector("#confirmModal .modal-btns .btn:last-child").onclick = deleteEvent;
 }
 
+function openDeleteModal() {
+    eventToDeleteIndex = null;
+    document.querySelector("#confirmModal h2").textContent = "⚠ Danger Zone";
+    document.querySelector("#confirmModal p").textContent = "This will permanently delete ALL student data. This action cannot be undone.";
+    document.getElementById("adminPasswordInput").style.display = "block";
+    document.getElementById("adminPasswordInput").value = "";
+    document.getElementById("confirmModal").style.display = "flex";
+    
+    // Override delete button to call confirmDeleteAllFromModal
+    document.querySelector("#confirmModal .modal-btns .btn:last-child").onclick = confirmDeleteAllFromModal;
+}
 function closeModal() {
     document.getElementById("confirmModal").style.display = "none";
 }
@@ -1355,7 +1367,11 @@ async function loadAdminSettings() {
         console.error("Admin settings load error:", err);
     }
 }
-document.addEventListener("DOMContentLoaded", loadAdminSettings);
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadAdminSettings();
+    fetchEventsFromServer(); // This loads events AND calls loadStudents()
+});
 </script>
 </body>
 </html>
