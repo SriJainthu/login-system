@@ -5,7 +5,6 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const axios = require('axios'); // Added Nodemailer
 require('dotenv').config();
-let emailCounter = 0;
 // Set slightly below 500 for safety
 const app = express();
 const jwt = require("jsonwebtoken");
@@ -70,17 +69,34 @@ app.use(express.urlencoded({ extended: true }));
 });
 */
 const promiseDb = db.promise();
-cron.schedule('0 0 * * *', () => {
+/*cron.schedule('0 0 * * *', () => {
     console.log("🕛 Midnight IST: Resetting Daily Email Counter.");
     emailCounter = 0;
 }, {
     scheduled: true,
     timezone: "Asia/Kolkata"
-});
+});*/
 
 async function sendSymposiumEmail(mailOptions) {
-    emailCounter++;
+    // Get today's date in IST
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 
+    // Get or create today's count from DB
+    await promiseDb.query(
+        `INSERT INTO email_usage (usage_date, count) VALUES (?, 1)
+         ON DUPLICATE KEY UPDATE count = count + 1`,
+        [today]
+    );
+
+    // Read the current count
+    const [[usage]] = await promiseDb.query(
+        "SELECT count FROM email_usage WHERE usage_date = ?",
+        [today]
+    );
+
+    const emailCounter = usage.count;
+
+    // Decide which account to use
     let accountIndex = -1;
     let cumulative = 0;
     for (let i = 0; i < BREVO_ACCOUNTS.length; i++) {
@@ -89,11 +105,12 @@ async function sendSymposiumEmail(mailOptions) {
     }
 
     if (accountIndex === -1) {
+        console.error("🚨 Daily email limit exhausted!");
         throw new Error("Daily registration limit reached. Please contact admin.");
     }
 
     const account = BREVO_ACCOUNTS[accountIndex];
-    console.log(`[Email] Account ${accountIndex + 1}: ${account.email} | Total: ${emailCounter}`);
+    console.log(`[Email] Account ${accountIndex + 1}: ${account.email} | Today's Total: ${emailCounter}`);
 
     const response = await axios.post(
         'https://api.brevo.com/v3/smtp/email',
