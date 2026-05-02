@@ -682,9 +682,7 @@ app.get("/api/public-settings", async (req, res) => {
         res.status(500).json({ error: "Could not load settings" });
     }
 });
-app.get("/admin.html", verifyAdmin, (req, res) => {
-    res.sendFile(__dirname + "/public/admin.html");
-});
+
 app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));

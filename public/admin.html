@@ -716,6 +716,13 @@ function adminFetch(url, options = {}) {
             'Authorization': `Bearer ${token}`,
             ...(options.headers || {})
         }
+    }).then(res => {
+        // If token expired, redirect to login
+        if (res.status === 401 || res.status === 403) {
+            localStorage.removeItem("adminToken");
+            window.location.href = "admin-login.html";
+        }
+        return res;
     });
 }
     // Add this at the top of your script
