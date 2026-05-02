@@ -199,7 +199,7 @@
 
   <div style="margin-top: 25px; font-size: 11px; color: #888; line-height: 1.5;">
     A confirmation message has been sent to your <br>
-    WhatsApp number: <span id="masked-phone" style="color: var(--accent); font-weight: bold;">Updating...</span>
+    Registered Email: <span id="masked-phone" style="color: var(--accent); font-weight: bold;">Updating...</span>
 </div>
 
 </div>
@@ -211,21 +211,21 @@
     return str.slice(0, 2) + "*****" + str.slice(-2);
   }
 
-  function displayRegistrationInfo() {
-    // Retrieve the data we saved in the previous step
+function displayRegistrationInfo() {
     const studentData = JSON.parse(localStorage.getItem("studentData"));
-    const phoneDisplay = document.getElementById('masked-phone');
+    const emailDisplay = document.getElementById('masked-phone'); // keep same id
 
-    if (studentData && studentData.phone) {
-      phoneDisplay.textContent = maskPhone(studentData.phone);
+    if (studentData && studentData.email) {
+        emailDisplay.textContent = maskEmail(studentData.email);
     } else {
-      phoneDisplay.textContent = "your registered number";
+        emailDisplay.textContent = "your registered email";
     }
-
-    // Optional: Clear localStorage if you don't want the data 
-    // to persist after the user sees this page
-    // localStorage.removeItem("studentData"); 
-  }
+}
+function maskEmail(email) {
+    if (!email) return "your registered email";
+    const [user, domain] = email.split("@");
+    return user.charAt(0) + "*****@" + domain;
+}
 
   // Simple Confetti Generator
   function createConfetti() {
