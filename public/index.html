@@ -337,18 +337,21 @@ async function updateTimer() {
     }
 }
 async function loadHomepageText() {
-    const res = await fetch("/api/settings");
-    const data = await res.json();
-
-    if (data) {
-        document.getElementById("headerText").innerText =
-            data.header_text || "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
-
-        document.getElementById("symposiumTitle").innerText =
-            data.symposium_title || "SYMPOSIUM '26";
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const data = await res.json();
+        if (data) {
+            document.getElementById("headerText").innerText =
+                data.header_text || "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
+            document.getElementById("symposiumTitle").innerText =
+                data.symposium_title || "SYMPOSIUM '26";
+        }
+    } catch(err) {
+        console.error("Homepage text load failed:", err);
+        document.getElementById("headerText").innerText = "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
+        document.getElementById("symposiumTitle").innerText = "SYMPOSIUM '26";
     }
 }
-
 loadHomepageText();
 
 // Initial Sync

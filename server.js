@@ -675,14 +675,16 @@ app.get('/admin/verify-session', verifyAdmin, (req, res) => {
 app.get("/api/public-settings", async (req, res) => {
     try {
         const [rows] = await promiseDb.query(
-            "SELECT event_selection_limit, registration_deadline FROM symposium_settings WHERE id = 1"
+            "SELECT event_selection_limit, registration_deadline, header_text, symposium_title FROM symposium_settings WHERE id = 1"
         );
         res.json(rows[0]);
     } catch (err) {
         res.status(500).json({ error: "Could not load settings" });
     }
 });
-
+app.get("/admin.html", verifyAdmin, (req, res) => {
+    res.sendFile(__dirname + "/public/admin.html");
+});
 app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));

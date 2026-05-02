@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+     <script>
+        // This runs BEFORE the page renders
+        if (!localStorage.getItem("adminToken")) {
+            window.location.replace("admin-login.html");
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Symposium 2026</title>
@@ -888,11 +894,7 @@ try {
                     year: document.getElementById("year").value,
                     event: selectedEventName
                 });
-               const res = await adminFetch(`${API_BASE_URL}/admin/students?` , {
-    headers: {
-        "Authorization": "Bearer " + localStorage.getItem("adminToken")
-    }
-}+ params.toString());
+               const res = await adminFetch(`${API_BASE_URL}/admin/students?${params.toString()}`);
                let data;
 try {
   data = await res.json();
@@ -1323,21 +1325,29 @@ async function updateContactDetails() {
     showToast("✅ Contact updated!");
 }
 async function loadAdminSettings() {
-    const res1 = await adminFetch(`${API_BASE_URL}/api/settings`);
-    const settings = await res1.json();
+    try {
+        const res1 = await adminFetch(`${API_BASE_URL}/api/settings`);
+        if (!res1.ok) throw new Error("Settings fetch failed");
+        const settings = await res1.json();
 
-    document.getElementById("adminHeaderText").value = settings.header_text || "";
-    document.getElementById("adminSymposiumTitle").value = settings.symposium_title || "";
+        document.getElementById("adminHeaderText").value = settings.header_text || "";
+        document.getElementById("adminSymposiumTitle").value = settings.symposium_title || "";
+        document.getElementById("adminLimitInput").value = settings.event_selection_limit || 3;
 
-    const res2 = await adminFetch(`${API_BASE_URL}/api/contact`);
-    const contact = await res2.json();
+        const res2 = await adminFetch(`${API_BASE_URL}/api/contact`);
+        if (!res2.ok) throw new Error("Contact fetch failed");
+        const contact = await res2.json();
 
-    document.getElementById("adminEmail").value = contact.contact_email || "";
-    document.getElementById("adminPhone").value = contact.contact_phone || "";
-    document.getElementById("adminLocation").value = contact.contact_location || "";
-    document.getElementById("adminMap").value = contact.contact_map_embed || "";
+        document.getElementById("adminEmail").value = contact.contact_email || "";
+        document.getElementById("adminPhone").value = contact.contact_phone || "";
+        document.getElementById("adminLocation").value = contact.contact_location || "";
+        document.getElementById("adminLat").value = contact.contact_lat || "";
+        document.getElementById("adminLng").value = contact.contact_lng || "";
+
+    } catch(err) {
+        console.error("Admin settings load error:", err);
+    }
 }
-
 document.addEventListener("DOMContentLoaded", loadAdminSettings);
 </script>
 </body>
