@@ -6,7 +6,7 @@ const cors = require("cors");
 const axios = require('axios'); // Added Nodemailer
 require('dotenv').config();
 let emailCounter = 0;
-const EMAIL_LIMIT = 250; // Set slightly below 500 for safety
+// Set slightly below 500 for safety
 const app = express();
 const jwt = require("jsonwebtoken");
 
@@ -20,6 +20,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const BREVO_ACCOUNTS = [
     { apiKey: process.env.BREVO_API_KEY_1, email: process.env.BREVO_EMAIL_1, limit: 300 },
     { apiKey: process.env.BREVO_API_KEY_2, email: process.env.BREVO_EMAIL_2, limit: 300 },
+    { apiKey: process.env.BREVO_API_KEY_3, email: process.env.BREVO_EMAIL_3, limit: 300 }, // 👈 ADD THIS
 ];
 console.log("✅ Brevo Email Service Ready");
 
