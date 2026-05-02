@@ -19,7 +19,7 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #0e141b;
             color: #fff;
-            padding: 30px;
+            padding: 0px;
             margin: 0;
             min-height: 100vh;
         }
@@ -37,6 +37,7 @@
             max-width: 1300px;
             margin: auto;
             display: flex;
+             padding: 30px;
             flex-direction: column;
             gap: 25px;
         }
@@ -490,14 +491,17 @@ th, td {
 .navbar {
     position: sticky;
     top: 0;
+    left: 0;
+    width: 100%;
     z-index: 1000;
-    background: rgba(10, 20, 30, 0.9);
+    background: rgba(10, 20, 30, 0.95);
     backdrop-filter: blur(10px);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    box-sizing: border-box;
 }
 
 .navbar h2 {
