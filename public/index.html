@@ -263,21 +263,47 @@
     100% { background-position: 200% 0; }
 }
 
-/* Fade-in text */
 .fade-text {
     opacity: 0;
     transform: translateY(20px);
-    transition: all 0.6s ease;
+    filter: blur(10px);
+    transition: all 0.8s ease;
 }
 
 .fade-text.show {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
+}
+/* Animated Gradient Title */
+#symposiumTitle {
+    background: linear-gradient(90deg, #00c6ff, #00ffae, #0072ff, #00c6ff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientMove 6s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+/* Top Loading Bar */
+#topLoader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #00c6ff, #00ffae);
+    z-index: 9999;
+    transition: width 0.3s ease;
 }
     </style>
 </head>
 <body>
-
+<div id="topLoader"></div>
     <div class="bg-container"></div>
 
     <div class="modal-overlay" id="modalOverlay">
@@ -387,35 +413,69 @@ async function updateTimer() {
     }
 }
 async function loadHomepageText() {
+    startLoader();
+
     try {
         const res = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await res.json();
+
+        const header = document.getElementById("headerText");
+        const title = document.getElementById("symposiumTitle");
+        const loader = document.getElementById("heroLoader");
+
         if (data) {
+            header.innerText =
+                data.header_text || "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
+            title.innerText =
+                data.symposium_title || "SYMPOSIUM '26";
+        } else {
+            header.innerText = "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
+            title.innerText = "SYMPOSIUM '26";
+        }
 
-    const header = document.getElementById("headerText");
-    const title = document.getElementById("symposiumTitle");
-    const loader = document.getElementById("heroLoader");
+        // remove skeleton loader
+        if (loader) loader.style.display = "none";
 
-    header.innerText =
-        data.header_text || "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
-    title.innerText =
-        data.symposium_title || "SYMPOSIUM '26";
+        // animate text
+        setTimeout(() => {
+            header.classList.add("show");
+            title.classList.add("show");
+        }, 100);
 
-    // remove loader
-    loader.style.display = "none";
+    } catch (err) {
+        console.error("Homepage text load failed:", err);
 
-    // animate text
-    setTimeout(() => {
+        const header = document.getElementById("headerText");
+        const title = document.getElementById("symposiumTitle");
+
+        header.innerText = "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
+        title.innerText = "SYMPOSIUM '26";
+
         header.classList.add("show");
         title.classList.add("show");
-    }, 100);
-}
-    } catch(err) {
-        console.error("Homepage text load failed:", err);
-        document.getElementById("headerText").innerText = "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
-        document.getElementById("symposiumTitle").innerText = "SYMPOSIUM '26";
+
+    } finally {
+        // ✅ ALWAYS runs (success or error)
+        finishLoader();
     }
 }
+function startLoader() {
+    const bar = document.getElementById("topLoader");
+    bar.style.width = "30%";
+
+    setTimeout(() => bar.style.width = "60%", 300);
+    setTimeout(() => bar.style.width = "80%", 600);
+}
+
+function finishLoader() {
+    const bar = document.getElementById("topLoader");
+    bar.style.width = "100%";
+
+    setTimeout(() => {
+        bar.style.opacity = "0";
+    }, 300);
+}
+
 loadHomepageText();
 
 // Initial Sync
