@@ -173,6 +173,43 @@
             .event-grid { grid-template-columns: 1fr; }
             .navbar { padding: 15px 20px; }
         }
+        /* ---------- SKELETON LOADING ---------- */
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.1),
+        transparent
+    );
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 150%;
+    }
+}
+.skeleton::before {
+    content: '';
+    display: block;
+    height: 20px;
+    width: 60%;
+    background: rgba(255,255,255,0.08);
+    margin: 20px;
+    border-radius: 6px;
+}
     </style>
 </head>
 <body>
@@ -215,8 +252,12 @@
         <h1>Event <span>Catalog</span></h1>
         <p class="subtitle">Explore the technical challenges and innovative competitions</p>
         
-        <div class="event-grid" id="eventGrid">
-  <p style="grid-column: 1/-1; color:#aaa;">Loading events...</p>
+      <div class="event-grid" id="eventGrid">
+    <!-- Skeleton Cards -->
+    <div class="event-card skeleton"></div>
+    <div class="event-card skeleton"></div>
+    <div class="event-card skeleton"></div>
+    <div class="event-card skeleton"></div>
 </div>
     </div>
 
