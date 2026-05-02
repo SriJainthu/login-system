@@ -344,7 +344,7 @@
 
     async function syncAdminSettings() {
         try {
-            const settingsRes = await fetch(`${API_BASE_URL}/api/settings`);
+            const settingsRes =await fetch(`${API_BASE_URL}/api/public-settings`);
             const settings = await settingsRes.json();
             
             adminEventLimit = parseInt(settings.event_selection_limit) || 3;

@@ -702,6 +702,16 @@ th, td {
 if (!token) {
     window.location.href = "admin-login.html";
 }
+function adminFetch(url, options = {}) {
+    return fetch(url, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...(options.headers || {})
+        }
+    });
+}
     // Add this at the top of your script
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
@@ -717,7 +727,7 @@ function logoutAdmin() {
     // --- 1. INITIALIZATION & SYNC ---
     async function fetchEventsFromServer() {
         try {
-          const res = await fetch(`${API_BASE_URL}/events`);
+          const res = await adminFetch(`${API_BASE_URL}/events`);
             let data;
 try {
   data = await res.json();
@@ -825,7 +835,7 @@ try {
         if (!name || !desc) return alert("Fill name and description");
 
         try {
-          const response = await fetch(`${API_BASE_URL}/admin/add-event`, {
+          const response = await adminFetch(`${API_BASE_URL}/admin/add-event`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
@@ -862,7 +872,7 @@ try {
             
             if (currentIsGroupView) {
                 // Fetch Grouped Logic (Includes Token in Query)
-               const res = await fetch(`${API_BASE_URL}/admin/grouped-teams?eventName=${encodeURIComponent(selectedEventName)}&college=${document.getElementById("college").value}&token=${encodeURIComponent(tokenSearch)}`);
+               const res = await adminFetch(`${API_BASE_URL}/admin/grouped-teams?eventName=${encodeURIComponent(selectedEventName)}&college=${document.getElementById("college").value}&token=${encodeURIComponent(tokenSearch)}`);
                 let data;
 try {
   data = await res.json();
@@ -878,7 +888,7 @@ try {
                     year: document.getElementById("year").value,
                     event: selectedEventName
                 });
-               const res = await fetch(`${API_BASE_URL}/admin/students?` , {
+               const res = await adminFetch(`${API_BASE_URL}/admin/students?` , {
     headers: {
         "Authorization": "Bearer " + localStorage.getItem("adminToken")
     }
@@ -1050,7 +1060,7 @@ try {
     async function deleteEvent() {
         const eventName = eventsList[eventToDeleteIndex].name;
         try {
-            const res = await fetch(`${API_BASE_URL}/admin/delete-event?name=${encodeURIComponent(eventName)}`, { method: "DELETE" });
+            const res = await adminFetch(`${API_BASE_URL}/admin/delete-event?name=${encodeURIComponent(eventName)}`, { method: "DELETE" });
             if (res.ok) {
                 showToast("🗑️ Event Deleted");
                 closeModal();
@@ -1100,7 +1110,7 @@ try {
 
     async function updateEventLimit() {
         const val = document.getElementById("adminLimitInput").value;
-        await fetch(`${API_BASE_URL}/api/settings`, {
+        await adminFetch(`${API_BASE_URL}/api/settings`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ limit: val })
@@ -1111,7 +1121,7 @@ try {
 
     function updateSymposiumDate() {
         const val = document.getElementById("adminDateInput").value;
-       fetch(`${API_BASE_URL}/api/settings`, {
+       adminFetch(`${API_BASE_URL}/api/settings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ deadline: val })
@@ -1248,7 +1258,7 @@ async function confirmDeleteAllFromModal() {
     }
 
     try {
-        const res = await fetch(`${API_BASE_URL}/admin/delete-all-students`, {
+        const res = await adminFetch(`${API_BASE_URL}/admin/delete-all-students`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -1274,7 +1284,7 @@ async function updateHomepageText() {
     const header = document.getElementById("adminHeaderText").value;
     const title = document.getElementById("adminSymposiumTitle").value;
 
-    const res = await fetch(`${API_BASE_URL}/api/settings`, {
+    const res = await adminFetch(`${API_BASE_URL}/api/settings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1302,7 +1312,7 @@ async function updateContactDetails() {
     const lat = document.getElementById("adminLat").value;
     const lng = document.getElementById("adminLng").value;
 
-    await fetch(`${API_BASE_URL}/api/update-contact`, {
+    await adminFetch(`${API_BASE_URL}/api/update-contact`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -1313,13 +1323,13 @@ async function updateContactDetails() {
     showToast("✅ Contact updated!");
 }
 async function loadAdminSettings() {
-    const res1 = await fetch(`${API_BASE_URL}/api/settings`);
+    const res1 = await adminFetch(`${API_BASE_URL}/api/settings`);
     const settings = await res1.json();
 
     document.getElementById("adminHeaderText").value = settings.header_text || "";
     document.getElementById("adminSymposiumTitle").value = settings.symposium_title || "";
 
-    const res2 = await fetch(`${API_BASE_URL}/api/contact`);
+    const res2 = await adminFetch(`${API_BASE_URL}/api/contact`);
     const contact = await res2.json();
 
     document.getElementById("adminEmail").value = contact.contact_email || "";

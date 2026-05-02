@@ -278,7 +278,7 @@ let serverDeadline = null;
 
 async function syncDeadline() {
     try {
-       const response = await fetch(`${API_BASE_URL}/api/settings`);
+       const response = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await response.json();
         serverDeadline = new Date(data.registration_deadline).getTime();
     } catch (err) {

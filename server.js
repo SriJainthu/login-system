@@ -538,52 +538,20 @@ app.get("/api/settings", verifyAdmin, async (req, res) => {
         );
         res.json(rows[0]);
     } catch (err) {
-        console.error("Settings fetch error:", err);
         res.status(500).json({ error: "Could not load settings" });
     }
 });
 
-app.post("/api/settings",  verifyAdmin,async (req, res) => {
+app.post("/api/settings", verifyAdmin, async (req, res) => {
     try {
         const { limit, deadline, header_text, symposium_title } = req.body;
-
-        if (limit) {
-            await promiseDb.query(
-                "UPDATE symposium_settings SET event_selection_limit = ? WHERE id = 1",
-                [parseInt(limit)]
-            );
-        }
-
-        if (deadline) {
-            await promiseDb.query(
-                "UPDATE symposium_settings SET registration_deadline = ? WHERE id = 1",
-                [deadline]
-            );
-        }
-
-        // 🔥 NEW
-        if (header_text) {
-            await promiseDb.query(
-                "UPDATE symposium_settings SET header_text = ? WHERE id = 1",
-                [header_text]
-            );
-        }
-
-        if (symposium_title) {
-            await promiseDb.query(
-                "UPDATE symposium_settings SET symposium_title = ? WHERE id = 1",
-                [symposium_title]
-            );
-        }
-
-        const [rows] = await promiseDb.query(
-            "SELECT * FROM symposium_settings WHERE id = 1"
-        );
-
+        if (limit) await promiseDb.query("UPDATE symposium_settings SET event_selection_limit = ? WHERE id = 1", [parseInt(limit)]);
+        if (deadline) await promiseDb.query("UPDATE symposium_settings SET registration_deadline = ? WHERE id = 1", [deadline]);
+        if (header_text) await promiseDb.query("UPDATE symposium_settings SET header_text = ? WHERE id = 1", [header_text]);
+        if (symposium_title) await promiseDb.query("UPDATE symposium_settings SET symposium_title = ? WHERE id = 1", [symposium_title]);
+        const [rows] = await promiseDb.query("SELECT * FROM symposium_settings WHERE id = 1");
         res.json({ success: true, settings: rows[0] });
-
     } catch (err) {
-        console.error("Settings update error:", err);
         res.status(500).json({ error: "Could not update settings" });
     }
 });
@@ -691,24 +659,30 @@ app.post("/api/update-contact",  verifyAdmin,async (req, res) => {
         res.status(500).json({ error: "Update failed" });
     }
 });
-app.get("/api/contact",  verifyAdmin,async (req, res) => {
+app.get("/api/contact", async (req, res) => {
     try {
         const [rows] = await promiseDb.query(
-            "SELECT * FROM symposium_settings WHERE id = 1"
+            "SELECT contact_email, contact_phone, contact_location, contact_lat, contact_lng FROM symposium_settings WHERE id = 1"
         );
         res.json(rows[0]);
     } catch (err) {
-        console.error("❌ Contact fetch error:", err);
         res.status(500).json({ error: "Failed to load contact" });
     }
 });
-app.get('/admin/verify-session', (req, res) => {
-    if (req.session && req.session.admin) {
-        return res.json({ success: true });
-    } else {
-        return res.status(401).json({ success: false });
+app.get('/admin/verify-session', verifyAdmin, (req, res) => {
+    res.json({ success: true });
+});
+app.get("/api/public-settings", async (req, res) => {
+    try {
+        const [rows] = await promiseDb.query(
+            "SELECT event_selection_limit, registration_deadline FROM symposium_settings WHERE id = 1"
+        );
+        res.json(rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: "Could not load settings" });
     }
 });
+
 app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));

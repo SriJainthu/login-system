@@ -408,7 +408,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const inputs = document.querySelectorAll('.input-field input');
 
     try {
-       const response = await fetch(`${API_BASE_URL}/api/settings`);
+       const response = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await response.json();
         // Assuming your API returns { settings: { registration_deadline: "..." } }
         const deadline = data.settings ? data.settings.registration_deadline : data.registration_deadline;
