@@ -17,15 +17,11 @@ const cron = require('node-cron');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 /* ---------- EMAIL CONFIGURATION (NODEMAILER) ---------- */
-let i = 1;
-while (process.env[`BREVO_API_KEY_${i}`]) {
-    BREVO_ACCOUNTS.push({
-        apiKey: process.env[`BREVO_API_KEY_${i}`],
-        email: process.env[`BREVO_EMAIL_${i}`],
-        limit: 300
-    });
-    i++;
-}
+const BREVO_ACCOUNTS = [
+    { apiKey: process.env.BREVO_API_KEY_1, email: process.env.BREVO_EMAIL_1, limit: 300 },
+    { apiKey: process.env.BREVO_API_KEY_2, email: process.env.BREVO_EMAIL_2, limit: 300 },
+    { apiKey: process.env.BREVO_API_KEY_3, email: process.env.BREVO_EMAIL_3, limit: 300 }, // ✅ NEW
+];
 console.log("✅ Brevo Email Service Ready");
 
 
