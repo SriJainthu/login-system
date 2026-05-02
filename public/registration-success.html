@@ -212,13 +212,21 @@
   }
 
 function displayRegistrationInfo() {
-    const studentData = JSON.parse(localStorage.getItem("studentData"));
-    const emailDisplay = document.getElementById('masked-phone'); // keep same id
-
-    if (studentData && studentData.email) {
-        emailDisplay.textContent = maskEmail(studentData.email);
-    } else {
-        emailDisplay.textContent = "your registered email";
+    const emailDisplay = document.getElementById('masked-phone');
+    
+    try {
+        const studentData = JSON.parse(localStorage.getItem("studentData"));
+        
+        if (studentData && studentData.email) {
+            emailDisplay.textContent = maskEmail(studentData.email);
+            // Clear after reading so it doesn't persist
+            // localStorage.removeItem("studentData"); // optional
+        } else {
+            // Fallback - check sessionStorage too
+            emailDisplay.textContent = "your registered email ✓";
+        }
+    } catch(e) {
+        emailDisplay.textContent = "your registered email ✓";
     }
 }
 function maskEmail(email) {

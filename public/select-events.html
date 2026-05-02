@@ -515,7 +515,7 @@ for (let card of eventCards) {
         const result = await response.json();
 
         if (result.success) {
-            localStorage.removeItem("studentData");
+           // localStorage.removeItem("studentData");
             window.location.href = 'registration-success.html';
         } else {
             openAlert(result.message, "Registration Error");
