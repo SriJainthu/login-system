@@ -1,1377 +1,1372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <script>
-        // This runs BEFORE the page renders
-        if (!localStorage.getItem("adminToken")) {
-            window.location.replace("admin-login.html");
-        }
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Symposium 2026</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    if (!localStorage.getItem("adminToken")) {
+      window.location.replace("admin-login.html");
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Symposium 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<style>
-        /* ---------- Existing Body & Layout ---------- */
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
-            padding: 30px;
-            margin: 0;
-            min-height: 100vh;
-        }
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 36px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(0, 198, 255, 0.6);
-        }
-
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        /* ---------- STATS CARDS ---------- */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 10px;
-        }
-
-        .stat-card {
-            background: rgba(0, 198, 255, 0.1);
-            border: 1px solid rgba(0, 198, 255, 0.3);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-            transition: transform 0.3s ease;
-        }
-        .stat-card:hover { transform: translateY(-5px); }
-
-        .stat-card h3 { margin: 0; font-size: 14px; text-transform: uppercase; color: #aaa; }
-        .stat-card p { margin: 10px 0 0; font-size: 28px; font-weight: bold; color: #00c6ff; }
-
-        /* ---------- TOAST NOTIFICATION ---------- */
-        #toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(to right, #2ecc71, #27ae60);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            display: none;
-            z-index: 10000;
-            font-weight: bold;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes tableFade {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animated-row { animation: tableFade 0.4s ease forwards; }
-
-        .top-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            align-items: stretch;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chart-header, .section-header {
-            margin-bottom: 20px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #00c6ff;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border-bottom: 1px solid rgba(0, 198, 255, 0.2);
-            padding-bottom: 10px;
-        }
-
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            flex-grow: 1;
-        }
-
-        .filters { display: flex; flex-direction: column; gap: 12px; }
-
-        .export-settings {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 12px;
-            justify-content: center;
-        }
-
-        .admin-config-box {
-            margin-top: 5px;
-            padding: 12px;
-            border: 1px solid rgba(0, 198, 255, 0.3);
-            border-radius: 12px;
-            background: rgba(0, 198, 255, 0.05);
-            transition: 0.3s;
-        }
-
-        .needs-confirm {
-            border-color: #f1c40f;
-            background: rgba(241, 196, 15, 0.1);
-        }
-
-        input, select, textarea, .btn {
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.08);
-            color: white;
-            font-size: 14px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #00c6ff;
-            background: #1a2a33;
-            transform: scale(1.01);
-        }
-
-        .btn {
-            background: linear-gradient(to right, #00c6ff, #0072ff);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn:hover { 
-            filter: brightness(1.2); 
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 198, 255, 0.4);
-        }
-        
-        .btn:active { transform: translateY(0); }
-
-        .btn-csv { background: linear-gradient(to right, #2ecc71, #27ae60); }
-        .btn-confirm { background: linear-gradient(to right, #2ecc71, #27ae60); margin-top: 10px; display: none; padding: 8px; }
-
-        /* ---------- DYNAMIC EVENT MANAGER STYLES ---------- */
-        .event-manager-card { grid-column: span 2; }
-        .event-form { display: flex; gap: 15px; margin-bottom: 25px; align-items: flex-end; }
-        .event-input-group { flex: 1; }
-        .event-input-group label { display: block; font-size: 11px; color: #00c6ff; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
-        
-        .added-events-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 5px;
-        }
-        .event-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 18px;
-            border-radius: 15px;
-            position: relative;
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .event-item:hover {
-            background: rgba(255,255,255,0.07);
-            border-color: #00c6ff;
-        }
-        .event-item h4 { margin: 0 0 8px 0; color: #00ffae; font-size: 18px; padding-right: 25px;}
-        .event-item p { margin: 0; font-size: 13px; color: #bbb; line-height: 1.5; }
-        
-        .delete-event {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 75, 43, 0.2);
-            border: 1px solid #ff4b2b;
-            color: #ff4b2b;
-            border-radius: 8px;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-        }
-        .delete-event:hover { background: #ff4b2b; color: white; }
-
-        /* ---------- MODAL ---------- */
-        .modal-overlay {
-            position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(8px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 20000;
-        }
-        .modal-box {
-            background: #1a2a33;
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid #00c6ff;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-        .modal-btns { display: flex; gap: 15px; margin-top: 25px; }
-        .btn-secondary { background: #444; color: white; border: none; cursor: pointer; }
-
-        /* ---------- TABLE ---------- */
-        .table-container {
-            overflow-x: auto;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            min-height: 200px;
-        }
-
-        table { width: 100%; border-collapse: separate; border-spacing: 0; color: #333; }
-        th { 
-            background: #1a2a33; 
-            color: #00c6ff; 
-            padding: 18px; 
-            text-align: center; 
-            text-transform: uppercase; 
-            font-size: 13px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        td { padding: 15px; border-bottom: 1px solid #eee; text-align: center; }
-        
-        /* Group View Rowspan Column styling */
-        td[rowspan] {
-            background: rgba(0, 198, 255, 0.08);
-            color: #0072ff;
-            font-weight: 800;
-            border-right: 2px solid rgba(0, 198, 255, 0.2);
-        }
-        tbody tr:nth-child(even) { background-color: #f8f9fa; }
-
-        @media (max-width: 850px) {
-            .top-row { grid-template-columns: 1fr; }
-            .event-manager-card { grid-column: span 1; }
-            .event-form { flex-direction: column; }
-        }
-        .event-manager-card { 
-        grid-column: span 2; 
-        width: 100%; /* Ensure card takes full width */
-    }
-    
-    .event-form { 
-        display: flex; 
-        gap: 15px; 
-        margin-bottom: 25px; 
-        align-items: flex-end; 
-        width: 100%; /* Form stretches to card edges */
+    :root {
+      --bg:       #080c10;
+      --surface:  #0d1117;
+      --panel:    #111820;
+      --border:   rgba(255,255,255,0.07);
+      --border-accent: rgba(0,210,180,0.35);
+      --accent:   #00d2b4;
+      --accent2:  #3b82f6;
+      --danger:   #ef4444;
+      --warn:     #f59e0b;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --label:    #94a3b8;
+      --mono:     'Space Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+      --radius:   12px;
+      --radius-lg:20px;
     }
 
-    .event-input-group { 
-        flex: 1; /* This makes Name and Description grow to fill space */
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Ensure the inputs themselves take up 100% of their flex container */
-    .event-input-group input {
-        width: 100%; 
-        box-sizing: border-box;
-    }
-
-    /* ---------- 2. FIX: TABLE ALIGNMENT (Fixed Header Shift) ---------- */
-    .table-container {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    table { 
-        width: 100%; 
-        border-collapse: collapse; 
-        table-layout: fixed; /* CRITICAL: Prevents rowspan from pushing headers */
-    }
-
-    th, td { 
-        padding: 15px; 
-        border: 1px solid rgba(0, 0, 0, 0.1); 
-        text-align: center;
-        word-wrap: break-word; /* Prevents long tokens from breaking layout */
-    }
-
-    /* Assigning specific widths to headers so they never shift */
-    .col-token { width: 180px; }
-    .col-team { width: 100px; }
-    .col-reg { width: 120px; }
-    .col-dept { width: 100px; }
-    .col-college { width: 150px; }
-    .col-name { width: auto; }
-
-    td[rowspan] {
-        background: rgba(0, 198, 255, 0.05);
-        vertical-align: middle; /* Keeps the Blue Token text centered vertically */
-        font-weight: bold;
-    }
-    /* Specific styling for the Description box */
-textarea {
-    resize: vertical; /* Allows user to stretch it vertically only */
-    min-height: 45px; /* Matches the height of your text inputs */
-    line-height: 1.4;
-    padding-top: 10px; /* Better alignment for multi-line text */
-}
-
-/* Ensure the input group doesn't break on mobile */
-@media (max-width: 850px) {
-    .event-input-group textarea {
-        width: 100%;
-        min-height: 80px; /* Give more space on mobile */
-    }
-}
-/* Update these specific parts of your <style> */
-table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    table-layout: auto; /* Change from FIXED to AUTO to allow columns to expand */
-    min-width: 800px; /* Ensures space for all data */
-}
-
-th, td { 
-    padding: 12px 15px; 
-    border: 1px solid rgba(0, 0, 0, 0.1); 
-    text-align: center;
-    white-space: nowrap; /* Prevents text from wrapping into vertical lines */
-}
-/* ---------- MOBILE FIX (NO DESIGN CHANGE) ---------- */
-@media (max-width: 768px) {
+    html { font-size: 15px; scroll-behavior: smooth; }
 
     body {
-        padding: 15px; /* reduce side spacing */
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    h1 {
-        font-size: 24px;
-        letter-spacing: 1px;
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
     }
 
-    /* Stack everything vertically */
-    .top-row {
-        grid-template-columns: 1fr;
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,12,16,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .controls-grid {
-        grid-template-columns: 1fr;
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
+    .logo-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    .topbar-title {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .live-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(0,210,180,0.1);
+      border: 1px solid rgba(0,210,180,0.3);
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .wrapper {
+      flex: 1;
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .page-header h1 {
+      font-family: var(--mono);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .page-header h1 span {
+      color: var(--accent);
+    }
+
+    .page-subtext {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+      font-weight: 300;
+    }
+
+    /* ── STAT CARDS ── */
     .stats-row {
-        grid-template-columns: 1fr 1fr;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
 
-    /* Fix event form layout */
-    .event-form {
-        flex-direction: column;
-        align-items: stretch;
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s;
     }
 
-    .event-form .btn {
-        width: 100% !important;
+    .stat-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
     }
 
-    /* Inputs full width */
-    .event-input-group {
-        width: 100%;
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
     }
 
-    /* Fix cards spacing */
+    .stat-card:hover::after { opacity: 1; }
+
+    .stat-label {
+      font-size: 11px;
+      font-family: var(--mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .stat-value.small { font-size: 22px; }
+
+    .stat-accent { color: var(--accent); }
+
+    /* ── SECTION CARD ── */
     .card {
-        padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
     }
 
-    /* Fix chart height */
-    canvas {
-        max-height: 220px !important;
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
     }
 
-    /* TABLE FIX (MOST IMPORTANT) */
-    .table-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .card-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
     }
+
+    .card-count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--panel);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── TWO-COL GRID ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* ── EVENT MANAGER ── */
+    .event-form {
+      display: grid;
+      grid-template-columns: 1.4fr 1.6fr 0.8fr 0.5fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .form-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    input, select, textarea {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      width: 100%;
+      transition: border-color 0.2s, background 0.2s;
+      outline: none;
+    }
+
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      background: rgba(0,210,180,0.04);
+    }
+
+    select option { background: #111820; }
+
+    textarea { resize: vertical; min-height: 44px; line-height: 1.5; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--radius);
+      padding: 11px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #080c10;
+    }
+    .btn-primary:hover {
+      background: #00f5d0;
+      box-shadow: 0 0 20px rgba(0,210,180,0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--label);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: rgba(255,255,255,0.2);
+      color: var(--text);
+    }
+
+    .btn-success {
+      background: rgba(0,210,180,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(0,210,180,0.3);
+    }
+    .btn-success:hover {
+      background: rgba(0,210,180,0.2);
+      box-shadow: 0 0 16px rgba(0,210,180,0.2);
+    }
+
+    .btn-danger {
+      background: rgba(239,68,68,0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239,68,68,0.3);
+    }
+    .btn-danger:hover {
+      background: rgba(239,68,68,0.2);
+    }
+
+    .btn-blue {
+      background: rgba(59,130,246,0.12);
+      color: var(--accent2);
+      border: 1px solid rgba(59,130,246,0.3);
+    }
+    .btn-blue:hover {
+      background: rgba(59,130,246,0.2);
+    }
+
+    .btn-confirm {
+      margin-top: 10px;
+      width: 100%;
+      display: none;
+      background: rgba(0,210,180,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0,210,180,0.3);
+    }
+    .btn-confirm:hover {
+      background: rgba(0,210,180,0.2);
+    }
+
+    /* ── EVENTS GRID ── */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .events-grid::-webkit-scrollbar { width: 4px; }
+    .events-grid::-webkit-scrollbar-track { background: transparent; }
+    .events-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .event-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.2s, background 0.2s;
+      animation: fadeUp 0.3s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .event-item:hover {
+      border-color: var(--border-accent);
+      background: rgba(0,210,180,0.03);
+    }
+
+    .event-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .event-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .event-badge {
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-group {
+      background: rgba(245,158,11,0.15);
+      color: var(--warn);
+      border: 1px solid rgba(245,158,11,0.3);
+    }
+
+    .badge-solo {
+      background: rgba(0,210,180,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(0,210,180,0.25);
+    }
+
+    .delete-event {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      border: 1px solid rgba(239,68,68,0.25);
+      background: rgba(239,68,68,0.08);
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .delete-event:hover {
+      background: var(--danger);
+      color: white;
+      border-color: var(--danger);
+    }
+
+    /* ── CONTROL PANEL ── */
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .filter-col { display: flex; flex-direction: column; gap: 10px; }
+
+    .config-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .config-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .config-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: -4px;
+    }
+
+    .export-col {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .export-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--label);
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: all 0.15s;
+    }
+
+    .checkbox-item:hover {
+      border-color: rgba(0,210,180,0.2);
+      color: var(--text);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 14px; height: 14px;
+      accent-color: var(--accent);
+      padding: 0;
+      margin: 0;
+    }
+
+    .export-actions { display: flex; flex-direction: column; gap: 8px; }
+
+    .danger-zone {
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(239,68,68,0.15);
+    }
+
+    .danger-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: rgba(239,68,68,0.6);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-toolbar-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .table-count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    .table-scroll::-webkit-scrollbar { height: 4px; }
+    .table-scroll::-webkit-scrollbar-track { background: transparent; }
+    .table-scroll::-webkit-scrollbar-thumb { background: var(--border); }
 
     table {
-        min-width: 700px; /* keeps structure intact */
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 780px;
     }
 
-    th, td {
-        font-size: 12px;
-        padding: 10px;
+    thead th {
+      background: var(--panel);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
 
-    /* Buttons spacing */
-    .btn {
-        font-size: 13px;
-        padding: 10px;
+    tbody td {
+      padding: 14px 20px;
+      font-size: 13px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
 
-    /* Modal fix */
+    tbody tr:last-child td { border-bottom: none; }
+
+    tbody tr {
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover td { background: rgba(255,255,255,0.025); }
+
+    td[rowspan] {
+      background: rgba(0,210,180,0.04) !important;
+      border-right: 1px solid var(--border-accent);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      vertical-align: middle;
+    }
+
+    .td-name { font-weight: 600; color: var(--text); }
+    .td-mono { font-family: var(--mono); font-size: 12px; color: var(--label); }
+
+    .events-pill {
+      display: inline-block;
+      font-size: 11px;
+      background: rgba(59,130,246,0.1);
+      color: var(--accent2);
+      border: 1px solid rgba(59,130,246,0.2);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 2px;
+      font-family: var(--mono);
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(10px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .modal-overlay.active { display: flex; }
+
     .modal-box {
-        padding: 20px;
-    }
-}
-
-/* EXTRA SMALL DEVICES */
-@media (max-width: 480px) {
-
-    .stats-row {
-        grid-template-columns: 1fr;
-    }
-
-    h1 {
-        font-size: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+      animation: modalIn 0.2s ease;
     }
 
-    .stat-card p {
-        font-size: 22px;
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    .added-events-list {
-        grid-template-columns: 1fr;
+    .modal-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
     }
-}
-#adminPasswordInput:focus {
-    border-color: #ff4b2b;
-    box-shadow: 0 0 10px rgba(255,75,43,0.5);
-}
 
-/* Remove the specific .col-token { width: 180px; } etc. if they exist */
-    </style>
+    .modal-title {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .modal-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-actions .btn { flex: 1; padding: 12px; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      padding: 14px 22px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border-accent);
+      color: var(--accent);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,210,180,0.15);
+      display: none;
+      z-index: 99999;
+      animation: toastIn 0.3s ease;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CHART ── */
+    .chart-wrap {
+      flex: 1;
+      position: relative;
+      min-height: 220px;
+    }
+
+    /* ── TEAM TOKEN INPUT ── */
+    #teamTokenFilter {
+      display: none;
+      border-color: rgba(245,158,11,0.4);
+    }
+
+    #teamTokenFilter:focus {
+      border-color: var(--warn);
+      background: rgba(245,158,11,0.04);
+    }
+
+    /* ── SCROLLBAR (global) ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .two-col, .control-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .event-form { grid-template-columns: 1fr 1fr; }
+      .event-form .btn-primary { grid-column: span 2; }
+      .wrapper { padding: 20px 16px 40px; }
+      .topbar { padding: 0 16px; }
+      .page-header h1 { font-size: 22px; }
+    }
+
+    @media (max-width: 560px) {
+      .stats-row { grid-template-columns: 1fr; }
+      .event-form { grid-template-columns: 1fr; }
+      .event-form .btn-primary { grid-column: span 1; }
+      .modal-actions { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
 
-<div id="toast">✅ Action Successful!</div>
+<!-- TOAST -->
+<div id="toast"></div>
 
+<!-- MODAL -->
 <div class="modal-overlay" id="confirmModal">
-    <div class="modal-box" style="max-width:420px;">
-        
-        <h2 style="color:#ff4b2b; margin-top:0;">⚠ Danger Zone</h2>
-        
-        <p style="color:#ccc; font-size:14px;">
-            This will permanently delete <b>ALL student data</b>.  
-            This action cannot be undone.
-        </p>
-
-        <input 
-            type="password" 
-            id="adminPasswordInput" 
-            placeholder="Enter Admin Password"
-            style="margin-top:15px;"
-        >
-
-        <div class="modal-btns">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn" style="background:#ff4b2b;" onclick="confirmDeleteAllFromModal()">
-                Delete Everything
-            </button>
-        </div>
-
+  <div class="modal-box">
+    <div class="modal-icon" id="modalIcon">⚠</div>
+    <div class="modal-title" id="modalTitle">Confirm Action</div>
+    <div class="modal-body" id="modalBody">Are you sure?</div>
+    <input type="password" id="adminPasswordInput" placeholder="Enter admin password" style="margin-bottom: 16px; display: none;">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="modalConfirmBtn">Confirm</button>
     </div>
+  </div>
 </div>
 
-<div class="main-container">
-    <h1>🚀 Symposium Dashboard</h1>
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo-dot"></div>
+    <span class="topbar-title">Symposium Admin</span>
+  </div>
+  <div class="topbar-right">
+    <span class="live-badge">● Live</span>
+    <button class="btn btn-ghost" style="padding: 7px 14px; font-size: 10px;" onclick="logoutAdmin()">Logout</button>
+  </div>
+</header>
 
-    <div class="stats-row">
-        <div class="stat-card">
-            <h3>Total Registrations</h3>
-            <p id="stat-total">0</p>
-        </div>
-        <div class="stat-card">
-            <h3>Top College</h3>
-            <p id="stat-college" style="font-size: 18px;">--</p>
-        </div>
-        <div class="stat-card">
-            <h3>Active Events</h3>
-            <p id="stat-events">0</p>
-        </div>
+<!-- MAIN -->
+<main class="wrapper">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Dashboard <span>2026</span></h1>
+      <p class="page-subtext">Real-time registration management</p>
     </div>
+  </div>
 
-    <div class="card event-manager-card">
-        <div class="section-header">Dynamic Event Manager</div>
-        <div class="event-form">
-            <div class="event-input-group">
-                <label>Event Name</label>
-                <input type="text" id="newEventName" placeholder="e.g. Robot War">
-            </div>
-            <div class="event-input-group">
-    <label>Description</label>
-    <textarea id="newEventDesc" placeholder="Brief details" rows="2"></textarea>
-</div>
-            <div class="event-input-group" style="flex: 0.5;">
-                <label>Type</label>
-                <select id="newEventType" onchange="toggleTeamSizeInput()">
-                    <option value="solo">Solo</option>
-                    <option value="group">Group</option>
-                </select>
-            </div>
-            <div class="event-input-group" id="teamSizeGroup" style="flex: 0.3; display: none;">
-                <label>Size</label>
-                <input type="number" id="newEventSize" value="1" min="1" max="10">
-            </div>
-            <button class="btn" style="width: 150px; height: 45px;" onclick="addEvent()">Add Event</button>
-        </div>
-        <div class="added-events-list" id="addedEventsList"></div>
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Registrations</div>
+      <div class="stat-value stat-accent" id="stat-total">0</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-label">Top College</div>
+      <div class="stat-value small" id="stat-college">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active Events</div>
+      <div class="stat-value" id="stat-events">0</div>
+    </div>
+  </div>
 
+  <!-- EVENT MANAGER -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Event Manager</span>
+      <span class="card-count" id="eventCount">0 Events</span>
+    </div>
+    <div class="event-form">
+      <div class="form-group">
+        <label class="form-label">Event Name</label>
+        <input type="text" id="newEventName" placeholder="e.g. Robot War">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea id="newEventDesc" placeholder="Brief details" rows="1"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select id="newEventType" onchange="toggleTeamSizeInput()">
+          <option value="solo">Solo</option>
+          <option value="group">Group</option>
+        </select>
+      </div>
+      <div class="form-group" id="teamSizeGroup" style="display:none;">
+        <label class="form-label">Team Size</label>
+        <input type="number" id="newEventSize" value="2" min="1" max="10">
+      </div>
+      <div class="form-group" style="justify-content: flex-end;">
+        <button class="btn btn-primary" onclick="addEvent()">+ Add Event</button>
+      </div>
+    </div>
+    <div class="events-grid" id="addedEventsList"></div>
+  </div>
 
-    <div class="top-row">
-        <div class="card">
-            <div class="chart-header">Real-time Event Distribution</div>
-            <div style="flex-grow: 1; display: flex; align-items: center;">
-                <canvas id="eventChart" style="max-height: 280px;"></canvas>
-            </div>
-        </div>
+  <!-- CHART + CONTROLS -->
+  <div class="two-col">
 
-        <div class="card">
-            <div class="section-header">Control Panel</div>
-            <div class="controls-grid">
-                <div class="filters">
-                    <input type="text" id="college" placeholder="College Name">
-                    <input type="text" id="department" placeholder="Department">
-                    <input type="number" id="year" placeholder="Year (1-4)">
-                     <input type="text" id="teamTokenFilter" placeholder="Search Team Token (e.g. T-123)" style="display: none; border-color: #e67e22;">
-                    <select id="event" onchange="applyFilterConstraints()">
-                        <option value="">All Events</option>
-                    </select>
-                    
-                    <button class="btn" id="filterBtn" onclick="loadStudents()">Apply Filters</button>
-                    
-                    <div class="admin-config-box" id="timerContainer">
-                        <label style="font-size: 11px; color: #00c6ff; text-transform: uppercase; font-weight: bold;">Symposium Date</label>
-                        <p id="timerStatus" style="font-size: 10px; color: #aaa; margin: 4px 0;">Status: Current active</p>
-                        <input type="datetime-local" id="adminDateInput" style="margin-top:5px; padding: 5px;" oninput="handleDateSelection()">
-                        <button class="btn btn-confirm" id="confirmBtn" onclick="updateSymposiumDate()">Confirm Date</button>
-                    </div>
-
-                    <div class="admin-config-box" id="limitContainer">
-                        <div class="admin-config-box" id="homepageTextContainer">
-    <label style="font-size: 11px; color: #00c6ff; text-transform: uppercase; font-weight: bold;">
-        Homepage Title
-    </label>
-
-    <p style="font-size: 10px; color: #aaa; margin: 4px 0;">
-        Edit landing page heading
-    </p>
-
-    <input 
-        type="text" 
-        id="adminHeaderText" 
-        placeholder="Department Name"
-        style="margin-top:5px; padding:5px;"
-        oninput="handleHomepageTextChange()"
-    >
-
-    <input 
-        type="text" 
-        id="adminSymposiumTitle" 
-        placeholder="Symposium Title"
-        style="margin-top:5px; padding:5px;"
-        oninput="handleHomepageTextChange()"
-    >
-
-    <button 
-        class="btn btn-confirm" 
-        style="margin-top:8px;"
-        onclick="updateHomepageText()"
-    >
-        Save Title
-    </button>
-</div>
-<div class="admin-config-box" id="contactContainer">
-    <label style="font-size: 11px; color: #00c6ff; font-weight: bold;">
-        Contact Page Settings
-    </label>
-<input type="text" id="adminEmail" placeholder="adminemail" oninput="handleContactChange()">
-<input type="text" id="adminPhone" placeholder="adminphonenumber" oninput="handleContactChange()">
-<textarea id="adminLocation" placeholder="Location" oninput="handleContactChange()"></textarea>
-<input type="text" id="adminLat" placeholder="Latitude (e.g. 8.194019)" oninput="handleContactChange()">
-<input type="text" id="adminLng" placeholder="Longitude (e.g. 77.434175)" oninput="handleContactChange()">
-
-    <button class="btn btn-confirm" onclick="updateContactDetails()">
-        Save Contact Info
-    </button>
-</div>
-
-                        <label style="font-size: 11px; color: #00c6ff; text-transform: uppercase; font-weight: bold;">Selection Limit</label>
-                        <p id="limitStatus" style="font-size: 10px; color: #aaa; margin: 4px 0;">Max events per student</p>
-                        <input type="number" id="adminLimitInput" min="1" max="6" placeholder="Limit (e.g. 3)" style="margin-top:5px; padding: 5px;" oninput="handleLimitChange()">
-                        <button class="btn btn-confirm" id="confirmLimitBtn" onclick="updateEventLimit()">Save Limit</button>
-                    </div>
-                </div>
-
-                <div class="export-settings">
-                    <div style="font-size: 12px; margin-bottom: 10px; color: #aaa; text-align: center;">Export Columns:</div>
-                  <div class="column-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-    <label style="font-size:12px;"><input type="checkbox" id="export-name" checked> Name</label>
-    <label style="font-size:12px;"><input type="checkbox" id="export-reg" checked> Reg No</label>
-    <label style="font-size:12px;"><input type="checkbox" id="export-college" checked> College</label>
-    <label style="font-size:12px;"><input type="checkbox" id="export-dept" checked> Dept</label>
-    <label style="font-size:12px;"><input type="checkbox" id="export-year" checked> Year</label>
-    <label style="font-size:12px;"><input type="checkbox" id="export-events" checked> Events</label>
-</div>
-                   <button class="btn btn-csv" onclick="downloadCSV()" style="margin-top: 15px;">⬇ Export CSV</button>
-
-<button class="btn" onclick="downloadPDF()" style="background: #e74c3c;">📕 PDF</button>
-
-<!-- 🔥 DANGER ZONE -->
-<div style="margin-top:15px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.2); text-align:center;">
-    <div style="font-size:11px; color:#ff7675; margin-bottom:8px;">Danger Zone</div>
-    <!-- Added the missing > after openDeleteModal()" -->
-    <button class="btn" style="background: #ff4b2b; color: white;" onclick="openDeleteModal()">
-        🗑 Delete All Students
-    </button>
-</div>
-</div>
-            </div>
-        </div>
+    <!-- CHART -->
+    <div class="card" style="display: flex; flex-direction: column;">
+      <div class="card-header">
+        <span class="card-title">Event Distribution</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="eventChart"></canvas>
+      </div>
     </div>
 
-    <div class="table-container">
-        <table id="mainDataTable">
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Register No</th>
-                    <th>College</th>
-                    <th>Dept</th>
-                    <th>Year</th>
-                    <th>Selected Events</th>
-                </tr>
-            </thead>
-            <tbody id="studentTable"></tbody>
-        </table>
+    <!-- CONTROLS -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Control Panel</span>
+      </div>
+      <div class="control-grid">
+
+        <!-- FILTERS -->
+        <div class="filter-col">
+          <input type="text" id="college" placeholder="Filter by College">
+          <input type="text" id="department" placeholder="Filter by Department">
+          <input type="number" id="year" placeholder="Year (1–4)">
+          <input type="text" id="teamTokenFilter" placeholder="Search Team Token">
+          <select id="event" onchange="applyFilterConstraints()">
+            <option value="">All Events</option>
+          </select>
+          <button class="btn btn-primary" id="filterBtn" onclick="loadStudents()">Apply Filters</button>
+
+          <!-- Settings Boxes -->
+          <div class="config-box">
+            <div class="config-label">Symposium Date</div>
+            <div class="config-hint">Set registration deadline</div>
+            <input type="datetime-local" id="adminDateInput" oninput="handleDateSelection()">
+            <button class="btn btn-confirm" id="confirmBtn" onclick="updateSymposiumDate()">Save Date</button>
+          </div>
+
+          <div class="config-box">
+            <div class="config-label">Selection Limit</div>
+            <div class="config-hint">Max events per student</div>
+            <input type="number" id="adminLimitInput" min="1" max="6" placeholder="e.g. 3" oninput="handleLimitChange()">
+            <button class="btn btn-confirm" id="confirmLimitBtn" onclick="updateEventLimit()">Save Limit</button>
+          </div>
+
+          <div class="config-box">
+            <div class="config-label">Homepage Title</div>
+            <input type="text" id="adminHeaderText" placeholder="Department Name" oninput="handleHomepageTextChange()">
+            <input type="text" id="adminSymposiumTitle" placeholder="Symposium Title" oninput="handleHomepageTextChange()">
+            <button class="btn btn-confirm" onclick="updateHomepageText()">Save Title</button>
+          </div>
+
+          <div class="config-box">
+            <div class="config-label">Contact Settings</div>
+            <input type="text" id="adminEmail" placeholder="Email" oninput="handleContactChange()">
+            <input type="text" id="adminPhone" placeholder="Phone" oninput="handleContactChange()">
+            <textarea id="adminLocation" placeholder="Location" oninput="handleContactChange()"></textarea>
+            <input type="text" id="adminLat" placeholder="Latitude" oninput="handleContactChange()">
+            <input type="text" id="adminLng" placeholder="Longitude" oninput="handleContactChange()">
+            <button class="btn btn-confirm" onclick="updateContactDetails()">Save Contact</button>
+          </div>
+        </div>
+
+        <!-- EXPORT -->
+        <div class="export-col">
+          <div class="export-title">Export Columns</div>
+          <div class="checkbox-grid">
+            <label class="checkbox-item"><input type="checkbox" id="export-name" checked> Name</label>
+            <label class="checkbox-item"><input type="checkbox" id="export-reg" checked> Reg No</label>
+            <label class="checkbox-item"><input type="checkbox" id="export-college" checked> College</label>
+            <label class="checkbox-item"><input type="checkbox" id="export-dept" checked> Dept</label>
+            <label class="checkbox-item" id="lbl-year"><input type="checkbox" id="export-year" checked> Year</label>
+            <label class="checkbox-item" id="lbl-events"><input type="checkbox" id="export-events" checked> Events</label>
+          </div>
+
+          <div class="export-actions" style="margin-top:auto;">
+            <button class="btn btn-success" onclick="downloadCSV()">⬇ Export CSV</button>
+            <button class="btn btn-blue" onclick="downloadPDF()">📄 Export PDF</button>
+          </div>
+
+          <div class="danger-zone">
+            <div class="danger-label">Danger Zone</div>
+            <button class="btn btn-danger" style="width:100%;" onclick="openDeleteModal()">🗑 Delete All Students</button>
+          </div>
+        </div>
+
+      </div>
     </div>
-</div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-toolbar">
+      <span class="table-toolbar-title">Registrations</span>
+      <span class="table-count" id="tableCount">— records</span>
+    </div>
+    <div class="table-scroll">
+      <table id="mainDataTable">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Register No</th>
+            <th>College</th>
+            <th>Dept</th>
+            <th>Year</th>
+            <th>Selected Events</th>
+          </tr>
+        </thead>
+        <tbody id="studentTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
 <script>
-    const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("adminToken");
+  if (!token) window.location.href = "admin-login.html";
 
-if (!token) {
-    window.location.href = "admin-login.html";
-}
-function adminFetch(url, options = {}) {
-    return fetch(url, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            ...(options.headers || {})
-        }
-    }).then(res => {
-        // If token expired, redirect to login
-        if (res.status === 401 || res.status === 403) {
-            localStorage.removeItem("adminToken");
-            window.location.href = "admin-login.html";
-        }
-        return res;
-    });
-}
-    // Add this at the top of your script
-const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000' 
+  const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
     : 'https://login-system-1-nowr.onrender.com';
-    let eventChart;
-    let eventsList = [];
-    let currentIsGroupView = false;
-    let eventToDeleteIndex = null;
-function logoutAdmin() {
-    localStorage.removeItem("adminToken");
-    window.location.href = "admin-login.html";
-}
-    // --- 1. INITIALIZATION & SYNC ---
-async function fetchEventsFromServer() {
+
+  let eventChart, eventsList = [], currentIsGroupView = false, eventToDeleteIndex = null;
+
+  function adminFetch(url, options = {}) {
+    return fetch(url, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...(options.headers || {}) }
+    }).then(res => {
+      if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "admin-login.html"; }
+      return res;
+    });
+  }
+
+  function logoutAdmin() { localStorage.removeItem("adminToken"); window.location.href = "admin-login.html"; }
+
+  async function fetchEventsFromServer() {
     try {
-        const res = await fetch(`${API_BASE_URL}/events`); // Use regular fetch, it's public
-        if (!res.ok) throw new Error("Failed to fetch events");
-        const data = await res.json();
-        eventsList = data.map(e => ({
-            name: e.event_name,
-            desc: e.description,
-            type: e.event_type,
-            max_size: e.max_team_size
-        }));
-        renderEvents();
-        loadStudents();
-    } catch (err) { 
-        console.error("Fetch Events Error:", err); 
-    }
-}
+      const res = await fetch(`${API_BASE_URL}/events`);
+      const data = await res.json();
+      eventsList = data.map(e => ({ name: e.event_name, desc: e.description, type: e.event_type, max_size: e.max_team_size }));
+      renderEvents();
+      loadStudents();
+    } catch (err) { console.error(err); }
+  }
 
-    function renderEvents() {
-        const listContainer = document.getElementById("addedEventsList");
-        const eventSelect = document.getElementById("event");
-        listContainer.innerHTML = "";
-        eventSelect.innerHTML = '<option value="">All Events</option>';
-        
-        eventsList.forEach((e, index) => {
-            const div = document.createElement("div");
-            div.className = "event-item animated-row";
-            div.innerHTML = `
-                <div>
-                    <h4 style="display:flex; align-items:center; gap:10px;">${e.name} 
-                        <span style="font-size:10px; background:${e.type === 'group' ? '#e67e22' : '#2ecc71'}; color:white; padding:2px 6px; border-radius:4px;">${e.type}</span>
-                    </h4>
-                    <p>${e.desc}</p>
-                </div>
-                <button class="delete-event" onclick="openModal(${index})">×</button>`;
-            listContainer.appendChild(div);
+  function renderEvents() {
+    const list = document.getElementById("addedEventsList");
+    const sel  = document.getElementById("event");
+    list.innerHTML = "";
+    sel.innerHTML = '<option value="">All Events</option>';
 
-            const opt = document.createElement("option");
-            opt.value = e.name;
-            opt.textContent = e.name;
-            eventSelect.appendChild(opt);
-        });
-        document.getElementById("stat-events").innerText = eventsList.length;
-    }
+    eventsList.forEach((e, i) => {
+      const div = document.createElement("div");
+      div.className = "event-item";
+      div.innerHTML = `
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+            <span class="event-name">${e.name}</span>
+            <span class="event-badge ${e.type === 'group' ? 'badge-group' : 'badge-solo'}">${e.type}${e.type==='group' ? ' · '+e.max_size : ''}</span>
+          </div>
+          <div class="event-desc">${e.desc}</div>
+        </div>
+        <button class="delete-event" onclick="openModal(${i})">×</button>`;
+      list.appendChild(div);
 
-    // --- 2. FILTER CONSTRAINTS (Now handles Team Token Visibility) ---
-    function applyFilterConstraints() {
-    const selectedEventName = document.getElementById("event").value;
-    const selectedEventObj = eventsList.find(e => e.name === selectedEventName);
-    
-    // UI Elements for Filtering
-    const deptInput = document.getElementById("department");
-    const yearInput = document.getElementById("year");
-    const tokenInput = document.getElementById("teamTokenFilter");
-    
-    // UI Elements for Export Checkboxes
-    const yearExportLabel = document.getElementById("export-year")?.parentElement;
-    const eventsExportLabel = document.getElementById("export-events")?.parentElement;
+      const opt = document.createElement("option");
+      opt.value = e.name; opt.textContent = e.name;
+      sel.appendChild(opt);
+    });
 
-    if (selectedEventObj && selectedEventObj.type === 'group') {
-        // --- GROUP VIEW LOGIC ---
-        
-        // 1. Disable filtering inputs that don't apply to groups
-        deptInput.value = "";
-        yearInput.value = "";
-        deptInput.disabled = true;
-        yearInput.disabled = true;
-        deptInput.style.opacity = "0.4";
-        yearInput.style.opacity = "0.4";
-        
-        // 2. Show Team Token search
-        if(tokenInput) tokenInput.style.display = "inline-block";
+    const count = eventsList.length;
+    document.getElementById("stat-events").innerText = count;
+    document.getElementById("eventCount").innerText = `${count} Event${count !== 1 ? 's' : ''}`;
+  }
 
-        // 3. Hide Year and Events from Export Column options
-        if(yearExportLabel) yearExportLabel.style.display = "none";
-        if(eventsExportLabel) eventsExportLabel.style.display = "none";
+  function applyFilterConstraints() {
+    const sel  = eventsList.find(e => e.name === document.getElementById("event").value);
+    const dept = document.getElementById("department");
+    const yr   = document.getElementById("year");
+    const tok  = document.getElementById("teamTokenFilter");
+    const lblYr  = document.getElementById("lbl-year");
+    const lblEv  = document.getElementById("lbl-events");
 
+    if (sel && sel.type === 'group') {
+      dept.value = ""; yr.value = "";
+      dept.disabled = yr.disabled = true;
+      dept.style.opacity = yr.style.opacity = "0.35";
+      if (tok) tok.style.display = "block";
+      if (lblYr) lblYr.style.display = "none";
+      if (lblEv) lblEv.style.display = "none";
     } else {
-        // --- SOLO VIEW LOGIC ---
-        
-        // 1. Re-enable filtering inputs
-        deptInput.disabled = false;
-        yearInput.disabled = false;
-        deptInput.style.opacity = "1";
-        yearInput.style.opacity = "1";
-        
-        // 2. Hide Team Token search
-        if(tokenInput) {
-            tokenInput.style.display = "none";
-            tokenInput.value = "";
-        }
-
-        // 3. Show Year and Events in Export options
-        if(yearExportLabel) yearExportLabel.style.display = "block";
-        if(eventsExportLabel) eventsExportLabel.style.display = "block";
+      dept.disabled = yr.disabled = false;
+      dept.style.opacity = yr.style.opacity = "1";
+      if (tok) { tok.style.display = "none"; tok.value = ""; }
+      if (lblYr) lblYr.style.display = "";
+      if (lblEv) lblEv.style.display = "";
     }
-}
-    // --- 3. ADD EVENT ---
-    async function addEvent() {
-        const name = document.getElementById("newEventName").value.trim();
-        const desc = document.getElementById("newEventDesc").value.trim();
-        const type = document.getElementById("newEventType").value;
-        const size = (type === 'solo') ? 1 : parseInt(document.getElementById("newEventSize").value);
+  }
 
-        if (!name || !desc) return alert("Fill name and description");
+  async function addEvent() {
+    const name = document.getElementById("newEventName").value.trim();
+    const desc = document.getElementById("newEventDesc").value.trim();
+    const type = document.getElementById("newEventType").value;
+    const size = type === 'solo' ? 1 : parseInt(document.getElementById("newEventSize").value);
+    if (!name || !desc) return alert("Fill event name and description");
+    try {
+      const r = await adminFetch(`${API_BASE_URL}/admin/add-event`, {
+        method: "POST",
+        body: JSON.stringify({ name, description: desc, type, max_team_size: size })
+      });
+      const d = await r.json();
+      if (d.success) {
+        showToast("✓ Event added");
+        document.getElementById("newEventName").value = "";
+        document.getElementById("newEventDesc").value = "";
+        fetchEventsFromServer();
+      }
+    } catch (e) { alert("Server error"); }
+  }
 
-        try {
-          const response = await adminFetch(`${API_BASE_URL}/admin/add-event`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    name: name, 
-                    description: desc, 
-                    type: type, 
-                    max_team_size: size 
-                })
-            });
-            const result = await response.json();
-            if (result.success) {
-                showToast("✅ Event added!");
-                document.getElementById("newEventName").value = "";
-                document.getElementById("newEventDesc").value = "";
-                fetchEventsFromServer();
-            }
-        } catch (e) { alert("Server error adding event"); }
-    }
+  async function loadStudents() {
+    const btn = document.getElementById("filterBtn");
+    const selName = document.getElementById("event").value;
+    const selObj  = eventsList.find(e => e.name === selName);
+    const tokVal  = document.getElementById("teamTokenFilter")?.value || "";
+    currentIsGroupView = !!(selObj && selObj.type === 'group');
 
-    // --- 4. DATA LOADING & RENDERING ---
-    async function loadStudents() {
-        const btn = document.getElementById("filterBtn");
-        const selectedEventName = document.getElementById("event").value;
-        const selectedEventObj = eventsList.find(e => e.name === selectedEventName);
-        const tokenSearch = document.getElementById("teamTokenFilter")?.value || "";
-        
-        currentIsGroupView = (selectedEventObj && selectedEventObj.type === 'group');
-        
-        btn.innerText = "Loading...";
-        btn.disabled = true;
+    btn.textContent = "Loading…";
+    btn.disabled = true;
 
-        try {
-            updateTableHeaders(currentIsGroupView);
-            
-            if (currentIsGroupView) {
-                // Fetch Grouped Logic (Includes Token in Query)
-               const res = await adminFetch(`${API_BASE_URL}/admin/grouped-teams?eventName=${encodeURIComponent(selectedEventName)}&college=${document.getElementById("college").value}&token=${encodeURIComponent(tokenSearch)}`);
-                let data;
-try {
-  data = await res.json();
-} catch {
-  throw new Error("Server error. Please try again.");
-}
+    try {
+      updateTableHeaders(currentIsGroupView);
+      if (currentIsGroupView) {
+        const r = await adminFetch(`${API_BASE_URL}/admin/grouped-teams?eventName=${encodeURIComponent(selName)}&college=${document.getElementById("college").value}&token=${encodeURIComponent(tokVal)}`);
+        const d = await r.json();
+        renderGroupedRows(d);
+      } else {
+        const p = new URLSearchParams({
+          college: document.getElementById("college").value,
+          department: document.getElementById("department").value,
+          year: document.getElementById("year").value,
+          event: selName
+        });
+        const r = await adminFetch(`${API_BASE_URL}/admin/students?${p}`);
+        const d = await r.json();
+        renderStandardRows(d);
+        updateChart(d);
+      }
+    } catch (e) { showToast("✗ Load error"); }
+    finally { btn.textContent = "Apply Filters"; btn.disabled = false; }
+  }
 
-                renderGroupedRows(data);
-            } else {
-                const params = new URLSearchParams({
-                    college: document.getElementById("college").value,
-                    department: document.getElementById("department").value,
-                    year: document.getElementById("year").value,
-                    event: selectedEventName
-                });
-               const res = await adminFetch(`${API_BASE_URL}/admin/students?${params.toString()}`);
-               let data;
-try {
-  data = await res.json();
-} catch {
-  throw new Error("Server error. Please try again.");
-}
-
-                renderStandardRows(data);
-                updateChart(data);
-            }
-        } catch (error) {
-            console.error(error);
-            showToast("❌ Load error");
-        } finally {
-            btn.innerText = "Apply Filters";
-            btn.disabled = false;
-        }
-    }
-
-  function updateTableHeaders(isGroupView) {
+  function updateTableHeaders(isGroup) {
     const thead = document.querySelector("#mainDataTable thead");
-    if (isGroupView) {
-        thead.innerHTML = `
-            <tr>
-                <th class="col-token">Team Token</th>
-                <th class="col-team">Team No</th>
-                <th class="col-reg">Register No</th>
-                <th class="col-dept">Dept</th>
-                <th class="col-college">College</th>
-                <th class="col-name">Student Name</th>
-            </tr>`;
+    if (isGroup) {
+      thead.innerHTML = `<tr><th>Team Token</th><th>Team No</th><th>Register No</th><th>Dept</th><th>College</th><th>Student Name</th></tr>`;
     } else {
-        thead.innerHTML = `
-            <tr>
-                <th>Student Name</th>
-                <th>Register No</th>
-                <th>College</th>
-                <th>Dept</th>
-                <th>Year</th>
-                <th>Selected Events</th>
-            </tr>`;
+      thead.innerHTML = `<tr><th>Student Name</th><th>Register No</th><th>College</th><th>Dept</th><th>Year</th><th>Selected Events</th></tr>`;
     }
-}
+  }
 
-    function renderStandardRows(data) {
-        const tbody = document.getElementById("studentTable");
-        tbody.innerHTML = "";
-        document.getElementById("stat-total").innerText = data.length;
-        data.forEach(s => {
-            const row = tbody.insertRow();
-            row.className = "animated-row";
-            row.innerHTML = `<td><b>${s.name}</b></td><td>${s.reg_no}</td><td>${s.college}</td><td>${s.department}</td><td>${s.year}</td><td>${s.events || 'None'}</td>`;
-        });
-    }
-
-    function renderGroupedRows(groupedData) {
-        const tbody = document.getElementById("studentTable");
-        tbody.innerHTML = "";
-        let totalStudentCount = 0;
-        let teamCounter = 1;
-
-        Object.keys(groupedData).forEach(token => {
-            const members = groupedData[token];
-            totalStudentCount += members.length;
-            members.forEach((m, i) => {
-                const row = tbody.insertRow();
-                // Add Team_N only to the first row of a group using rowspan
-                row.innerHTML = `
-                    ${i === 0 ? `<td rowspan="${members.length}"><b>${token}</b></td>` : ""}
-                    ${i === 0 ? `<td rowspan="${members.length}">Team_${teamCounter}</td>` : ""}
-                    <td>${m.reg_no}</td><td>${m.department}</td><td>${m.college}</td><td>${m.name}</td>`;
-            });
-            teamCounter++;
-        });
-        document.getElementById("stat-total").innerText = totalStudentCount;
-    }
-
-   function downloadCSV() {
+  function renderStandardRows(data) {
     const tbody = document.getElementById("studentTable");
-    const rows = tbody.querySelectorAll("tr");
-    if (rows.length === 0) return alert("No data to export!");
+    tbody.innerHTML = "";
+    const total = data.length;
+    document.getElementById("stat-total").innerText = total;
+    document.getElementById("tableCount").innerText = `${total} record${total !== 1 ? 's' : ''}`;
+    data.forEach(s => {
+      const row = tbody.insertRow();
+      row.style.animation = "fadeUp 0.3s ease forwards";
+      const events = (s.events && s.events !== 'None')
+        ? s.events.split(', ').map(ev => `<span class="events-pill">${ev}</span>`).join('')
+        : '<span style="color:var(--muted);font-size:12px;">—</span>';
+      row.innerHTML = `<td class="td-name">${s.name}</td><td class="td-mono">${s.reg_no}</td><td>${s.college}</td><td>${s.department}</td><td class="td-mono">${s.year}</td><td>${events}</td>`;
+    });
+  }
 
-    const prefs = {
-        name: document.getElementById("export-name").checked,
-        reg: document.getElementById("export-reg").checked,
-        college: document.getElementById("export-college").checked,
-        dept: document.getElementById("export-dept").checked,
-        year: document.getElementById("export-year").checked,
-        events: document.getElementById("export-events").checked
-    };
+  function renderGroupedRows(groupedData) {
+    const tbody = document.getElementById("studentTable");
+    tbody.innerHTML = "";
+    let total = 0, teamN = 1;
+    Object.keys(groupedData).forEach(token => {
+      const members = groupedData[token];
+      total += members.length;
+      members.forEach((m, i) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          ${i === 0 ? `<td rowspan="${members.length}"><b>${token}</b></td>` : ""}
+          ${i === 0 ? `<td rowspan="${members.length}" style="text-align:center;">Team_${teamN}</td>` : ""}
+          <td class="td-mono">${m.reg_no}</td><td>${m.department}</td><td>${m.college}</td><td class="td-name">${m.name}</td>`;
+      });
+      teamN++;
+    });
+    document.getElementById("stat-total").innerText = total;
+    document.getElementById("tableCount").innerText = `${total} record${total !== 1 ? 's' : ''}`;
+  }
 
+  function updateChart(data) {
+    const counts = {};
+    data.forEach(s => {
+      if (s.events && s.events !== 'No events') {
+        s.events.split(', ').forEach(e => {
+          const n = e.split(' [')[0];
+          counts[n] = (counts[n] || 0) + 1;
+        });
+      }
+    });
+    const ctx = document.getElementById('eventChart').getContext('2d');
+    if (eventChart) eventChart.destroy();
+    eventChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(counts),
+        datasets: [{
+          label: 'Registrations',
+          data: Object.values(counts),
+          backgroundColor: 'rgba(0,210,180,0.25)',
+          borderColor: 'rgba(0,210,180,0.8)',
+          borderWidth: 1.5,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0d1117', titleColor: '#00d2b4', bodyColor: '#94a3b8', borderColor: 'rgba(255,255,255,0.07)', borderWidth: 1 } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { family: "'Space Mono'" , size: 10 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { family: "'Space Mono'", size: 10 } } }
+        }
+      }
+    });
+  }
+
+  function downloadCSV() {
+    const tbody = document.getElementById("studentTable");
+    const rows  = tbody.querySelectorAll("tr");
+    if (!rows.length) return alert("No data to export");
+    const p = { name: document.getElementById("export-name").checked, reg: document.getElementById("export-reg").checked, college: document.getElementById("export-college").checked, dept: document.getElementById("export-dept").checked, year: document.getElementById("export-year").checked, events: document.getElementById("export-events").checked };
     let headers = [];
-    if (currentIsGroupView) {
-        headers.push("TEAM TOKEN", "TEAM NO");
-        if (prefs.reg) headers.push("REG NO");
-        if (prefs.dept) headers.push("DEPT");
-        if (prefs.college) headers.push("COLLEGE");
-        if (prefs.name) headers.push("STUDENT NAME");
-    } else {
-        if (prefs.name) headers.push("STUDENT NAME");
-        if (prefs.reg) headers.push("REG NO");
-        if (prefs.college) headers.push("COLLEGE");
-        if (prefs.dept) headers.push("DEPT");
-        if (prefs.year) headers.push("YEAR");
-        if (prefs.events) headers.push("SELECTED EVENTS");
-    }
-
+    if (currentIsGroupView) { headers.push("TEAM TOKEN","TEAM NO"); if(p.reg) headers.push("REG NO"); if(p.dept) headers.push("DEPT"); if(p.college) headers.push("COLLEGE"); if(p.name) headers.push("STUDENT NAME"); }
+    else { if(p.name) headers.push("STUDENT NAME"); if(p.reg) headers.push("REG NO"); if(p.college) headers.push("COLLEGE"); if(p.dept) headers.push("DEPT"); if(p.year) headers.push("YEAR"); if(p.events) headers.push("SELECTED EVENTS"); }
     let csv = headers.join(",") + "\n";
-
     rows.forEach(row => {
-        let rowData = [];
-        const cells = Array.from(row.querySelectorAll("td"));
-
-        if (currentIsGroupView) {
-            const isLeader = row.querySelector("td[rowspan]");
-            
-            if (isLeader) {
-                // First person in team: Fill Token and Team No
-                rowData.push(`"${cells[0].innerText}"`);
-                rowData.push(`"${cells[1].innerText}"`);
-                
-                // Student data starts at index 2
-                if (prefs.reg) rowData.push(`"${cells[2]?.innerText || ''}"`);
-                if (prefs.dept) rowData.push(`"${cells[3]?.innerText || ''}"`);
-                if (prefs.college) rowData.push(`"${cells[4]?.innerText || ''}"`);
-                if (prefs.name) rowData.push(`"${cells[5]?.innerText || ''}"`);
-            } else {
-                // Member of team: Leave Token and Team No EMPTY
-                rowData.push(""); 
-                rowData.push("");
-                
-                // Student data starts at index 0 for members
-                if (prefs.reg) rowData.push(`"${cells[0]?.innerText || ''}"`);
-                if (prefs.dept) rowData.push(`"${cells[1]?.innerText || ''}"`);
-                if (prefs.college) rowData.push(`"${cells[2]?.innerText || ''}"`);
-                if (prefs.name) rowData.push(`"${cells[3]?.innerText || ''}"`);
-            }
-        } else {
-            // Standard Solo Logic
-            if (prefs.name) rowData.push(`"${cells[0]?.innerText || ''}"`);
-            if (prefs.reg) rowData.push(`"${cells[1]?.innerText || ''}"`);
-            if (prefs.college) rowData.push(`"${cells[2]?.innerText || ''}"`);
-            if (prefs.dept) rowData.push(`"${cells[3]?.innerText || ''}"`);
-            if (prefs.year) rowData.push(`"${cells[4]?.innerText || ''}"`);
-            if (prefs.events) rowData.push(`"${cells[5]?.innerText || ''}"`);
-        }
-        csv += rowData.join(",") + "\n";
+      const cells = Array.from(row.querySelectorAll("td"));
+      let rowData = [];
+      if (currentIsGroupView) {
+        const isLeader = row.querySelector("td[rowspan]");
+        if (isLeader) { rowData.push(`"${cells[0].innerText}"`,`"${cells[1].innerText}"`); if(p.reg) rowData.push(`"${cells[2]?.innerText||''}"`); if(p.dept) rowData.push(`"${cells[3]?.innerText||''}"`); if(p.college) rowData.push(`"${cells[4]?.innerText||''}"`); if(p.name) rowData.push(`"${cells[5]?.innerText||''}"`); }
+        else { rowData.push("",""); if(p.reg) rowData.push(`"${cells[0]?.innerText||''}"`); if(p.dept) rowData.push(`"${cells[1]?.innerText||''}"`); if(p.college) rowData.push(`"${cells[2]?.innerText||''}"`); if(p.name) rowData.push(`"${cells[3]?.innerText||''}"`); }
+      } else { if(p.name) rowData.push(`"${cells[0]?.innerText||''}"`); if(p.reg) rowData.push(`"${cells[1]?.innerText||''}"`); if(p.college) rowData.push(`"${cells[2]?.innerText||''}"`); if(p.dept) rowData.push(`"${cells[3]?.innerText||''}"`); if(p.year) rowData.push(`"${cells[4]?.innerText||''}"`); if(p.events) rowData.push(`"${cells[5]?.innerText||''}"`); }
+      csv += rowData.join(",") + "\n";
     });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+    a.download = `Symposium_${new Date().toLocaleDateString()}.csv`;
+    a.click();
+  }
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Symposium_List_${new Date().toLocaleDateString()}.csv`;
-    link.click();
-}
-
-    // --- 6. EXISTING UTILS ---
-   
-    function closeModal() { document.getElementById("confirmModal").style.display = "none"; }
-
-    async function deleteEvent() {
-        const eventName = eventsList[eventToDeleteIndex].name;
-        try {
-            const res = await adminFetch(`${API_BASE_URL}/admin/delete-event?name=${encodeURIComponent(eventName)}`, { method: "DELETE" });
-            if (res.ok) {
-                showToast("🗑️ Event Deleted");
-                closeModal();
-                fetchEventsFromServer();
-            }
-        } catch (e) { alert("Delete failed"); }
-    }
-
-    function updateChart(data) {
-        const counts = {};
-        data.forEach(s => {
-            if(s.events && s.events !== 'No events') {
-                s.events.split(', ').forEach(e => {
-                    const name = e.split(' [')[0];
-                    counts[name] = (counts[name] || 0) + 1;
-                });
-            }
-        });
-        const ctx = document.getElementById('eventChart').getContext('2d');
-        if (eventChart) eventChart.destroy();
-        eventChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(counts),
-                datasets: [{ label: 'Registrations', data: Object.values(counts), backgroundColor: '#00c6ff' }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    }
-
-    function showToast(msg) {
-        const t = document.getElementById("toast");
-        if(t) {
-            t.innerText = msg; t.style.display = "block";
-            setTimeout(() => t.style.display = "none", 3000);
-        }
-    }
-    
-    function toggleTeamSizeInput() {
-        const type = document.getElementById("newEventType").value;
-        const group = document.getElementById("teamSizeGroup");
-        if(group) group.style.display = (type === 'group') ? 'block' : 'none';
-    }
-
-    function handleLimitChange() { document.getElementById("confirmLimitBtn").style.display = "block"; }
-    function handleDateSelection() { document.getElementById("confirmBtn").style.display = "block"; }
-
-    async function updateEventLimit() {
-        const val = document.getElementById("adminLimitInput").value;
-        await adminFetch(`${API_BASE_URL}/api/settings`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ limit: val })
-        });
-        showToast("✅ Limit Saved");
-        document.getElementById("confirmLimitBtn").style.display = "none";
-    }
-
-    function updateSymposiumDate() {
-        const val = document.getElementById("adminDateInput").value;
-       adminFetch(`${API_BASE_URL}/api/settings`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ deadline: val })
-        }).then(() => {
-            showToast("📅 Date Updated");
-            document.getElementById("confirmBtn").style.display = "none";
-        });
-    }
-   function downloadPDF() {
-    const eventName = document.getElementById("event").value || "General_Report";
-    
-    // 1. Capture preferences
-    const prefs = {
-        name: document.getElementById("export-name")?.checked || false,
-        reg: document.getElementById("export-reg")?.checked || false,
-        college: document.getElementById("export-college")?.checked || false,
-        dept: document.getElementById("export-dept")?.checked || false,
-        year: document.getElementById("export-year")?.checked || false,
-        events: document.getElementById("export-events")?.checked || false
-    };
-
-    // 2. Map indices DYNAMICALLY (Fixed ID from adminTable to mainDataTable)
-    const headCells = Array.from(document.querySelectorAll("#mainDataTable thead th"));
-    const tableHeaders = headCells.map(th => th.innerText.toLowerCase().trim());
-    
-    const idx = {
-        teamToken: tableHeaders.findIndex(h => h.includes("token")),
-        teamNo: tableHeaders.findIndex(h => h.includes("team no")),
-        reg: tableHeaders.findIndex(h => h.includes("register") || h.includes("reg no")),
-        name: tableHeaders.findIndex(h => h.includes("student name") || h.includes("name")),
-        dept: tableHeaders.findIndex(h => h.includes("dept")),
-        college: tableHeaders.findIndex(h => h.includes("college")),
-        year: tableHeaders.findIndex(h => h.includes("year")),
-        events: tableHeaders.findIndex(h => h.includes("events") || h.includes("selected"))
-    };
-
-    // 3. Build HTML Header for PDF
-    let printTable = `<table border="1"><thead><tr>`;
-    if (currentIsGroupView) {
-        printTable += `<th>Team Token</th><th>Team No</th>`;
-    }
-    if (prefs.reg) printTable += `<th>Register No</th>`;
-    if (prefs.name) printTable += `<th>Student Name</th>`;
-    if (prefs.dept) printTable += `<th>Department</th>`;
-    if (prefs.college) printTable += `<th>College</th>`;
-    if (prefs.year && !currentIsGroupView) printTable += `<th>Year</th>`;
-    if (prefs.events && !currentIsGroupView) printTable += `<th>Events</th>`;
-    printTable += `</tr></thead><tbody>`;
-
-    // 4. Build Rows
-    const rows = document.querySelectorAll("#studentTable tr");
-    
-    // Tracking for group view rowspan
-    let lastToken = "";
-    let lastTeamNo = "";
-
-    rows.forEach(row => {
-        const cells = Array.from(row.cells);
-        if (cells.length === 0) return; 
-
-        printTable += `<tr>`;
-
-        if (currentIsGroupView) {
-            // Group logic: Indexing changes if the row has rowspan (Leader) or not (Member)
-            const isLeader = cells.length > 4; 
-            
-            if (isLeader) {
-                lastToken = cells[0].innerText;
-                lastTeamNo = cells[1].innerText;
-                printTable += `<td style="background:#f9f9f9;"><b>${lastToken}</b></td><td>${lastTeamNo}</td>`;
-                
-                // For Leaders, the data is shifted by 2
-                if (prefs.reg) printTable += `<td>${cells[2]?.innerText || ''}</td>`;
-                if (prefs.name) printTable += `<td>${cells[5]?.innerText || ''}</td>`;
-                if (prefs.dept) printTable += `<td>${cells[3]?.innerText || ''}</td>`;
-                if (prefs.college) printTable += `<td>${cells[4]?.innerText || ''}</td>`;
-            } else {
-                // For Members, data starts at index 0
-                printTable += `<td></td><td></td>`; 
-                if (prefs.reg) printTable += `<td>${cells[0]?.innerText || ''}</td>`;
-                if (prefs.name) printTable += `<td>${cells[3]?.innerText || ''}</td>`;
-                if (prefs.dept) printTable += `<td>${cells[1]?.innerText || ''}</td>`;
-                if (prefs.college) printTable += `<td>${cells[2]?.innerText || ''}</td>`;
-            }
-        } else {
-            // Solo logic: Mapping based on your specific standard row order
-            // [0:Name, 1:Reg, 2:College, 3:Dept, 4:Year, 5:Events]
-            if (prefs.reg) printTable += `<td>${cells[1]?.innerText || ''}</td>`;
-            if (prefs.name) printTable += `<td>${cells[0]?.innerText || ''}</td>`;
-            if (prefs.dept) printTable += `<td>${cells[3]?.innerText || ''}</td>`;
-            if (prefs.college) printTable += `<td>${cells[2]?.innerText || ''}</td>`;
-            if (prefs.year) printTable += `<td>${cells[4]?.innerText || ''}</td>`;
-            if (prefs.events) printTable += `<td>${cells[5]?.innerText || ''}</td>`;
-        }
-        printTable += `</tr>`;
+  function downloadPDF() {
+    const eventName = document.getElementById("event").value || "Report";
+    const p = { name: document.getElementById("export-name")?.checked, reg: document.getElementById("export-reg")?.checked, college: document.getElementById("export-college")?.checked, dept: document.getElementById("export-dept")?.checked, year: document.getElementById("export-year")?.checked, events: document.getElementById("export-events")?.checked };
+    let tbl = `<table border="1"><thead><tr>`;
+    if (currentIsGroupView) { tbl += `<th>Team Token</th><th>Team No</th>`; }
+    if (p.reg) tbl += `<th>Register No</th>`; if (p.name) tbl += `<th>Name</th>`; if (p.dept) tbl += `<th>Dept</th>`; if (p.college) tbl += `<th>College</th>`;
+    if (p.year && !currentIsGroupView) tbl += `<th>Year</th>`; if (p.events && !currentIsGroupView) tbl += `<th>Events</th>`;
+    tbl += `</tr></thead><tbody>`;
+    document.querySelectorAll("#studentTable tr").forEach(row => {
+      const cells = Array.from(row.cells); if (!cells.length) return;
+      tbl += `<tr>`;
+      if (currentIsGroupView) {
+        const isL = cells.length > 4;
+        if (isL) { tbl += `<td>${cells[0].innerText}</td><td>${cells[1].innerText}</td>`; if(p.reg) tbl+=`<td>${cells[2]?.innerText||''}</td>`; if(p.name) tbl+=`<td>${cells[5]?.innerText||''}</td>`; if(p.dept) tbl+=`<td>${cells[3]?.innerText||''}</td>`; if(p.college) tbl+=`<td>${cells[4]?.innerText||''}</td>`; }
+        else { tbl += `<td></td><td></td>`; if(p.reg) tbl+=`<td>${cells[0]?.innerText||''}</td>`; if(p.name) tbl+=`<td>${cells[3]?.innerText||''}</td>`; if(p.dept) tbl+=`<td>${cells[1]?.innerText||''}</td>`; if(p.college) tbl+=`<td>${cells[2]?.innerText||''}</td>`; }
+      } else { if(p.reg) tbl+=`<td>${cells[1]?.innerText||''}</td>`; if(p.name) tbl+=`<td>${cells[0]?.innerText||''}</td>`; if(p.dept) tbl+=`<td>${cells[3]?.innerText||''}</td>`; if(p.college) tbl+=`<td>${cells[2]?.innerText||''}</td>`; if(p.year) tbl+=`<td>${cells[4]?.innerText||''}</td>`; if(p.events) tbl+=`<td>${cells[5]?.innerText||''}</td>`; }
+      tbl += `</tr>`;
     });
+    tbl += `</tbody></table>`;
+    const w = window.open('','','height=800,width=1000');
+    w.document.write(`<html><head><title>Symposium Report</title><style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:8px;font-size:12px;}th{background:#f0f0f0;}h2,h3{text-align:center;}</style></head><body><h2>Symposium Registration List</h2><h3>${eventName.toUpperCase()}</h3>${tbl}</body></html>`);
+    w.document.close();
+    setTimeout(() => { w.print(); w.close(); }, 500);
+  }
 
-    printTable += `</tbody></table>`;
-
-    // 5. Open and Print
-    const printWindow = window.open('', '', 'height=800,width=1000');
-    printWindow.document.write(`
-        <html><head><title>Symposium Report</title><style>
-            body { font-family: sans-serif; padding: 20px; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px; }
-            th { background: #eee; }
-            h2, h3 { text-align: center; }
-        </style></head><body>
-            <h2>Symposium Registration List</h2>
-            <h3>Event: ${eventName.toUpperCase().replace('_', ' ')}</h3>
-            ${printTable}
-        </body></html>
-    `);
-    printWindow.document.close();
-    setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
-}
-
-
-function openModal(index) {
+  function openModal(index) {
     eventToDeleteIndex = index;
-    // Change modal content for event deletion
-    document.querySelector("#confirmModal h2").textContent = "⚠ Delete Event?";
-    document.querySelector("#confirmModal p").textContent = `Delete "${eventsList[index].name}"? This cannot be undone.`;
+    document.getElementById("modalIcon").textContent = "🗑";
+    document.getElementById("modalTitle").textContent = "Delete Event?";
+    document.getElementById("modalBody").textContent = `Delete "${eventsList[index].name}"? This cannot be undone.`;
     document.getElementById("adminPasswordInput").style.display = "none";
-    document.getElementById("confirmModal").style.display = "flex";
-    
-    // Override the delete button to call deleteEvent
-    document.querySelector("#confirmModal .modal-btns .btn:last-child").onclick = deleteEvent;
-}
+    document.getElementById("modalConfirmBtn").onclick = deleteEvent;
+    document.getElementById("confirmModal").classList.add("active");
+  }
 
-function openDeleteModal() {
-    eventToDeleteIndex = null;
-    document.querySelector("#confirmModal h2").textContent = "⚠ Danger Zone";
-    document.querySelector("#confirmModal p").textContent = "This will permanently delete ALL student data. This action cannot be undone.";
+  function openDeleteModal() {
+    document.getElementById("modalIcon").textContent = "⚠";
+    document.getElementById("modalTitle").textContent = "Delete All Students";
+    document.getElementById("modalBody").textContent = "This will permanently erase all student registration data. This action cannot be undone.";
     document.getElementById("adminPasswordInput").style.display = "block";
     document.getElementById("adminPasswordInput").value = "";
-    document.getElementById("confirmModal").style.display = "flex";
-    
-    // Override delete button to call confirmDeleteAllFromModal
-    document.querySelector("#confirmModal .modal-btns .btn:last-child").onclick = confirmDeleteAllFromModal;
-}
-function closeModal() {
-    document.getElementById("confirmModal").style.display = "none";
-}
+    document.getElementById("modalConfirmBtn").onclick = confirmDeleteAllFromModal;
+    document.getElementById("confirmModal").classList.add("active");
+  }
 
-async function confirmDeleteAllFromModal() {
-    const password = document.getElementById("adminPasswordInput").value;
+  function closeModal() { document.getElementById("confirmModal").classList.remove("active"); }
 
-    if (!password) {
-        alert("Please enter password");
-        return;
-    }
+  async function deleteEvent() {
+    const name = eventsList[eventToDeleteIndex].name;
+    const r = await adminFetch(`${API_BASE_URL}/admin/delete-event?name=${encodeURIComponent(name)}`, { method: "DELETE" });
+    if (r.ok) { showToast("✓ Event deleted"); closeModal(); fetchEventsFromServer(); }
+  }
 
+  async function confirmDeleteAllFromModal() {
+    const pw = document.getElementById("adminPasswordInput").value;
+    if (!pw) return alert("Enter password");
+    const r = await adminFetch(`${API_BASE_URL}/admin/delete-all-students`, { method: "POST", body: JSON.stringify({ password: pw }) });
+    const d = await r.json();
+    if (d.success) { showToast("✓ All data deleted"); closeModal(); loadStudents(); }
+    else showToast("✗ Wrong password");
+  }
+
+  function handleLimitChange() { document.getElementById("confirmLimitBtn").style.display = "block"; }
+  function handleDateSelection() { document.getElementById("confirmBtn").style.display = "block"; }
+  function handleHomepageTextChange() { document.querySelectorAll(".config-box .btn-confirm").forEach(b => { if (b.onclick?.toString().includes("updateHomepageText")) b.style.display = "block"; }); }
+  function handleContactChange() { document.querySelectorAll(".config-box .btn-confirm").forEach(b => { if (b.onclick?.toString().includes("updateContactDetails")) b.style.display = "block"; }); }
+
+  async function updateEventLimit() {
+    await adminFetch(`${API_BASE_URL}/api/settings`, { method: "POST", body: JSON.stringify({ limit: document.getElementById("adminLimitInput").value }) });
+    showToast("✓ Limit saved"); document.getElementById("confirmLimitBtn").style.display = "none";
+  }
+
+  async function updateSymposiumDate() {
+    await adminFetch(`${API_BASE_URL}/api/settings`, { method: "POST", body: JSON.stringify({ deadline: document.getElementById("adminDateInput").value }) });
+    showToast("✓ Date updated"); document.getElementById("confirmBtn").style.display = "none";
+  }
+
+  async function updateHomepageText() {
+    const r = await adminFetch(`${API_BASE_URL}/api/settings`, { method: "POST", body: JSON.stringify({ header_text: document.getElementById("adminHeaderText").value, symposium_title: document.getElementById("adminSymposiumTitle").value }) });
+    const d = await r.json(); if (d.success) showToast("✓ Homepage updated");
+  }
+
+  async function updateContactDetails() {
+    await adminFetch(`${API_BASE_URL}/api/update-contact`, { method: "POST", body: JSON.stringify({ email: document.getElementById("adminEmail").value, phone: document.getElementById("adminPhone").value, location: document.getElementById("adminLocation").value, lat: document.getElementById("adminLat").value, lng: document.getElementById("adminLng").value }) });
+    showToast("✓ Contact saved");
+  }
+
+  async function loadAdminSettings() {
     try {
-        const res = await adminFetch(`${API_BASE_URL}/admin/delete-all-students`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ password })
-        });
+      const s = await (await adminFetch(`${API_BASE_URL}/api/settings`)).json();
+      document.getElementById("adminHeaderText").value = s.header_text || "";
+      document.getElementById("adminSymposiumTitle").value = s.symposium_title || "";
+      document.getElementById("adminLimitInput").value = s.event_selection_limit || 3;
+      const c = await (await adminFetch(`${API_BASE_URL}/api/contact`)).json();
+      document.getElementById("adminEmail").value = c.contact_email || "";
+      document.getElementById("adminPhone").value = c.contact_phone || "";
+      document.getElementById("adminLocation").value = c.contact_location || "";
+      document.getElementById("adminLat").value = c.contact_lat || "";
+      document.getElementById("adminLng").value = c.contact_lng || "";
+    } catch (e) { console.error(e); }
+  }
 
-        const data = await res.json();
+  function toggleTeamSizeInput() {
+    document.getElementById("teamSizeGroup").style.display = document.getElementById("newEventType").value === 'group' ? '' : 'none';
+  }
 
-        if (data.success) {
-            showToast("🗑 All student data deleted");
-            closeModal();
-            loadStudents();
-        } else {
-            showToast("❌ Wrong password");
-        }
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg; t.style.display = "block";
+    setTimeout(() => t.style.display = "none", 3000);
+  }
 
-    } catch (err) {
-        alert("Server error");
-    }
-}
-async function updateHomepageText() {
-    const header = document.getElementById("adminHeaderText").value;
-    const title = document.getElementById("adminSymposiumTitle").value;
-
-    const res = await adminFetch(`${API_BASE_URL}/api/settings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            header_text: header,
-            symposium_title: title
-        })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-        showToast("✅ Homepage updated!");
-    }
-}
-function handleHomepageTextChange() {
-    document.querySelector("#homepageTextContainer .btn-confirm").style.display = "block";
-}
-function handleContactChange() {
-    document.querySelector("#contactContainer .btn-confirm").style.display = "block";
-}
-async function updateContactDetails() {
-    const email = document.getElementById("adminEmail").value;
-    const phone = document.getElementById("adminPhone").value;
-    const location = document.getElementById("adminLocation").value;
-    const lat = document.getElementById("adminLat").value;
-    const lng = document.getElementById("adminLng").value;
-
-    await adminFetch(`${API_BASE_URL}/api/update-contact`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email, phone, location, lat, lng })
-    });
-
-    showToast("✅ Contact updated!");
-}
-async function loadAdminSettings() {
-    try {
-        const res1 = await adminFetch(`${API_BASE_URL}/api/settings`);
-        if (!res1.ok) throw new Error("Settings fetch failed");
-        const settings = await res1.json();
-
-        document.getElementById("adminHeaderText").value = settings.header_text || "";
-        document.getElementById("adminSymposiumTitle").value = settings.symposium_title || "";
-        document.getElementById("adminLimitInput").value = settings.event_selection_limit || 3;
-
-        const res2 = await adminFetch(`${API_BASE_URL}/api/contact`);
-        if (!res2.ok) throw new Error("Contact fetch failed");
-        const contact = await res2.json();
-
-        document.getElementById("adminEmail").value = contact.contact_email || "";
-        document.getElementById("adminPhone").value = contact.contact_phone || "";
-        document.getElementById("adminLocation").value = contact.contact_location || "";
-        document.getElementById("adminLat").value = contact.contact_lat || "";
-        document.getElementById("adminLng").value = contact.contact_lng || "";
-
-    } catch(err) {
-        console.error("Admin settings load error:", err);
-    }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadAdminSettings();
-    fetchEventsFromServer(); // This loads events AND calls loadStudents()
-});
+  document.addEventListener("DOMContentLoaded", () => { loadAdminSettings(); fetchEventsFromServer(); });
 </script>
 </body>
 </html>
