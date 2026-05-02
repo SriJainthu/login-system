@@ -97,17 +97,34 @@
         }
 
         .info-item {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: 0.3s;
-        }
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(15px);
+    padding: 25px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+.info-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    background: linear-gradient(120deg, transparent, rgba(0,198,255,0.3), transparent);
+    opacity: 0;
+    transition: 0.4s;
+}
 
-        .info-item:hover {
-            background: rgba(0, 198, 255, 0.1);
-            transform: translateY(-5px);
-        }
+
+    .info-item:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: #00c6ff;
+    box-shadow: 0 0 25px rgba(0,198,255,0.25);
+}
+.info-item:hover::before {
+    opacity: 1;
+}
 
         .info-item .icon { 
             width: 40px; height: 40px; background: var(--primary); border-radius: 50%; 
@@ -216,6 +233,47 @@
     z-index: 9999;
     transition: width 0.3s ease;
 }
+.map-pin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -150%);
+    font-size: 30px;
+    color: #00c6ff;
+    opacity: 0;
+    animation: dropPin 0.8s ease forwards;
+}
+
+@keyframes dropPin {
+    0% {
+        transform: translate(-50%, -200%);
+        opacity: 0;
+    }
+    70% {
+        transform: translate(-50%, -40%);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -60%);
+    }
+}
+.whatsapp-btn {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 12px 25px;
+    border-radius: 50px;
+    background: linear-gradient(45deg, #25D366, #128C7E);
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+    box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(37, 211, 102, 0.7);
+}
     </style>
 </head>
 <body>
@@ -263,6 +321,9 @@
 
 <p id="contactLocationText" class="fade-text"></p>
             <div class="info-grid">
+                <a id="whatsappBtn" class="whatsapp-btn" target="_blank">
+    💬 Chat on WhatsApp
+</a>
                 <div class="info-item">
     <div class="icon">V</div>
     <b>Location</b>
@@ -272,13 +333,13 @@
 <div class="info-item">
     <div class="icon">E</div>
     <b>Email Us</b>
-    <span id="contactEmail"  class="fade-text"></span>
+   <a id="contactEmail" href="#" class="fade-text"></a>
 </div>
 
 <div class="info-item">
     <div class="icon">C</div>
     <b>Call Support</b>
-    <span id="contactPhone"  class="fade-text"></span>
+   <a id="contactPhone" class="fade-text"></a>
 </div>
             </div>
         </div>
@@ -300,6 +361,7 @@
         allowfullscreen="" 
         loading="lazy">
     </iframe>
+    <div id="mapPin" class="map-pin">📍</div>
 
 </div>
     </div>
@@ -338,12 +400,28 @@ async function loadContactData() {
         const location = document.getElementById("contactLocation");
         const email = document.getElementById("contactEmail");
         const phone = document.getElementById("contactPhone");
-
+        const whatsappBtn = document.getElementById("whatsappBtn");
+        if (data.contact_phone) {
+    const phoneNumber = data.contact_phone.replace(/\D/g, ""); // remove spaces
+    whatsappBtn.href = `https://wa.me/${phoneNumber}`;
+} else {
+    whatsappBtn.style.display = "none";
+}
         // Set values
         locationText.innerText = data.contact_location || "Location unavailable";
         location.innerHTML = (data.contact_location || "").replace(/\n/g, "<br>");
-        email.innerText = data.contact_email || "Not available";
-        phone.innerText = data.contact_phone || "Not available";
+       if (data.contact_email) {
+    email.innerText = data.contact_email;
+    email.href = `mailto:${data.contact_email}`;
+} else {
+    email.innerText = "Not available";
+}
+       if (data.contact_phone) {
+    phone.innerText = data.contact_phone;
+    phone.href = `tel:${data.contact_phone}`;
+} else {
+    phone.innerText = "Not available";
+}
 
         // Remove skeleton
         if (loader) loader.style.display = "none";
@@ -361,6 +439,7 @@ async function loadContactData() {
 
         iframe.onload = () => {
             document.getElementById("mapLoading").style.display = "none";
+            document.getElementById("mapPin").style.display = "block";
             iframe.style.opacity = "1";
         };
 
