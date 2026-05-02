@@ -290,11 +290,55 @@
         min-height: 120px;
         padding: 20px 15px;
     }
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
 
+.loader-box {
+  text-align: center;
+  padding: 30px 40px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.spinner {
+  width: 45px;
+  height: 45px;
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top: 4px solid #00c6ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+#loader-text {
+  font-size: 13px;
+  color: #aaa;
+}
     </style>
 </head>
 <body>
-
+<div id="loader">
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <p id="loader-text">Loading events...</p>
+  </div>
+</div>
 <div class="container">
     <div class="header-section">
         <span class="logo-small">Symposium <span>2026</span></span>
@@ -342,77 +386,81 @@
     return `${prefix}-${randomPart}${datePart}`;
 }
 
-    async function syncAdminSettings() {
-        try {
-            const settingsRes =await fetch(`${API_BASE_URL}/api/public-settings`);
-            const settings = await settingsRes.json();
-            
-            adminEventLimit = parseInt(settings.event_selection_limit) || 3;
-            document.getElementById('max-limit-display').textContent = adminEventLimit;
+   async function syncAdminSettings() {
+    animateLoaderText();
 
-            const eventRes = await fetch(`${API_BASE_URL}/events`);
-            const adminEvents = await eventRes.json();
-            
-            const groupContainer = document.getElementById("groupEventsContainer");
-            const soloContainer = document.getElementById("soloEventsContainer");
+    try {
+        const settingsRes = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const settings = await settingsRes.json();
 
-            groupContainer.innerHTML = ""; 
-            soloContainer.innerHTML = ""; 
+        adminEventLimit = parseInt(settings.event_selection_limit) || 3;
+        document.getElementById('max-limit-display').textContent = adminEventLimit;
 
-            if (adminEvents && adminEvents.length > 0) {
-                const renderedNames = new Set();
+        const eventRes = await fetch(`${API_BASE_URL}/events`);
+        const adminEvents = await eventRes.json();
 
-                adminEvents.forEach(event => {
-                    const eName = event.event_name || event.name;
-                    const normalizedName = eName.toLowerCase().trim();
-                    if (renderedNames.has(normalizedName)) return;
-                    renderedNames.add(normalizedName);
+        const groupContainer = document.getElementById("groupEventsContainer");
+        const soloContainer = document.getElementById("soloEventsContainer");
 
-                    const isGroup = event.event_type === 'group' || event.type === 'group'; 
-                    const card = document.createElement("div");
-                    card.className = "event-card";
-                    
-                    card.onclick = function(e) { 
-                        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') toggleEvent(card, eName); 
-                    };
+        groupContainer.innerHTML = "";
+        soloContainer.innerHTML = "";
 
-                    card.innerHTML = `
-                        <span class="indicator">✓</span>
-                        <h3>${eName}</h3>
-                        ${isGroup ? `
-                            <div class="team-code-container">
-                                <label>Join Team (Leave blank if Leader)</label>
-                                <div style="display: flex; gap: 5px;">
-                                    <input type="text" placeholder="Code" 
-                                           id="token_${event.id}" 
-                                           maxlength="12" oninput="resetValidation('${eName}')">
-                                    <button type="button" class="verify-btn" onclick="verifyToken(event, ${event.id}, '${eName}')">Verify</button>
-                                </div>
-                                <p id="msg_${event.id}" class="token-msg"></p>
-                            </div>
-                        ` : ''}
-                    `;
-                    
-                    // Logic to separate the events into containers
-                    if (isGroup) {
-                        groupContainer.appendChild(card);
-                    } else {
-                        soloContainer.appendChild(card);
+        if (adminEvents && adminEvents.length > 0) {
+            const renderedNames = new Set();
+
+            adminEvents.forEach(event => {
+                const eName = event.event_name || event.name;
+                const normalizedName = eName.toLowerCase().trim();
+                if (renderedNames.has(normalizedName)) return;
+                renderedNames.add(normalizedName);
+
+                const isGroup = event.event_type === 'group' || event.type === 'group';
+
+                const card = document.createElement("div");
+                card.className = "event-card";
+
+                card.onclick = function(e) {
+                    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+                        toggleEvent(card, eName);
                     }
-                });
+                };
 
-                // Hide section if empty
-                if (groupContainer.children.length === 0) groupContainer.parentElement.style.display = 'none';
-                if (soloContainer.children.length === 0) soloContainer.parentElement.style.display = 'none';
+                card.innerHTML = `
+                    <span class="indicator">✓</span>
+                    <h3>${eName}</h3>
+                    ${isGroup ? `
+                    <div class="team-code-container">
+                        <label>Join Team (Leave blank if Leader)</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="token_${event.id}" maxlength="12"
+                                   oninput="resetValidation('${eName}')">
+                            <button type="button" class="verify-btn"
+                                onclick="verifyToken(event, ${event.id}, '${eName}')">
+                                Verify
+                            </button>
+                        </div>
+                        <p id="msg_${event.id}" class="token-msg"></p>
+                    </div>` : ''}
+                `;
 
-            } else {
-                document.getElementById("eventSelectionGrid").innerHTML = "<p>No events found.</p>";
-            }
-        } catch (err) {
-            console.error("Sync Error:", err);
+                if (isGroup) groupContainer.appendChild(card);
+                else soloContainer.appendChild(card);
+            });
+
+        } else {
+            document.getElementById("eventSelectionGrid").innerHTML = "<p>No events found.</p>";
         }
+
+    } catch (err) {
+        console.error("Sync Error:", err);
     }
-// Fix 1: Normalize names when tracking validation
+
+    // ✅ Hide loader ONLY ONCE
+    const loader = document.getElementById("loader");
+    loader.style.opacity = "0";
+    loader.style.transition = "0.5s";
+    setTimeout(() => loader.style.display = "none", 500);
+}
 function toggleEvent(el, name) {
     const normalizedName = name.trim().toLowerCase(); 
     if (el.classList.contains('selected')) {
@@ -599,7 +647,26 @@ function resetValidation(eventName) {
         if (msgElement) msgElement.innerText = "⚠️ Please verify this code";
     }
 }
-    window.onload = syncAdminSettings;
+function animateLoaderText() {
+  const text = document.getElementById("loader-text");
+
+  const steps = [
+    "Fetching settings...",
+    "Loading events...",
+    "Preparing UI...",
+    "Almost ready..."
+  ];
+
+  let i = 0;
+  const interval = setInterval(() => {
+    text.textContent = steps[i];
+    i++;
+    if (i >= steps.length) clearInterval(interval);
+  }, 600);
+}
+    window.onload = () => {
+    syncAdminSettings();
+};
 </script>
 
 </body>

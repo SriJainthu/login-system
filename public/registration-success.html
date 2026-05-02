@@ -301,7 +301,7 @@ function maskEmail(email) {
     }
   }
 
- 
+
   function animateLoaderText() {
   const text = document.getElementById("loader-text");
 
@@ -324,7 +324,7 @@ async function loadPageData() {
   animateLoaderText();
 
   try {
-   await new Promise(resolve => setTimeout(resolve, 1200));
+    await new Promise(resolve => setTimeout(resolve, 1200));
 
   } catch (err) {
     console.error(err);
@@ -342,6 +342,7 @@ window.onload = () => {
   displayRegistrationInfo();
   loadPageData();
 };
+
 </script>
 
 </body>
