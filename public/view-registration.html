@@ -393,7 +393,7 @@
                     <div id="event-list"></div>
                 </div>
             </div>
-            <p style="text-align: center; font-size: 11px; color: #888; margin-top: 20px; opacity: 0.7;">Verified Digital ID • Symposium 2026</p>
+           <p id="footerVerifiedText" style="text-align: center; font-size: 11px; color: #888; margin-top: 20px; opacity: 0.7;">Verified Digital ID • Symposium 2026</p>
         </div>
     </div>
 
@@ -668,7 +668,9 @@ async function loadNavbarTitle() {
             } else {
                 logoEl.textContent = title;
             }
-
+             document.title = `Registration Status | ${title}`;
+             const footerText = document.getElementById('footerVerifiedText');
+if (footerText) footerText.textContent = `Verified Digital ID • ${title}`;
             requestAnimationFrame(() => {
                 logoEl.style.opacity = '1';
             });
