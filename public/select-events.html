@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Select Events | Symposium 2026</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -22,8 +20,8 @@
     }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: radial-gradient(ellipse at 70% 0%, #1a3a4a 0%, #0d2030 40%, #07111a 100%);
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -37,7 +35,7 @@
     #loader {
       position: fixed;
       inset: 0;
-      background: #07111a;
+      background: #0f2027;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -60,7 +58,6 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     #loader-text {
-      font-family: 'Syne', sans-serif;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.15em;
@@ -87,7 +84,6 @@
     }
 
     .brand {
-      font-family: 'Syne', sans-serif;
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.18em;
@@ -99,10 +95,9 @@
     .brand span { color: var(--accent); }
 
     .page-title {
-      font-family: 'Syne', sans-serif;
       font-size: 32px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 300;
+      letter-spacing: 1px;
       color: var(--text);
       line-height: 1;
     }
@@ -110,16 +105,17 @@
     .page-title em {
       font-style: normal;
       color: var(--accent);
+      font-weight: 700;
     }
 
     /* ── MAIN CARD ── */
     .card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 24px;
       padding: 32px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
 
     /* ── SCROLL AREA ── */
@@ -135,11 +131,8 @@
     .scroll-area::-webkit-scrollbar-track { background: transparent; }
     .scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
-    /* ── PARTICIPATION SECTION (Solo / Group) ── */
-    .participation-section {
-      margin-bottom: 28px;
-    }
-
+    /* ── PARTICIPATION SECTION ── */
+    .participation-section { margin-bottom: 28px; }
     .participation-section:last-child { margin-bottom: 0; }
 
     .section-header {
@@ -148,15 +141,12 @@
       gap: 10px;
       margin-bottom: 16px;
       padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
-    .section-icon {
-      font-size: 14px;
-    }
+    .section-icon { font-size: 14px; }
 
     .section-label {
-      font-family: 'Syne', sans-serif;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.14em;
@@ -164,12 +154,11 @@
       color: var(--accent);
     }
 
-    /* ── CATEGORY LABEL (Technical / Non-Technical) ── */
+    /* ── CATEGORY LABEL ── */
     .cat-label {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-family: 'Syne', sans-serif;
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -182,7 +171,7 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: var(--border);
+      background: rgba(255,255,255,0.08);
     }
 
     /* ── EVENTS GRID ── */
@@ -195,17 +184,17 @@
     /* ── EVENT CARD ── */
     .event-card {
       position: relative;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px;
       padding: 18px 14px 14px;
       cursor: pointer;
-      transition: border-color 0.25s var(--ease), background 0.25s var(--ease), transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+      transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
+                  transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0;
-      min-height: 0;
     }
 
     .event-card:hover {
@@ -221,21 +210,17 @@
       box-shadow: 0 0 18px rgba(0,255,174,0.12);
     }
 
-    /* Category icon - top left */
     .cat-icon {
       position: absolute;
-      top: 8px;
-      left: 10px;
+      top: 8px; left: 10px;
       font-size: 10px;
       opacity: 0.45;
       line-height: 1;
     }
 
-    /* Checkmark - top right */
     .indicator {
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 8px; right: 8px;
       width: 18px; height: 18px;
       border-radius: 50%;
       background: var(--green);
@@ -250,14 +235,9 @@
       transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
     }
 
-    .event-card.selected .indicator {
-      opacity: 1;
-      transform: scale(1);
-    }
+    .event-card.selected .indicator { opacity: 1; transform: scale(1); }
 
-    /* Event name */
     .event-card h3 {
-      font-family: 'Syne', sans-serif;
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -271,7 +251,7 @@
 
     .event-card.selected h3 { color: var(--green); }
 
-    /* ── TEAM CODE (Group Events) ── */
+    /* ── TEAM CODE ── */
     .team-code-container {
       width: 100%;
       margin-top: 12px;
@@ -295,10 +275,7 @@
       margin-bottom: 6px;
     }
 
-    .token-row {
-      display: flex;
-      gap: 6px;
-    }
+    .token-row { display: flex; gap: 6px; }
 
     .team-code-container input {
       flex: 1;
@@ -308,7 +285,7 @@
       background: rgba(0,0,0,0.25);
       color: var(--green);
       font-size: 11px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
       text-align: center;
       outline: none;
       transition: border-color 0.2s;
@@ -322,7 +299,6 @@
       border: none;
       background: var(--accent);
       color: #07111a;
-      font-family: 'Syne', sans-serif;
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -347,25 +323,20 @@
       align-items: center;
       justify-content: space-between;
       padding-top: 20px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(255,255,255,0.08);
       gap: 16px;
     }
 
-    .status-text {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
+    .status-text { font-size: 13px; color: var(--muted); }
     .status-text .count { color: var(--accent); font-weight: 600; }
     .status-text .max   { color: var(--green);  font-weight: 600; }
 
     .confirm-btn {
       padding: 13px 32px;
-      background: linear-gradient(135deg, var(--accent), #0072ff);
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
       border: none;
       border-radius: 12px;
       color: #fff;
-      font-family: 'Syne', sans-serif;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.1em;
@@ -378,7 +349,6 @@
     .confirm-btn:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 12px 28px rgba(0,198,255,0.35);
-      filter: brightness(1.1);
     }
 
     .confirm-btn:disabled {
@@ -403,13 +373,14 @@
     .alert-overlay.show { display: flex; }
 
     .alert-box {
-      background: #0f1e28;
+      background: rgba(255,255,255,0.07);
       border: 1px solid rgba(255,75,43,0.4);
       border-radius: 20px;
       padding: 36px 32px;
       max-width: 340px;
       width: 90%;
       text-align: center;
+      backdrop-filter: blur(15px);
       animation: popIn 0.3s var(--ease);
     }
 
@@ -419,16 +390,37 @@
     }
 
     .alert-box .alert-icon { font-size: 36px; margin-bottom: 14px; }
-    .alert-box h3 { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--danger); margin-bottom: 10px; }
-    .alert-box p  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+
+    .alert-box h3 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--danger);
+      margin-bottom: 10px;
+    }
+
+    .alert-box p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
     .alert-box button {
       padding: 12px 24px;
-      border: none; border-radius: 10px;
-      background: var(--danger); color: #fff;
-      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
-      cursor: pointer; width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      width: 100%;
       transition: filter 0.2s;
     }
+
     .alert-box button:hover { filter: brightness(1.15); }
 
     /* ── EMPTY STATE ── */
@@ -477,27 +469,23 @@
   <div class="card">
     <div class="scroll-area" id="scrollArea">
 
-      <!-- Solo Section -->
       <div class="participation-section" id="soloSection">
         <div class="section-header">
           <span class="section-icon">👤</span>
           <span class="section-label">Solo Events</span>
         </div>
-        <!-- category sub-grids injected here by JS -->
         <div id="soloEventsContainer"></div>
       </div>
 
-      <!-- Group Section -->
       <div class="participation-section" id="groupSection">
         <div class="section-header">
           <span class="section-icon">👥</span>
           <span class="section-label">Group Events</span>
         </div>
-        <!-- category sub-grids injected here by JS -->
         <div id="groupEventsContainer"></div>
       </div>
 
-    </div><!-- /scroll-area -->
+    </div>
 
     <div class="footer">
       <div class="status-text">
@@ -509,7 +497,7 @@
     </div>
   </div>
 
-</div><!-- /wrapper -->
+</div>
 
 <script>
   const API_BASE_URL = window.location.hostname === 'localhost'
@@ -520,7 +508,6 @@
   let adminEventLimit = 3;
   let validatedTokens = {};
 
-  /* ── LOADER ── */
   function animateLoaderText() {
     const steps = ["Fetching settings...", "Loading events...", "Preparing UI...", "Almost ready..."];
     let i = 0;
@@ -534,7 +521,6 @@
     setTimeout(() => l.style.display = "none", 500);
   }
 
-  /* ── MAIN INIT ── */
   async function syncAdminSettings() {
     animateLoaderText();
     try {
@@ -543,7 +529,7 @@
         fetch(`${API_BASE_URL}/events`)
       ]);
 
-      const settings   = await settingsRes.json();
+      const settings    = await settingsRes.json();
       const adminEvents = await eventRes.json();
 
       adminEventLimit = parseInt(settings.event_selection_limit) || 3;
@@ -562,7 +548,7 @@
       const renderedNames = new Set();
 
       adminEvents.forEach(event => {
-        const eName = (event.event_name || event.name || '').trim();
+        const eName    = (event.event_name || event.name || '').trim();
         const normName = eName.toLowerCase();
         if (renderedNames.has(normName)) return;
         renderedNames.add(normName);
@@ -572,12 +558,10 @@
         const catIcon = cat === 'technical' ? '⚡' : '🎨';
         const catText = cat === 'technical' ? '⚡ Technical' : '🎨 Non-Technical';
 
-        // Pick parent container
         const parentContainer = isGroup ? groupContainer : soloContainer;
-
-        // Find or create category sub-section
         const sectionId = `section_${isGroup ? 'group' : 'solo'}_${cat}`;
         let section = document.getElementById(sectionId);
+
         if (!section) {
           section = document.createElement('div');
           section.id = sectionId;
@@ -595,7 +579,6 @@
           parentContainer.appendChild(section);
         }
 
-        // Build card
         const card = document.createElement("div");
         card.className = "event-card";
         card.onclick = function(e) {
@@ -624,14 +607,12 @@
             </div>` : ''}
         `;
 
-        // Append to correct grid
         const grid = document.getElementById(`grid_${sectionId}`);
         grid.appendChild(card);
       });
 
-      // Hide empty sections
-      if (!soloContainer.innerHTML.trim())   document.getElementById("soloSection").style.display  = "none";
-      if (!groupContainer.innerHTML.trim())  document.getElementById("groupSection").style.display = "none";
+      if (!soloContainer.innerHTML.trim())  document.getElementById("soloSection").style.display  = "none";
+      if (!groupContainer.innerHTML.trim()) document.getElementById("groupSection").style.display = "none";
 
     } catch (err) {
       console.error("Sync Error:", err);
@@ -641,7 +622,6 @@
     }
   }
 
-  /* ── TOGGLE ── */
   function toggleEvent(el, name) {
     const norm = name.trim().toLowerCase();
     if (el.classList.contains('selected')) {
@@ -652,7 +632,7 @@
       if (selectedList.length < adminEventLimit) {
         el.classList.add('selected');
         selectedList.push(name);
-        validatedTokens[norm] = true; // leader mode default
+        validatedTokens[norm] = true;
       } else {
         openAlert(`You can only select up to ${adminEventLimit} events.`, "Limit Reached");
       }
@@ -665,7 +645,6 @@
     document.getElementById('confirmBtn').disabled = selectedList.length === 0;
   }
 
-  /* ── ALERT ── */
   function openAlert(msg, title = "Notice") {
     document.getElementById('alertTitle').textContent   = title;
     document.getElementById('alertMessage').textContent = msg;
@@ -676,13 +655,12 @@
     document.getElementById('alertOverlay').classList.remove('show');
   }
 
-  /* ── TOKEN VERIFY ── */
   async function verifyToken(evt, eventId, eventName) {
     if (evt) evt.stopPropagation();
-    const norm     = eventName.trim().toLowerCase();
-    const inputEl  = document.getElementById(`token_${eventId}`);
-    const msgEl    = document.getElementById(`msg_${eventId}`);
-    const token    = inputEl.value.trim();
+    const norm    = eventName.trim().toLowerCase();
+    const inputEl = document.getElementById(`token_${eventId}`);
+    const msgEl   = document.getElementById(`msg_${eventId}`);
+    const token   = inputEl.value.trim();
 
     if (token === "") {
       msgEl.textContent = "👑 You will be the Team Leader";
@@ -729,7 +707,6 @@
     }
   }
 
-  /* ── SUBMIT ── */
   function generateUniqueToken(eventName) {
     const prefix = eventName.substring(0, 3).toUpperCase().replace(/\s/g, 'X');
     const rand   = Math.random().toString(36).substring(2, 7).toUpperCase();
@@ -741,7 +718,6 @@
     const confirmBtn  = document.getElementById("confirmBtn");
     const studentData = JSON.parse(localStorage.getItem("studentData"));
 
-    // Safety gate
     for (let card of document.querySelectorAll('.event-card.selected')) {
       const eName      = card.querySelector('h3').innerText.trim().toLowerCase();
       const tokenInput = card.querySelector('input[type="text"]');
@@ -770,7 +746,7 @@
 
     const payload = { ...studentData, events: eventPayload };
 
-    confirmBtn.disabled  = true;
+    confirmBtn.disabled    = true;
     confirmBtn.textContent = "Processing...";
 
     try {
