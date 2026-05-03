@@ -301,6 +301,17 @@
     transition: width 0.3s ease;
 }
     </style>
+    <script>
+  fetch(`${API_BASE_URL}/api/public-settings`)
+    .then(r => r.json())
+    .then(data => {
+      if (data?.symposium_title) {
+        // Change "Registration" to whatever that page's subtitle is
+        document.title = `${data.symposium_title} | Registration`;
+      }
+    })
+    .catch(() => {}); // silent fail — static title stays
+</script>
 </head>
 <body>
 <div id="topLoader"></div>
@@ -428,6 +439,7 @@ async function loadHomepageText() {
                 data.header_text || "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
             title.innerText =
                 data.symposium_title || "SYMPOSIUM '26";
+            document.title = `${data.symposium_title || "Symposium '26"} | Future Tech`;
         } else {
             header.innerText = "DEPARTMENT OF COMPUTER SCIENCE PRESENTS";
             title.innerText = "SYMPOSIUM '26";
