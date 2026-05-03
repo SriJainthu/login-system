@@ -204,12 +204,7 @@
   letter-spacing: 1px;
 }
 </style>
-<script>
-  fetch(`${API_BASE_URL}/api/public-settings`)
-    .then(r => r.json())
-    .then(d => { if (d?.symposium_title) document.title = `Registration Successful | ${d.symposium_title}`; })
-    .catch(() => {});
-</script>
+
 </head>
 <body>
 <div id="loader">
@@ -347,7 +342,14 @@ window.onload = () => {
   displayRegistrationInfo();
   loadPageData();
 };
+  const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://login-system-1-nowr.onrender.com';
 
+  fetch(`${API_BASE_URL}/api/public-settings`)
+    .then(r => r.json())
+    .then(d => { if (d?.symposium_title) document.title = `Registration Successful | ${d.symposium_title}`; })
+    .catch(() => {});
 </script>
 
 </body>
