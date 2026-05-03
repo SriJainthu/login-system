@@ -54,7 +54,6 @@
       border-radius: 50%;
       pointer-events: none;
       z-index: 99999;
-      /* NO transition — snaps instantly to mouse, rAF handles position */
       will-change: transform;
     }
 
@@ -66,7 +65,6 @@
       pointer-events: none;
       z-index: 99998;
       will-change: transform;
-      /* Size/color transitions only, NOT position */
       transition: width 0.25s var(--ease), height 0.25s var(--ease), border-color 0.25s, opacity 0.25s;
     }
 
@@ -145,17 +143,8 @@
 
     @keyframes slideDown { to { transform: translateY(0); } }
 
-    .topbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand-glyph {
-      position: relative;
-      width: 32px; height: 32px;
-    }
-
+    .topbar-brand { display: flex; align-items: center; gap: 14px; }
+    .brand-glyph { position: relative; width: 32px; height: 32px; }
     .brand-glyph svg { width: 100%; height: 100%; }
 
     .brand-name {
@@ -169,17 +158,7 @@
 
     .brand-name span { color: var(--accent); }
 
-    .topbar-center {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
 
     .live-dot {
       display: flex;
@@ -226,9 +205,7 @@
       animation: revealUp 0.7s var(--ease) forwards;
     }
 
-    @keyframes revealUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
 
     .d1 { animation-delay: 1.8s; }
     .d2 { animation-delay: 1.95s; }
@@ -238,11 +215,7 @@
     .d6 { animation-delay: 2.55s; }
 
     /* ─── PAGE HEADER ─── */
-    .page-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-    }
+    .page-header { display: flex; align-items: flex-end; justify-content: space-between; }
 
     .ph-eyebrow {
       font-family: var(--syne);
@@ -257,11 +230,7 @@
       gap: 8px;
     }
 
-    .ph-eyebrow::before {
-      content: '';
-      width: 24px; height: 1px;
-      background: var(--accent);
-    }
+    .ph-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
 
     .ph-title {
       font-family: var(--syne);
@@ -280,13 +249,7 @@
       background-clip: text;
     }
 
-    .ph-sub {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 8px;
-      font-weight: 300;
-      letter-spacing: 0.02em;
-    }
+    .ph-sub { font-size: 13px; color: var(--muted); margin-top: 8px; font-weight: 300; letter-spacing: 0.02em; }
 
     /* ─── STAT CARDS ─── */
     .stats-row {
@@ -361,7 +324,7 @@
     }
 
     .stat-value.accent { color: var(--accent); }
-    .stat-value.small { font-size: 24px; }
+    .stat-value.small  { font-size: 24px; }
 
     /* ─── CARD ─── */
     .card {
@@ -403,7 +366,6 @@
       border: 1px solid var(--border);
       padding: 4px 12px;
       border-radius: 20px;
-      transition: all 0.3s var(--ease);
     }
 
     /* ─── FORM ─── */
@@ -475,15 +437,7 @@
       overflow: hidden;
     }
 
-    .btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: white;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
+    .btn::after { content: ''; position: absolute; inset: 0; background: white; opacity: 0; transition: opacity 0.2s; }
     .btn:active::after { opacity: 0.06; }
 
     .btn-primary {
@@ -492,12 +446,7 @@
       box-shadow: 0 4px 20px rgba(0,229,190,0.25);
     }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0,229,190,0.4);
-      filter: brightness(1.1);
-    }
-
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,229,190,0.4); filter: brightness(1.1); }
     .btn-primary:active { transform: translateY(0); }
 
     .btn-ghost {
@@ -575,21 +524,9 @@
       to   { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    .event-item:hover {
-      border-color: var(--border-hi);
-      background: rgba(0,229,190,0.025);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-    }
+    .event-item:hover { border-color: var(--border-hi); background: rgba(0,229,190,0.025); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
 
-    .event-name {
-      font-family: var(--syne);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 5px;
-    }
-
+    .event-name { font-family: var(--syne); font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
     .event-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
     .event-badge {
@@ -719,7 +656,6 @@
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       overflow: hidden;
-      transition: border-color 0.3s;
     }
 
     .table-toolbar {
@@ -739,17 +675,13 @@
       color: var(--accent);
     }
 
-    .table-count {
-      font-family: var(--syne);
-      font-size: 10px;
-      color: var(--muted);
-    }
+    .table-count { font-family: var(--syne); font-size: 10px; color: var(--muted); }
 
     .table-scroll { overflow-x: auto; }
     .table-scroll::-webkit-scrollbar { height: 3px; }
     .table-scroll::-webkit-scrollbar-thumb { background: var(--border); }
 
-    table { width: 100%; border-collapse: collapse; min-width: 780px; }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
 
     thead th {
       background: var(--panel);
@@ -804,6 +736,20 @@
 
     .td-name { font-weight: 600; }
     .td-mono { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--label); }
+
+    /* Level badge in table */
+    .level-pill {
+      display: inline-block;
+      font-family: var(--syne);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .level-ug { background: rgba(0,229,190,0.1); color: var(--accent); border: 1px solid rgba(0,229,190,0.2); }
+    .level-pg { background: rgba(79,142,247,0.1); color: var(--accent2); border: 1px solid rgba(79,142,247,0.2); }
 
     .epill {
       display: inline-block;
@@ -862,20 +808,10 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 24px;
       margin-bottom: 22px;
-      transition: background 0.3s, border-color 0.3s;
     }
 
-    .modal-title {
-      font-family: var(--syne);
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      margin-bottom: 10px;
-    }
-
-    .modal-body { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
-
+    .modal-title { font-family: var(--syne); font-size: 16px; font-weight: 800; letter-spacing: -0.01em; color: var(--text); margin-bottom: 10px; }
+    .modal-body  { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
     .modal-actions { display: flex; gap: 12px; }
     .modal-actions .btn { flex: 1; padding: 14px; }
 
@@ -906,24 +842,10 @@
 
     #toast.show { transform: translateY(0); opacity: 1; }
 
-    #toast::before {
-      content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-    }
+    #toast::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
     /* ─── CHART ─── */
     .chart-wrap { flex: 1; position: relative; min-height: 220px; }
-
-    /* ─── GLOWING DIVIDER ─── */
-    .glow-line {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: 0.15;
-      margin: 4px 0;
-    }
 
     /* ─── TOKEN FILTER ─── */
     #teamTokenFilter { display: none; border-color: rgba(251,191,36,0.3); }
@@ -942,7 +864,6 @@
       .event-form { grid-template-columns: 1fr 1fr; }
       .event-form .btn-primary { grid-column: span 2; }
       .wrapper { padding: 24px 16px 48px; }
-      .topbar-center { display: none; }
       .ph-title { font-size: 28px; }
     }
 
@@ -1002,7 +923,6 @@
     </div>
     <span class="brand-name">Sym<span>Admin</span></span>
   </div>
-
   <div class="topbar-right">
     <span class="live-dot">Live</span>
     <button class="btn btn-ghost" style="padding:7px 16px; font-size:9px;" onclick="logoutAdmin()">Logout</button>
@@ -1061,14 +981,13 @@
           <option value="solo">Solo</option>
           <option value="group">Group</option>
         </select>
-        <!-- Add this AFTER the Type select group -->
-<div class="fg">
-    <label class="fg-label">Category</label>
-    <select id="newEventCategory">
-        <option value="technical">Technical</option>
-        <option value="non-technical">Non-Technical</option>
-    </select>
-</div>
+        <div class="fg" style="margin-top:8px;">
+          <label class="fg-label">Category</label>
+          <select id="newEventCategory">
+            <option value="technical">Technical</option>
+            <option value="non-technical">Non-Technical</option>
+          </select>
+        </div>
       </div>
       <div class="fg" id="teamSizeGroup" style="display:none;">
         <label class="fg-label">Size</label>
@@ -1080,41 +999,39 @@
     </div>
     <div class="events-grid" id="addedEventsList"></div>
   </div>
-<!-- ACADEMIC MANAGER -->
-<div class="card reveal d3" style="animation-delay: 2.2s;">
+
+  <!-- ACADEMIC MANAGER -->
+  <div class="card reveal d3" style="animation-delay: 2.2s;">
     <div class="card-header">
-        <span class="card-title">Academic Structure Manager</span>
-        <span class="card-chip" id="deptCount">0 Departments</span>
+      <span class="card-title">Academic Structure Manager</span>
+      <span class="card-chip" id="deptCount">0 Departments</span>
     </div>
-
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-
-        <!-- DEPARTMENTS -->
-        <div>
-            <div style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">Departments</div>
-            <div style="display:flex; gap:8px; margin-bottom:14px;">
-                <input type="text" id="newDeptName" placeholder="e.g. Computer Science" style="flex:1;">
-                <button class="btn btn-primary" onclick="addDepartment()" style="padding:11px 16px; white-space:nowrap;">+ Add</button>
-            </div>
-            <div id="deptList" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;"></div>
+      <!-- DEPARTMENTS -->
+      <div>
+        <div style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">Departments</div>
+        <div style="display:flex; gap:8px; margin-bottom:14px;">
+          <input type="text" id="newDeptName" placeholder="e.g. Computer Science" style="flex:1;">
+          <button class="btn btn-primary" onclick="addDepartment()" style="padding:11px 16px; white-space:nowrap;">+ Add</button>
         </div>
-
-        <!-- DEGREES -->
-        <div>
-            <div style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">Degrees</div>
-            <div style="display:grid; grid-template-columns:1fr 0.6fr auto; gap:8px; margin-bottom:14px;">
-                <input type="text" id="newDegreeName" placeholder="e.g. B.Tech">
-                <select id="newDegreeLevel">
-                    <option value="UG">UG</option>
-                    <option value="PG">PG</option>
-                </select>
-                <button class="btn btn-primary" onclick="addDegree()" style="padding:11px 16px;">+</button>
-            </div>
-            <div id="degreeList" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;"></div>
+        <div id="deptList" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;"></div>
+      </div>
+      <!-- DEGREES -->
+      <div>
+        <div style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">Degrees</div>
+        <div style="display:grid; grid-template-columns:1fr 0.6fr auto; gap:8px; margin-bottom:14px;">
+          <input type="text" id="newDegreeName" placeholder="e.g. B.Tech">
+          <select id="newDegreeLevel">
+            <option value="UG">UG</option>
+            <option value="PG">PG</option>
+          </select>
+          <button class="btn btn-primary" onclick="addDegree()" style="padding:11px 16px;">+</button>
         </div>
-
+        <div id="degreeList" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;"></div>
+      </div>
     </div>
-</div>
+  </div>
+
   <!-- CHART + CONTROLS -->
   <div class="two-col reveal d4">
     <div class="card" style="display:flex; flex-direction:column;">
@@ -1133,7 +1050,24 @@
       <div class="control-grid">
         <div class="filter-col">
           <input type="text" id="college" placeholder="Filter by College">
-          <input type="text" id="department" placeholder="Filter by Department">
+
+          <!-- ── DEPARTMENT DROPDOWN (dynamic) ── -->
+          <select id="department">
+            <option value="">All Departments</option>
+          </select>
+
+          <!-- ── DEGREE DROPDOWN (dynamic) ── -->
+          <select id="degree">
+            <option value="">All Degrees</option>
+          </select>
+
+          <!-- ── LEVEL DROPDOWN ── -->
+          <select id="level">
+            <option value="">All Levels (UG / PG)</option>
+            <option value="UG">UG</option>
+            <option value="PG">PG</option>
+          </select>
+
           <input type="number" id="year" placeholder="Year (1–4)">
           <input type="text" id="teamTokenFilter" placeholder="Search Team Token">
           <select id="event" onchange="applyFilterConstraints()">
@@ -1170,6 +1104,7 @@
           </div>
         </div>
 
+        <!-- ── EXPORT COLUMN ── -->
         <div class="export-col">
           <div class="export-title">Export Columns</div>
           <div class="checkbox-grid">
@@ -1178,11 +1113,13 @@
             <label class="checkbox-item"><input type="checkbox" id="export-college" checked> College</label>
             <label class="checkbox-item"><input type="checkbox" id="export-dept" checked> Dept</label>
             <label class="checkbox-item" id="lbl-year"><input type="checkbox" id="export-year" checked> Year</label>
+            <label class="checkbox-item" id="lbl-degree"><input type="checkbox" id="export-degree" checked> Degree</label>
+            <label class="checkbox-item" id="lbl-level"><input type="checkbox" id="export-level" checked> Level (UG/PG)</label>
             <label class="checkbox-item" id="lbl-events"><input type="checkbox" id="export-events" checked> Events</label>
           </div>
           <div class="export-actions">
             <button class="btn btn-success" onclick="downloadCSV()">⬇ Export CSV</button>
-            <button class="btn btn-blue" onclick="downloadPDF()">📄 Export PDF</button>
+            <button class="btn btn-blue"    onclick="downloadPDF()">📄 Export PDF</button>
           </div>
           <div class="danger-zone">
             <div class="danger-label">Danger Zone</div>
@@ -1207,6 +1144,8 @@
             <th>Register No</th>
             <th>College</th>
             <th>Dept</th>
+            <th>Degree</th>
+            <th>Level</th>
             <th>Year</th>
             <th>Selected Events</th>
           </tr>
@@ -1232,70 +1171,40 @@ let eventChart, eventsList = [], currentIsGroupView = false, eventToDeleteIndex 
 /* ─── CURSOR ─── */
 const cur  = document.getElementById('cursor');
 const ring = document.getElementById('cursor-ring');
-
-let mx = window.innerWidth / 2,  my = window.innerHeight / 2;  // real mouse
-let rx = mx, ry = my;                                            // ring (lerped)
+let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+let rx = mx, ry = my;
 
 document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-
-// Hover detection for ring size
-document.addEventListener('mouseover', e => {
-  if (e.target.closest('button, a, input, select, textarea, label, [data-magnet]')) {
-    ring.classList.add('hovering');
-  }
-});
-document.addEventListener('mouseout', e => {
-  if (e.target.closest('button, a, input, select, textarea, label, [data-magnet]')) {
-    ring.classList.remove('hovering');
-  }
-});
+document.addEventListener('mouseover', e => { if (e.target.closest('button, a, input, select, textarea, label, [data-magnet]')) ring.classList.add('hovering'); });
+document.addEventListener('mouseout',  e => { if (e.target.closest('button, a, input, select, textarea, label, [data-magnet]')) ring.classList.remove('hovering'); });
 
 (function animCursor() {
-  // Dot: snap to exact mouse position
   cur.style.transform  = `translate(${mx - 4}px, ${my - 4}px)`;
-
-  // Ring: smooth lerp
   rx += (mx - rx) * 0.13;
   ry += (my - ry) * 0.13;
   const rw = ring.classList.contains('hovering') ? 26 : 17;
   const rh = ring.classList.contains('hovering') ? 26 : 17;
   ring.style.transform = `translate(${rx - rw}px, ${ry - rh}px)`;
-
   requestAnimationFrame(animCursor);
 })();
 
-/* ─── MAGNETIC STAT CARDS ─── */
+/* ─── MAGNETIC CARDS ─── */
 document.querySelectorAll('[data-magnet]').forEach(el => {
   el.addEventListener('mousemove', e => {
     const r = el.getBoundingClientRect();
-    const mx = ((e.clientX - r.left) / r.width) * 100;
-    const my = ((e.clientY - r.top) / r.height) * 100;
-    el.style.setProperty('--mx', mx + '%');
-    el.style.setProperty('--my', my + '%');
+    el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+    el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
   });
 });
 
-/* ─── CANVAS BACKGROUND ─── */
+/* ─── CANVAS BG ─── */
 (function initCanvas() {
   const canvas = document.getElementById('bg-canvas');
   const ctx = canvas.getContext('2d');
   let W, H, particles = [];
 
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
-  function makeParticle() {
-    return {
-      x: Math.random() * W,
-      y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: (Math.random() - 0.5) * 0.25,
-      r: Math.random() * 1.5 + 0.3,
-      a: Math.random() * 0.35 + 0.05,
-    };
-  }
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  function makeParticle() { return { x: Math.random()*W, y: Math.random()*H, vx:(Math.random()-0.5)*0.25, vy:(Math.random()-0.5)*0.25, r:Math.random()*1.5+0.3, a:Math.random()*0.35+0.05 }; }
 
   resize();
   for (let i = 0; i < 90; i++) particles.push(makeParticle());
@@ -1303,42 +1212,22 @@ document.querySelectorAll('[data-magnet]').forEach(el => {
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    // Grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.018)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < W; x += 80) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-    for (let y = 0; y < H; y += 80) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-    // Radial glow
-    const g = ctx.createRadialGradient(W * 0.5, H * 0.15, 0, W * 0.5, H * 0.15, H * 0.7);
-    g.addColorStop(0, 'rgba(0,229,190,0.04)');
-    g.addColorStop(1, 'transparent');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-    // Particles
+    ctx.strokeStyle = 'rgba(255,255,255,0.018)'; ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 80) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 80) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    const g = ctx.createRadialGradient(W*.5,H*.15,0,W*.5,H*.15,H*.7);
+    g.addColorStop(0,'rgba(0,229,190,0.04)'); g.addColorStop(1,'transparent');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
     particles.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0,229,190,${p.a})`;
-      ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,229,190,${p.a})`; ctx.fill();
     });
-    // Lines between close particles
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(0,229,190,${0.06 * (1 - dist / 120)})`;
-          ctx.lineWidth = 0.6;
-          ctx.stroke();
-        }
-      }
+    for (let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(0,229,190,${0.06*(1-dist/120)})`; ctx.lineWidth=0.6; ctx.stroke(); }
     }
     requestAnimationFrame(draw);
   }
@@ -1346,172 +1235,185 @@ document.querySelectorAll('[data-magnet]').forEach(el => {
 })();
 
 /* ─── LOADER ─── */
-window.addEventListener('load', () => {
-  setTimeout(() => document.getElementById('loader').classList.add('done'), 1500);
-});
+window.addEventListener('load', () => { setTimeout(() => document.getElementById('loader').classList.add('done'), 1500); });
 
-/* ─── COUNTER ANIMATION ─── */
+/* ─── COUNTER ─── */
 function animateCounter(el, target) {
   const start = parseInt(el.innerText) || 0;
-  const dur = 900;
-  const startTime = performance.now();
-  const isText = isNaN(target);
-  if (isText) { el.innerText = target; return; }
+  if (isNaN(target)) { el.innerText = target; return; }
+  const dur = 900, startTime = performance.now();
   (function step(now) {
-    const p = Math.min((now - startTime) / dur, 1);
-    const eased = 1 - Math.pow(1 - p, 3);
-    el.innerText = Math.round(start + (target - start) * eased);
-    if (p < 1) requestAnimationFrame(step);
-    else el.innerText = target;
+    const p = Math.min((now - startTime) / dur, 1), e = 1 - Math.pow(1-p,3);
+    el.innerText = Math.round(start + (target-start)*e);
+    if (p < 1) requestAnimationFrame(step); else el.innerText = target;
   })(startTime);
 }
 
 /* ─── API ─── */
 function adminFetch(url, options = {}) {
-  return fetch(url, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...(options.headers || {}) }
-  }).then(res => {
-    if (res.status === 401 || res.status === 403) { localStorage.removeItem("adminToken"); window.location.href = "admin-login.html"; }
-    return res;
-  });
+  return fetch(url, { ...options, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...(options.headers||{}) } })
+    .then(res => { if (res.status===401||res.status===403) { localStorage.removeItem("adminToken"); window.location.href="admin-login.html"; } return res; });
 }
 
 function logoutAdmin() { localStorage.removeItem("adminToken"); window.location.href = "admin-login.html"; }
 
-async function fetchEventsFromServer() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/events`);
-        const data = await res.json();
-        eventsList = data.map(e => ({
-            name:     e.event_name,
-            desc:     e.description,
-            type:     e.event_type,
-            category: e.event_category || 'technical', // fallback
-            max_size: e.max_team_size
-        }));
-        renderEvents();
-        loadStudents();
-    } catch (err) { console.error(err); }
+/* ─── POPULATE FILTER DROPDOWNS FROM API ─── */
+async function populateFilterDropdowns() {
+  try {
+    const [deptRes, degRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/api/departments`),
+      fetch(`${API_BASE_URL}/api/degrees`)
+    ]);
+    const depts   = await deptRes.json();
+    const degrees = await degRes.json();
+
+    // Department dropdown in filter
+    const deptSel = document.getElementById('department');
+    deptSel.innerHTML = '<option value="">All Departments</option>';
+    depts.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.name; o.textContent = d.name;
+      deptSel.appendChild(o);
+    });
+
+    // Degree dropdown in filter (grouped by UG/PG)
+    const degSel = document.getElementById('degree');
+    degSel.innerHTML = '<option value="">All Degrees</option>';
+    const ug = degrees.filter(d => d.level === 'UG');
+    const pg = degrees.filter(d => d.level === 'PG');
+
+    if (ug.length) {
+      const og = document.createElement('optgroup'); og.label = 'UG Degrees';
+      ug.forEach(d => { const o = document.createElement('option'); o.value=d.name; o.textContent=d.name; og.appendChild(o); });
+      degSel.appendChild(og);
+    }
+    if (pg.length) {
+      const og = document.createElement('optgroup'); og.label = 'PG Degrees';
+      pg.forEach(d => { const o = document.createElement('option'); o.value=d.name; o.textContent=d.name; og.appendChild(o); });
+      degSel.appendChild(og);
+    }
+  } catch(e) { console.error('Filter dropdown error:', e); }
 }
+
+/* ─── EVENTS ─── */
+async function fetchEventsFromServer() {
+  try {
+    const res  = await fetch(`${API_BASE_URL}/events`);
+    const data = await res.json();
+    eventsList = data.map(e => ({
+      name:     e.event_name,
+      desc:     e.description,
+      type:     e.event_type,
+      category: e.event_category || 'technical',
+      max_size: e.max_team_size
+    }));
+    renderEvents();
+    loadStudents();
+  } catch(err) { console.error(err); }
+}
+
 function renderEvents() {
-    const list = document.getElementById("addedEventsList");
-    const sel  = document.getElementById("event");
-    list.innerHTML = "";
-    sel.innerHTML  = '<option value="">All Events</option>';
+  const list = document.getElementById("addedEventsList");
+  const sel  = document.getElementById("event");
+  list.innerHTML = "";
+  sel.innerHTML  = '<option value="">All Events</option>';
 
-    // Group by category
-    const technical    = eventsList.filter(e => e.category === 'technical');
-    const nonTechnical = eventsList.filter(e => e.category === 'non-technical');
+  const technical    = eventsList.filter(e => e.category === 'technical');
+  const nonTechnical = eventsList.filter(e => e.category === 'non-technical');
 
-    function renderGroup(title, events) {
-    if (events.length === 0) return;
+  function renderGroup(title, events) {
+    if (!events.length) return;
     const header = document.createElement("div");
-    header.style.cssText = `grid-column: 1/-1; font-family: var(--syne); font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 4px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 4px;`;
+    header.style.cssText = `grid-column:1/-1; font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); padding:4px 0 8px; border-bottom:1px solid var(--border); margin-bottom:4px;`;
     header.textContent = title;
     list.appendChild(header);
-
     events.forEach((e, i) => {
-        const globalIndex = eventsList.indexOf(e);
-        const div = document.createElement("div");
-        div.className = "event-item";
-        div.style.animationDelay = (i * 0.06) + 's';
-        div.innerHTML = `
-            <div style="flex:1;min-width:0;">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
-                    <span class="event-name">${e.name}</span>
-                    <span class="event-badge ${e.type === 'group' ? 'badge-group' : 'badge-solo'}">${e.type}${e.type==='group'?' · '+e.max_size:''}</span>
-                    <span class="event-badge" style="background:${e.category==='technical'?'rgba(79,142,247,0.1)':'rgba(168,85,247,0.1)'}; color:${e.category==='technical'?'var(--accent2)':'#a855f7'}; border-color:${e.category==='technical'?'rgba(79,142,247,0.2)':'rgba(168,85,247,0.2)'};">${e.category === 'technical' ? '⚡ Tech' : '🎨 Non-Tech'}</span>
-                </div>
-                <div class="event-desc">${e.desc}</div>
-            </div>
-            <button class="delete-event" onclick="openModal(${globalIndex})">×</button>`;
-        list.appendChild(div);
-        // ← NO option appended here anymore
+      const globalIndex = eventsList.indexOf(e);
+      const div = document.createElement("div");
+      div.className = "event-item";
+      div.style.animationDelay = (i * 0.06) + 's';
+      div.innerHTML = `
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+            <span class="event-name">${e.name}</span>
+            <span class="event-badge ${e.type==='group'?'badge-group':'badge-solo'}">${e.type}${e.type==='group'?' · '+e.max_size:''}</span>
+            <span class="event-badge" style="background:${e.category==='technical'?'rgba(79,142,247,0.1)':'rgba(168,85,247,0.1)'}; color:${e.category==='technical'?'var(--accent2)':'#a855f7'}; border-color:${e.category==='technical'?'rgba(79,142,247,0.2)':'rgba(168,85,247,0.2)'};">${e.category==='technical'?'⚡ Tech':'🎨 Non-Tech'}</span>
+          </div>
+          <div class="event-desc">${e.desc}</div>
+        </div>
+        <button class="delete-event" onclick="openModal(${globalIndex})">×</button>`;
+      list.appendChild(div);
     });
+  }
+
+  renderGroup("⚡ Technical Events", technical);
+  renderGroup("🎨 Non-Technical Events", nonTechnical);
+
+  if (technical.length) {
+    const og = document.createElement("optgroup"); og.label = "⚡ Technical";
+    technical.forEach(e => { const o=document.createElement("option"); o.value=e.name; o.textContent=e.name; og.appendChild(o); });
+    sel.appendChild(og);
+  }
+  if (nonTechnical.length) {
+    const og = document.createElement("optgroup"); og.label = "🎨 Non-Technical";
+    nonTechnical.forEach(e => { const o=document.createElement("option"); o.value=e.name; o.textContent=e.name; og.appendChild(o); });
+    sel.appendChild(og);
+  }
+
+  const count = eventsList.length;
+  animateCounter(document.getElementById("stat-events"), count);
+  document.getElementById("eventCount").textContent = `${count} Event${count!==1?'s':''}`;
 }
 
-   // Render event cards grouped by category
-renderGroup("⚡ Technical Events", technical);
-renderGroup("🎨 Non-Technical Events", nonTechnical);
-
-// Build dropdown with optgroups (single pass, no duplicates)
-if (technical.length > 0) {
-    const og1 = document.createElement("optgroup");
-    og1.label = "⚡ Technical";
-    technical.forEach(e => {
-        const o = document.createElement("option");
-        o.value = e.name; o.textContent = e.name;
-        og1.appendChild(o);
-    });
-    sel.appendChild(og1);
-}
-if (nonTechnical.length > 0) {
-    const og2 = document.createElement("optgroup");
-    og2.label = "🎨 Non-Technical";
-    nonTechnical.forEach(e => {
-        const o = document.createElement("option");
-        o.value = e.name; o.textContent = e.name;
-        og2.appendChild(o);
-    });
-    sel.appendChild(og2);
-}
-
-    const count = eventsList.length;
-    animateCounter(document.getElementById("stat-events"), count);
-    document.getElementById("eventCount").textContent = `${count} Event${count !== 1 ? 's' : ''}`;
-}
 function applyFilterConstraints() {
   const sel  = eventsList.find(e => e.name === document.getElementById("event").value);
   const dept = document.getElementById("department");
   const yr   = document.getElementById("year");
+  const deg  = document.getElementById("degree");
+  const lvl  = document.getElementById("level");
   const tok  = document.getElementById("teamTokenFilter");
   const lblY = document.getElementById("lbl-year");
   const lblE = document.getElementById("lbl-events");
+  const lblD = document.getElementById("lbl-degree");
+  const lblL = document.getElementById("lbl-level");
 
   if (sel && sel.type === 'group') {
-    dept.value = ""; yr.value = "";
-    dept.disabled = yr.disabled = true;
-    dept.style.opacity = yr.style.opacity = "0.3";
+    dept.value = ""; yr.value = ""; deg.value = ""; lvl.value = "";
+    dept.disabled = yr.disabled = deg.disabled = lvl.disabled = true;
+    dept.style.opacity = yr.style.opacity = deg.style.opacity = lvl.style.opacity = "0.3";
     if (tok) tok.style.display = "block";
     if (lblY) lblY.style.display = "none";
     if (lblE) lblE.style.display = "none";
+    if (lblD) lblD.style.display = "none";
+    if (lblL) lblL.style.display = "none";
   } else {
-    dept.disabled = yr.disabled = false;
-    dept.style.opacity = yr.style.opacity = "1";
+    dept.disabled = yr.disabled = deg.disabled = lvl.disabled = false;
+    dept.style.opacity = yr.style.opacity = deg.style.opacity = lvl.style.opacity = "1";
     if (tok) { tok.style.display = "none"; tok.value = ""; }
     if (lblY) lblY.style.display = "";
     if (lblE) lblE.style.display = "";
+    if (lblD) lblD.style.display = "";
+    if (lblL) lblL.style.display = "";
   }
 }
 
 async function addEvent() {
-    const name     = document.getElementById("newEventName").value.trim();
-    const desc     = document.getElementById("newEventDesc").value.trim();
-    const type     = document.getElementById("newEventType").value;
-    const category = document.getElementById("newEventCategory").value;
-    const size     = type === 'solo' ? 1 : parseInt(document.getElementById("newEventSize").value);
-
-    if (!name || !desc) return alert("Fill event name and description");
-
-    try {
-        const r = await adminFetch(`${API_BASE_URL}/admin/add-event`, {
-            method: "POST",
-            body: JSON.stringify({ name, description: desc, type, category, max_team_size: size })
-        });
-        const d = await r.json();
-        if (d.success) {
-            showToast("✓ Event added");
-            document.getElementById("newEventName").value = "";
-            document.getElementById("newEventDesc").value = "";
-            fetchEventsFromServer();
-        }
-    } catch { alert("Server error"); }
+  const name     = document.getElementById("newEventName").value.trim();
+  const desc     = document.getElementById("newEventDesc").value.trim();
+  const type     = document.getElementById("newEventType").value;
+  const category = document.getElementById("newEventCategory").value;
+  const size     = type === 'solo' ? 1 : parseInt(document.getElementById("newEventSize").value);
+  if (!name || !desc) return alert("Fill event name and description");
+  try {
+    const r = await adminFetch(`${API_BASE_URL}/admin/add-event`, { method:"POST", body: JSON.stringify({ name, description:desc, type, category, max_team_size:size }) });
+    const d = await r.json();
+    if (d.success) { showToast("✓ Event added"); document.getElementById("newEventName").value=""; document.getElementById("newEventDesc").value=""; fetchEventsFromServer(); }
+  } catch { alert("Server error"); }
 }
 
 /* ─── LOAD STUDENTS ─── */
 async function loadStudents() {
-  const btn = document.getElementById("filterBtn");
+  const btn     = document.getElementById("filterBtn");
   const selName = document.getElementById("event").value;
   const selObj  = eventsList.find(e => e.name === selName);
   const tokVal  = document.getElementById("teamTokenFilter")?.value || "";
@@ -1523,7 +1425,15 @@ async function loadStudents() {
       const r = await adminFetch(`${API_BASE_URL}/admin/grouped-teams?eventName=${encodeURIComponent(selName)}&college=${document.getElementById("college").value}&token=${encodeURIComponent(tokVal)}`);
       const d = await r.json(); renderGroupedRows(d);
     } else {
-      const p = new URLSearchParams({ college: document.getElementById("college").value, department: document.getElementById("department").value, year: document.getElementById("year").value, event: selName });
+      // Include degree and level in query params
+      const p = new URLSearchParams({
+        college:    document.getElementById("college").value,
+        department: document.getElementById("department").value,
+        year:       document.getElementById("year").value,
+        event:      selName,
+        degree:     document.getElementById("degree").value,
+        level:      document.getElementById("level").value
+      });
       const r = await adminFetch(`${API_BASE_URL}/admin/students?${p}`);
       const d = await r.json(); renderStandardRows(d); updateChart(d);
     }
@@ -1534,7 +1444,7 @@ async function loadStudents() {
 function updateTableHeaders(isGroup) {
   document.querySelector("#mainDataTable thead").innerHTML = isGroup
     ? `<tr><th>Team Token</th><th>Team No</th><th>Register No</th><th>Dept</th><th>College</th><th>Student Name</th></tr>`
-    : `<tr><th>Student Name</th><th>Register No</th><th>College</th><th>Dept</th><th>Year</th><th>Selected Events</th></tr>`;
+    : `<tr><th>Student Name</th><th>Register No</th><th>College</th><th>Dept</th><th>Degree</th><th>Level</th><th>Year</th><th>Selected Events</th></tr>`;
 }
 
 function renderStandardRows(data) {
@@ -1542,11 +1452,41 @@ function renderStandardRows(data) {
   tbody.innerHTML = "";
   const total = data.length;
   animateCounter(document.getElementById("stat-total"), total);
-  document.getElementById("tableCount").textContent = `${total} record${total !== 1 ? 's' : ''}`;
+  document.getElementById("tableCount").textContent = `${total} record${total!==1?'s':''}`;
+
+  // Top college
+  if (data.length > 0) {
+    const counts = {};
+    data.forEach(s => { const n=s.college?.trim(); if(n) counts[n]=(counts[n]||0)+1; });
+    const top = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+    const el = document.getElementById("stat-college");
+    if (top) { el.textContent = top[0].length>20 ? top[0].substring(0,18)+'…' : top[0]; el.title=top[0]; }
+  } else {
+    document.getElementById("stat-college").textContent = "—";
+  }
+
   data.forEach((s, i) => {
     const row = tbody.insertRow(); row.style.animationDelay = (i * 0.03) + 's';
-    const events = (s.events && s.events !== 'None') ? s.events.split(', ').map(ev => `<span class="epill">${ev}</span>`).join('') : '<span style="color:var(--muted);font-size:11px;">—</span>';
-    row.innerHTML = `<td class="td-name">${s.name}</td><td class="td-mono">${s.reg_no}</td><td>${s.college}</td><td>${s.department}</td><td class="td-mono">${s.year}</td><td>${events}</td>`;
+    const events = (s.events && s.events !== 'None')
+      ? s.events.split(', ').map(ev=>`<span class="epill">${ev}</span>`).join('')
+      : '<span style="color:var(--muted);font-size:11px;">—</span>';
+
+    // Degree and level from student record (adjust field names to match your API response)
+    const degree = s.degree || '—';
+    const level  = s.level  || '';
+    const levelHtml = level
+      ? `<span class="level-pill level-${level.toLowerCase()}">${level}</span>`
+      : '<span style="color:var(--muted);font-size:11px;">—</span>';
+
+    row.innerHTML = `
+      <td class="td-name">${s.name}</td>
+      <td class="td-mono">${s.reg_no}</td>
+      <td>${s.college}</td>
+      <td>${s.department}</td>
+      <td style="font-size:12px;">${degree}</td>
+      <td>${levelHtml}</td>
+      <td class="td-mono">${s.year}</td>
+      <td>${events}</td>`;
   });
 }
 
@@ -1562,49 +1502,54 @@ function renderGroupedRows(groupedData) {
     }); teamN++;
   });
   animateCounter(document.getElementById("stat-total"), total);
-  document.getElementById("tableCount").textContent = `${total} record${total !== 1 ? 's' : ''}`;
+  document.getElementById("tableCount").textContent = `${total} record${total!==1?'s':''}`;
 }
 
 /* ─── CHART ─── */
 function updateChart(data) {
   const counts = {};
-  data.forEach(s => { if (s.events && s.events !== 'No events') { s.events.split(', ').forEach(e => { const n = e.split(' [')[0]; counts[n] = (counts[n] || 0) + 1; }); } });
+  data.forEach(s => { if(s.events&&s.events!=='No events') s.events.split(', ').forEach(e=>{ const n=e.split(' [')[0]; counts[n]=(counts[n]||0)+1; }); });
   const ctx = document.getElementById('eventChart').getContext('2d');
   if (eventChart) eventChart.destroy();
   eventChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: Object.keys(counts),
-      datasets: [{
-        label: 'Registrations', data: Object.values(counts),
-        backgroundColor: 'rgba(0,229,190,0.15)', borderColor: 'rgba(0,229,190,0.7)',
-        borderWidth: 1.5, borderRadius: 8, borderSkipped: false,
-        hoverBackgroundColor: 'rgba(0,229,190,0.28)',
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      animation: { duration: 900, easing: 'easeOutQuart' },
-      plugins: {
-        legend: { display: false },
-        tooltip: { backgroundColor: 'rgba(10,15,24,0.95)', titleColor: '#00e5be', titleFont: { family: 'Syne', size: 11, weight: '700' }, bodyColor: '#8899b0', borderColor: 'rgba(0,229,190,0.2)', borderWidth: 1, padding: 12, cornerRadius: 10 }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false }, ticks: { color: '#4a5a72', font: { family: 'Syne', size: 9 } } },
-        y: { grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false }, ticks: { color: '#4a5a72', font: { family: 'Syne', size: 9 } } }
-      }
-    }
+    type:'bar',
+    data:{ labels:Object.keys(counts), datasets:[{ label:'Registrations', data:Object.values(counts), backgroundColor:'rgba(0,229,190,0.15)', borderColor:'rgba(0,229,190,0.7)', borderWidth:1.5, borderRadius:8, borderSkipped:false, hoverBackgroundColor:'rgba(0,229,190,0.28)' }] },
+    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:900,easing:'easeOutQuart'}, plugins:{ legend:{display:false}, tooltip:{backgroundColor:'rgba(10,15,24,0.95)',titleColor:'#00e5be',titleFont:{family:'Syne',size:11,weight:'700'},bodyColor:'#8899b0',borderColor:'rgba(0,229,190,0.2)',borderWidth:1,padding:12,cornerRadius:10} }, scales:{ x:{grid:{color:'rgba(255,255,255,0.03)',drawBorder:false},ticks:{color:'#4a5a72',font:{family:'Syne',size:9}}}, y:{grid:{color:'rgba(255,255,255,0.03)',drawBorder:false},ticks:{color:'#4a5a72',font:{family:'Syne',size:9}}} } }
   });
 }
 
-/* ─── CSV ─── */
+/* ─── CSV EXPORT ─── */
 function downloadCSV() {
   const rows = document.getElementById("studentTable").querySelectorAll("tr");
   if (!rows.length) return alert("No data");
-  const p = { name: document.getElementById("export-name").checked, reg: document.getElementById("export-reg").checked, college: document.getElementById("export-college").checked, dept: document.getElementById("export-dept").checked, year: document.getElementById("export-year").checked, events: document.getElementById("export-events").checked };
+  const p = {
+    name:   document.getElementById("export-name").checked,
+    reg:    document.getElementById("export-reg").checked,
+    college:document.getElementById("export-college").checked,
+    dept:   document.getElementById("export-dept").checked,
+    year:   document.getElementById("export-year").checked,
+    degree: document.getElementById("export-degree").checked,
+    level:  document.getElementById("export-level").checked,
+    events: document.getElementById("export-events").checked
+  };
+
   let headers = currentIsGroupView ? ["TEAM TOKEN","TEAM NO"] : [];
-  if (!currentIsGroupView) { if(p.name) headers.push("STUDENT NAME"); if(p.reg) headers.push("REG NO"); if(p.college) headers.push("COLLEGE"); if(p.dept) headers.push("DEPT"); if(p.year) headers.push("YEAR"); if(p.events) headers.push("SELECTED EVENTS"); }
-  else { if(p.reg) headers.push("REG NO"); if(p.dept) headers.push("DEPT"); if(p.college) headers.push("COLLEGE"); if(p.name) headers.push("STUDENT NAME"); }
+  if (!currentIsGroupView) {
+    if(p.name)   headers.push("STUDENT NAME");
+    if(p.reg)    headers.push("REG NO");
+    if(p.college)headers.push("COLLEGE");
+    if(p.dept)   headers.push("DEPT");
+    if(p.degree) headers.push("DEGREE");
+    if(p.level)  headers.push("LEVEL");
+    if(p.year)   headers.push("YEAR");
+    if(p.events) headers.push("SELECTED EVENTS");
+  } else {
+    if(p.reg)    headers.push("REG NO");
+    if(p.dept)   headers.push("DEPT");
+    if(p.college)headers.push("COLLEGE");
+    if(p.name)   headers.push("STUDENT NAME");
+  }
+
   let csv = headers.join(",") + "\n";
   rows.forEach(row => {
     const cells = Array.from(row.querySelectorAll("td")); let rowData = [];
@@ -1612,29 +1557,67 @@ function downloadCSV() {
       const isL = row.querySelector("td[rowspan]");
       if (isL) { rowData.push(`"${cells[0].innerText}"`,`"${cells[1].innerText}"`); if(p.reg) rowData.push(`"${cells[2]?.innerText||''}"`); if(p.dept) rowData.push(`"${cells[3]?.innerText||''}"`); if(p.college) rowData.push(`"${cells[4]?.innerText||''}"`); if(p.name) rowData.push(`"${cells[5]?.innerText||''}"`); }
       else { rowData.push("",""); if(p.reg) rowData.push(`"${cells[0]?.innerText||''}"`); if(p.dept) rowData.push(`"${cells[1]?.innerText||''}"`); if(p.college) rowData.push(`"${cells[2]?.innerText||''}"`); if(p.name) rowData.push(`"${cells[3]?.innerText||''}"`); }
-    } else { if(p.name) rowData.push(`"${cells[0]?.innerText||''}"`); if(p.reg) rowData.push(`"${cells[1]?.innerText||''}"`); if(p.college) rowData.push(`"${cells[2]?.innerText||''}"`); if(p.dept) rowData.push(`"${cells[3]?.innerText||''}"`); if(p.year) rowData.push(`"${cells[4]?.innerText||''}"`); if(p.events) rowData.push(`"${cells[5]?.innerText||''}"`); }
+    } else {
+      // Standard rows: Name(0), Reg(1), College(2), Dept(3), Degree(4), Level(5), Year(6), Events(7)
+      if(p.name)   rowData.push(`"${cells[0]?.innerText||''}"`);
+      if(p.reg)    rowData.push(`"${cells[1]?.innerText||''}"`);
+      if(p.college)rowData.push(`"${cells[2]?.innerText||''}"`);
+      if(p.dept)   rowData.push(`"${cells[3]?.innerText||''}"`);
+      if(p.degree) rowData.push(`"${cells[4]?.innerText||''}"`);
+      if(p.level)  rowData.push(`"${cells[5]?.innerText||''}"`);
+      if(p.year)   rowData.push(`"${cells[6]?.innerText||''}"`);
+      if(p.events) rowData.push(`"${cells[7]?.innerText||''}"`);
+    }
     csv += rowData.join(",") + "\n";
   });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" })); a.download = `Symposium_${new Date().toLocaleDateString()}.csv`; a.click();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type:"text/csv;charset=utf-8;" }));
+  a.download = `Symposium_${new Date().toLocaleDateString()}.csv`; a.click();
 }
 
-/* ─── PDF ─── */
+/* ─── PDF EXPORT ─── */
 function downloadPDF() {
   const eventName = document.getElementById("event").value || "Report";
-  const p = { name: document.getElementById("export-name")?.checked, reg: document.getElementById("export-reg")?.checked, college: document.getElementById("export-college")?.checked, dept: document.getElementById("export-dept")?.checked, year: document.getElementById("export-year")?.checked, events: document.getElementById("export-events")?.checked };
+  const p = {
+    name:   document.getElementById("export-name")?.checked,
+    reg:    document.getElementById("export-reg")?.checked,
+    college:document.getElementById("export-college")?.checked,
+    dept:   document.getElementById("export-dept")?.checked,
+    year:   document.getElementById("export-year")?.checked,
+    degree: document.getElementById("export-degree")?.checked,
+    level:  document.getElementById("export-level")?.checked,
+    events: document.getElementById("export-events")?.checked
+  };
   let tbl = `<table border="1"><thead><tr>`;
   if (currentIsGroupView) { tbl += `<th>Team Token</th><th>Team No</th>`; }
-  if(p.reg) tbl+=`<th>Register No</th>`; if(p.name) tbl+=`<th>Name</th>`; if(p.dept) tbl+=`<th>Dept</th>`; if(p.college) tbl+=`<th>College</th>`;
-  if(p.year && !currentIsGroupView) tbl+=`<th>Year</th>`; if(p.events && !currentIsGroupView) tbl+=`<th>Events</th>`;
+  if(p.reg)    tbl+=`<th>Register No</th>`;
+  if(p.name)   tbl+=`<th>Name</th>`;
+  if(p.dept)   tbl+=`<th>Dept</th>`;
+  if(p.college)tbl+=`<th>College</th>`;
+  if(p.degree && !currentIsGroupView) tbl+=`<th>Degree</th>`;
+  if(p.level  && !currentIsGroupView) tbl+=`<th>Level</th>`;
+  if(p.year   && !currentIsGroupView) tbl+=`<th>Year</th>`;
+  if(p.events && !currentIsGroupView) tbl+=`<th>Events</th>`;
   tbl += `</tr></thead><tbody>`;
+
   document.querySelectorAll("#studentTable tr").forEach(row => {
-    const cells = Array.from(row.cells); if (!cells.length) return; tbl += `<tr>`;
+    const cells = Array.from(row.cells); if(!cells.length) return; tbl+=`<tr>`;
     if (currentIsGroupView) {
       const isL = cells.length > 4;
       if(isL) { tbl+=`<td>${cells[0].innerText}</td><td>${cells[1].innerText}</td>`; if(p.reg) tbl+=`<td>${cells[2]?.innerText||''}</td>`; if(p.name) tbl+=`<td>${cells[5]?.innerText||''}</td>`; if(p.dept) tbl+=`<td>${cells[3]?.innerText||''}</td>`; if(p.college) tbl+=`<td>${cells[4]?.innerText||''}</td>`; }
       else { tbl+=`<td></td><td></td>`; if(p.reg) tbl+=`<td>${cells[0]?.innerText||''}</td>`; if(p.name) tbl+=`<td>${cells[3]?.innerText||''}</td>`; if(p.dept) tbl+=`<td>${cells[1]?.innerText||''}</td>`; if(p.college) tbl+=`<td>${cells[2]?.innerText||''}</td>`; }
-    } else { if(p.reg) tbl+=`<td>${cells[1]?.innerText||''}</td>`; if(p.name) tbl+=`<td>${cells[0]?.innerText||''}</td>`; if(p.dept) tbl+=`<td>${cells[3]?.innerText||''}</td>`; if(p.college) tbl+=`<td>${cells[2]?.innerText||''}</td>`; if(p.year) tbl+=`<td>${cells[4]?.innerText||''}</td>`; if(p.events) tbl+=`<td>${cells[5]?.innerText||''}</td>`; }
-    tbl += `</tr>`;
+    } else {
+      // Standard: Name(0),Reg(1),College(2),Dept(3),Degree(4),Level(5),Year(6),Events(7)
+      if(p.reg)    tbl+=`<td>${cells[1]?.innerText||''}</td>`;
+      if(p.name)   tbl+=`<td>${cells[0]?.innerText||''}</td>`;
+      if(p.dept)   tbl+=`<td>${cells[3]?.innerText||''}</td>`;
+      if(p.college)tbl+=`<td>${cells[2]?.innerText||''}</td>`;
+      if(p.degree) tbl+=`<td>${cells[4]?.innerText||''}</td>`;
+      if(p.level)  tbl+=`<td>${cells[5]?.innerText||''}</td>`;
+      if(p.year)   tbl+=`<td>${cells[6]?.innerText||''}</td>`;
+      if(p.events) tbl+=`<td>${cells[7]?.innerText||''}</td>`;
+    }
+    tbl+=`</tr>`;
   });
   tbl += `</tbody></table>`;
   const w = window.open('','','height=800,width=1000');
@@ -1664,48 +1647,118 @@ function openDeleteModal() {
 }
 
 function closeModal() { document.getElementById("confirmModal").classList.remove("active"); }
-document.getElementById("confirmModal").addEventListener("click", e => { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById("confirmModal").addEventListener("click", e => { if(e.target===e.currentTarget) closeModal(); });
 
 async function deleteEvent() {
   const name = eventsList[eventToDeleteIndex].name;
-  const r = await adminFetch(`${API_BASE_URL}/admin/delete-event?name=${encodeURIComponent(name)}`, { method: "DELETE" });
+  const r = await adminFetch(`${API_BASE_URL}/admin/delete-event?name=${encodeURIComponent(name)}`, { method:"DELETE" });
   if (r.ok) { showToast("✓ Event deleted"); closeModal(); fetchEventsFromServer(); }
 }
 
 async function confirmDeleteAllFromModal() {
   const pw = document.getElementById("adminPasswordInput").value;
   if (!pw) return alert("Enter password");
-  const r = await adminFetch(`${API_BASE_URL}/admin/delete-all-students`, { method: "POST", body: JSON.stringify({ password: pw }) });
+  const r = await adminFetch(`${API_BASE_URL}/admin/delete-all-students`, { method:"POST", body: JSON.stringify({ password: pw }) });
   const d = await r.json();
   if (d.success) { showToast("✓ All data deleted"); closeModal(); loadStudents(); }
   else showToast("✗ Wrong password");
 }
 
 /* ─── SETTINGS ─── */
-function handleLimitChange() { document.getElementById("confirmLimitBtn").style.display = "block"; }
-function handleDateSelection() { document.getElementById("confirmBtn").style.display = "block"; }
-function handleHomepageTextChange() { document.querySelectorAll(".config-box .btn-confirm").forEach(b => { if (b.textContent.includes("Title")) b.style.display = "block"; }); }
-function handleContactChange() { document.querySelectorAll(".config-box .btn-confirm").forEach(b => { if (b.textContent.includes("Contact")) b.style.display = "block"; }); }
-function toggleTeamSizeInput() { document.getElementById("teamSizeGroup").style.display = document.getElementById("newEventType").value === 'group' ? '' : 'none'; }
+function handleLimitChange()       { document.getElementById("confirmLimitBtn").style.display = "block"; }
+function handleDateSelection()     { document.getElementById("confirmBtn").style.display = "block"; }
+function handleHomepageTextChange(){ document.querySelectorAll(".config-box .btn-confirm").forEach(b=>{ if(b.textContent.includes("Title")) b.style.display="block"; }); }
+function handleContactChange()     { document.querySelectorAll(".config-box .btn-confirm").forEach(b=>{ if(b.textContent.includes("Contact")) b.style.display="block"; }); }
+function toggleTeamSizeInput()     { document.getElementById("teamSizeGroup").style.display = document.getElementById("newEventType").value==='group'?'':'none'; }
 
-async function updateEventLimit() { await adminFetch(`${API_BASE_URL}/api/settings`, { method: "POST", body: JSON.stringify({ limit: document.getElementById("adminLimitInput").value }) }); showToast("✓ Limit saved"); document.getElementById("confirmLimitBtn").style.display = "none"; }
-async function updateSymposiumDate() { await adminFetch(`${API_BASE_URL}/api/settings`, { method: "POST", body: JSON.stringify({ deadline: document.getElementById("adminDateInput").value }) }); showToast("✓ Date updated"); document.getElementById("confirmBtn").style.display = "none"; }
-async function updateHomepageText() { const r = await adminFetch(`${API_BASE_URL}/api/settings`, { method: "POST", body: JSON.stringify({ header_text: document.getElementById("adminHeaderText").value, symposium_title: document.getElementById("adminSymposiumTitle").value }) }); const d = await r.json(); if (d.success) showToast("✓ Homepage updated"); }
-async function updateContactDetails() { await adminFetch(`${API_BASE_URL}/api/update-contact`, { method: "POST", body: JSON.stringify({ email: document.getElementById("adminEmail").value, phone: document.getElementById("adminPhone").value, location: document.getElementById("adminLocation").value, lat: document.getElementById("adminLat").value, lng: document.getElementById("adminLng").value }) }); showToast("✓ Contact saved"); }
+async function updateEventLimit()    { await adminFetch(`${API_BASE_URL}/api/settings`,{method:"POST",body:JSON.stringify({limit:document.getElementById("adminLimitInput").value})}); showToast("✓ Limit saved"); document.getElementById("confirmLimitBtn").style.display="none"; }
+async function updateSymposiumDate() { await adminFetch(`${API_BASE_URL}/api/settings`,{method:"POST",body:JSON.stringify({deadline:document.getElementById("adminDateInput").value})}); showToast("✓ Date updated"); document.getElementById("confirmBtn").style.display="none"; }
+async function updateHomepageText()  { const r=await adminFetch(`${API_BASE_URL}/api/settings`,{method:"POST",body:JSON.stringify({header_text:document.getElementById("adminHeaderText").value,symposium_title:document.getElementById("adminSymposiumTitle").value})}); const d=await r.json(); if(d.success) showToast("✓ Homepage updated"); }
+async function updateContactDetails(){ await adminFetch(`${API_BASE_URL}/api/update-contact`,{method:"POST",body:JSON.stringify({email:document.getElementById("adminEmail").value,phone:document.getElementById("adminPhone").value,location:document.getElementById("adminLocation").value,lat:document.getElementById("adminLat").value,lng:document.getElementById("adminLng").value})}); showToast("✓ Contact saved"); }
 
 async function loadAdminSettings() {
   try {
     const s = await (await adminFetch(`${API_BASE_URL}/api/settings`)).json();
-    document.getElementById("adminHeaderText").value = s.header_text || "";
+    document.getElementById("adminHeaderText").value    = s.header_text || "";
     document.getElementById("adminSymposiumTitle").value = s.symposium_title || "";
-    document.getElementById("adminLimitInput").value = s.event_selection_limit || 3;
+    document.getElementById("adminLimitInput").value    = s.event_selection_limit || 3;
     const c = await (await adminFetch(`${API_BASE_URL}/api/contact`)).json();
-    document.getElementById("adminEmail").value = c.contact_email || "";
-    document.getElementById("adminPhone").value = c.contact_phone || "";
+    document.getElementById("adminEmail").value    = c.contact_email    || "";
+    document.getElementById("adminPhone").value    = c.contact_phone    || "";
     document.getElementById("adminLocation").value = c.contact_location || "";
-    document.getElementById("adminLat").value = c.contact_lat || "";
-    document.getElementById("adminLng").value = c.contact_lng || "";
-  } catch (e) { console.error(e); }
+    document.getElementById("adminLat").value      = c.contact_lat      || "";
+    document.getElementById("adminLng").value      = c.contact_lng      || "";
+  } catch(e) { console.error(e); }
+}
+
+/* ─── DEPARTMENTS & DEGREES ─── */
+async function loadDepartmentsAndDegrees() {
+  try {
+    const [deptRes, degRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/api/departments`),
+      fetch(`${API_BASE_URL}/api/degrees`)
+    ]);
+    const depts   = await deptRes.json();
+    const degrees = await degRes.json();
+    renderDeptList(depts);
+    renderDegreeList(degrees);
+    document.getElementById("deptCount").textContent = `${depts.length} Department${depts.length!==1?'s':''}`;
+  } catch(e) { console.error(e); }
+}
+
+function renderDeptList(depts) {
+  const list = document.getElementById("deptList");
+  list.innerHTML = depts.map(d => `
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 14px;">
+      <span style="font-size:13px;color:var(--text);">${d.name}</span>
+      <button onclick="deleteDepartment('${d.name.replace(/'/g,"\\'")}')\" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);color:var(--danger);border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:0.2s;" onmouseover="this.style.background='var(--danger)';this.style.color='white'" onmouseout="this.style.background='rgba(255,77,109,0.1)';this.style.color='var(--danger)'">×</button>
+    </div>`).join('');
+}
+
+function renderDegreeList(degrees) {
+  const list = document.getElementById("degreeList");
+  const ug = degrees.filter(d => d.level === 'UG');
+  const pg = degrees.filter(d => d.level === 'PG');
+  function group(title, items, color) {
+    if (!items.length) return '';
+    return `<div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${color};margin:4px 0 6px;">${title}</div>
+      ${items.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:9px 14px;margin-bottom:6px;">
+        <span style="font-size:13px;color:var(--text);">${d.name}</span>
+        <button onclick="deleteDegree(${d.id})" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);color:var(--danger);border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:0.2s;" onmouseover="this.style.background='var(--danger)';this.style.color='white'" onmouseout="this.style.background='rgba(255,77,109,0.1)';this.style.color='var(--danger)'">×</button>
+      </div>`).join('')}`;
+  }
+  list.innerHTML = group('UG Degrees', ug, 'var(--accent)') + group('PG Degrees', pg, 'var(--accent2)');
+}
+
+async function addDepartment() {
+  const name = document.getElementById("newDeptName").value.trim();
+  if (!name) return alert("Enter department name");
+  const r = await adminFetch(`${API_BASE_URL}/admin/add-department`, { method:"POST", body: JSON.stringify({ name }) });
+  const d = await r.json();
+  if (d.success) { showToast("✓ Department added"); document.getElementById("newDeptName").value=""; loadDepartmentsAndDegrees(); populateFilterDropdowns(); }
+  else showToast("✗ " + (d.error || "Error"));
+}
+
+async function deleteDepartment(name) {
+  if (!confirm(`Delete department "${name}"?`)) return;
+  const r = await adminFetch(`${API_BASE_URL}/admin/delete-department?name=${encodeURIComponent(name)}`, { method:"DELETE" });
+  if (r.ok) { showToast("✓ Department deleted"); loadDepartmentsAndDegrees(); populateFilterDropdowns(); }
+}
+
+async function addDegree() {
+  const name  = document.getElementById("newDegreeName").value.trim();
+  const level = document.getElementById("newDegreeLevel").value;
+  if (!name) return alert("Enter degree name");
+  const r = await adminFetch(`${API_BASE_URL}/admin/add-degree`, { method:"POST", body: JSON.stringify({ name, level }) });
+  const d = await r.json();
+  if (d.success) { showToast("✓ Degree added"); document.getElementById("newDegreeName").value=""; loadDepartmentsAndDegrees(); populateFilterDropdowns(); }
+  else showToast("✗ " + (d.error || "Error"));
+}
+
+async function deleteDegree(id) {
+  if (!confirm("Delete this degree?")) return;
+  const r = await adminFetch(`${API_BASE_URL}/admin/delete-degree?id=${id}`, { method:"DELETE" });
+  if (r.ok) { showToast("✓ Degree deleted"); loadDepartmentsAndDegrees(); populateFilterDropdowns(); }
 }
 
 /* ─── TOAST ─── */
@@ -1716,126 +1769,13 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 3200);
 }
-function renderStandardRows(data) {
-    const tbody = document.getElementById("studentTable");
-    tbody.innerHTML = "";
-    const total = data.length;
-    animateCounter(document.getElementById("stat-total"), total);
-    document.getElementById("tableCount").textContent = `${total} record${total !== 1 ? 's' : ''}`;
 
-    // ✅ ADD THIS — Calculate Top College
-    if (data.length > 0) {
-        const collegeCounts = {};
-        data.forEach(s => {
-            const name = s.college?.trim();
-            if (name) collegeCounts[name] = (collegeCounts[name] || 0) + 1;
-        });
-        const topCollege = Object.entries(collegeCounts)
-            .sort((a, b) => b[1] - a[1])[0];
-        
-        const collegeEl = document.getElementById("stat-college");
-        if (topCollege) {
-            // Shorten long college names for display
-            const shortName = topCollege[0].length > 20 
-                ? topCollege[0].substring(0, 18) + '…' 
-                : topCollege[0];
-            collegeEl.textContent = shortName;
-            collegeEl.title = topCollege[0]; // Full name on hover
-        }
-    } else {
-        document.getElementById("stat-college").textContent = "—";
-    }
-
-    // existing row rendering below — keep this unchanged
-    data.forEach((s, i) => {
-        const row = tbody.insertRow();
-        row.style.animationDelay = (i * 0.03) + 's';
-        const events = (s.events && s.events !== 'None') 
-            ? s.events.split(', ').map(ev => `<span class="epill">${ev}</span>`).join('') 
-            : '<span style="color:var(--muted);font-size:11px;">—</span>';
-        row.innerHTML = `<td class="td-name">${s.name}</td><td class="td-mono">${s.reg_no}</td><td>${s.college}</td><td>${s.department}</td><td class="td-mono">${s.year}</td><td>${events}</td>`;
-    });
-}
-// ─── DEPARTMENTS & DEGREES ───
-async function loadDepartmentsAndDegrees() {
-    try {
-        const [deptRes, degRes] = await Promise.all([
-            fetch(`${API_BASE_URL}/api/departments`),
-            fetch(`${API_BASE_URL}/api/degrees`)
-        ]);
-        const depts   = await deptRes.json();
-        const degrees = await degRes.json();
-
-        renderDeptList(depts);
-        renderDegreeList(degrees);
-
-        document.getElementById("deptCount").textContent = `${depts.length} Department${depts.length !== 1 ? 's' : ''}`;
-    } catch(e) { console.error(e); }
-}
-
-function renderDeptList(depts) {
-    const list = document.getElementById("deptList");
-    list.innerHTML = depts.map(d => `
-        <div style="display:flex; align-items:center; justify-content:space-between; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px 14px;">
-            <span style="font-size:13px; color:var(--text);">${d.name}</span>
-            <button onclick="deleteDepartment('${d.name.replace(/'/g, "\\'")}')" style="background:rgba(255,77,109,0.1); border:1px solid rgba(255,77,109,0.2); color:var(--danger); border-radius:6px; width:26px; height:26px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='var(--danger)';this.style.color='white'" onmouseout="this.style.background='rgba(255,77,109,0.1)';this.style.color='var(--danger)'">×</button>
-        </div>`).join('');
-}
-
-function renderDegreeList(degrees) {
-    const list = document.getElementById("degreeList");
-    const ug = degrees.filter(d => d.level === 'UG');
-    const pg = degrees.filter(d => d.level === 'PG');
-
-    function group(title, items, color) {
-        if (!items.length) return '';
-        return `
-            <div style="font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:${color}; margin:4px 0 6px;">${title}</div>
-            ${items.map(d => `
-                <div style="display:flex; align-items:center; justify-content:space-between; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:9px 14px; margin-bottom:6px;">
-                    <span style="font-size:13px; color:var(--text);">${d.name}</span>
-                    <button onclick="deleteDegree(${d.id})" style="background:rgba(255,77,109,0.1); border:1px solid rgba(255,77,109,0.2); color:var(--danger); border-radius:6px; width:26px; height:26px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='var(--danger)';this.style.color='white'" onmouseout="this.style.background='rgba(255,77,109,0.1)';this.style.color='var(--danger)'">×</button>
-                </div>`).join('')}`;
-    }
-
-    list.innerHTML = group('UG Degrees', ug, 'var(--accent)') + group('PG Degrees', pg, 'var(--accent2)');
-}
-
-async function addDepartment() {
-    const name = document.getElementById("newDeptName").value.trim();
-    if (!name) return alert("Enter department name");
-    const r = await adminFetch(`${API_BASE_URL}/admin/add-department`, { method: "POST", body: JSON.stringify({ name }) });
-    const d = await r.json();
-    if (d.success) { showToast("✓ Department added"); document.getElementById("newDeptName").value = ""; loadDepartmentsAndDegrees(); }
-    else showToast("✗ " + (d.error || "Error"));
-}
-
-async function deleteDepartment(name) {
-    if (!confirm(`Delete department "${name}"?`)) return;
-    const r = await adminFetch(`${API_BASE_URL}/admin/delete-department?name=${encodeURIComponent(name)}`, { method: "DELETE" });
-    if (r.ok) { showToast("✓ Department deleted"); loadDepartmentsAndDegrees(); }
-}
-
-async function addDegree() {
-    const name  = document.getElementById("newDegreeName").value.trim();
-    const level = document.getElementById("newDegreeLevel").value;
-    if (!name) return alert("Enter degree name");
-    const r = await adminFetch(`${API_BASE_URL}/admin/add-degree`, { method: "POST", body: JSON.stringify({ name, level }) });
-    const d = await r.json();
-    if (d.success) { showToast("✓ Degree added"); document.getElementById("newDegreeName").value = ""; loadDepartmentsAndDegrees(); }
-    else showToast("✗ " + (d.error || "Error"));
-}
-
-async function deleteDegree(id) {
-    if (!confirm("Delete this degree?")) return;
-    const r = await adminFetch(`${API_BASE_URL}/admin/delete-degree?id=${id}`, { method: "DELETE" });
-    if (r.ok) { showToast("✓ Degree deleted"); loadDepartmentsAndDegrees(); }
-}
 /* ─── INIT ─── */
 document.addEventListener("DOMContentLoaded", () => {
-    loadAdminSettings();
-    fetchEventsFromServer();
-    loadDepartmentsAndDegrees(); // ← Add this
+  loadAdminSettings();
+  fetchEventsFromServer();
+  loadDepartmentsAndDegrees();
+  populateFilterDropdowns();   // populate filter dropdowns from API
 });
 </script>
 </body>
