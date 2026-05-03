@@ -69,6 +69,17 @@ app.use(express.urlencoded({ extended: true }));
 });
 */
 const promiseDb = db.promise();
+// ── Fetch symposium title from DB (with fallback) ──
+async function getSymposiumTitle() {
+    try {
+        const [[row]] = await promiseDb.query(
+            "SELECT symposium_title FROM symposium_settings WHERE id = 1"
+        );
+        return row?.symposium_title || "Symposium 2026";
+    } catch {
+        return "Symposium 2026";
+    }
+}
 /*cron.schedule('0 0 * * *', () => {
     console.log("🕛 Midnight IST: Resetting Daily Email Counter.");
     emailCounter = 0;
@@ -78,17 +89,17 @@ const promiseDb = db.promise();
 });*/
 
 async function sendSymposiumEmail(mailOptions) {
-    // Get today's date in IST
+    // ── Fetch dynamic title for sender name ──
+    const sympTitle = await getSymposiumTitle();
+    
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 
-    // Get or create today's count from DB
     await promiseDb.query(
         `INSERT INTO email_usage (usage_date, count) VALUES (?, 1)
          ON DUPLICATE KEY UPDATE count = count + 1`,
         [today]
     );
 
-    // Read the current count
     const [[usage]] = await promiseDb.query(
         "SELECT count FROM email_usage WHERE usage_date = ?",
         [today]
@@ -96,7 +107,6 @@ async function sendSymposiumEmail(mailOptions) {
 
     const emailCounter = usage.count;
 
-    // Decide which account to use
     let accountIndex = -1;
     let cumulative = 0;
     for (let i = 0; i < BREVO_ACCOUNTS.length; i++) {
@@ -115,7 +125,7 @@ async function sendSymposiumEmail(mailOptions) {
     const response = await axios.post(
         'https://api.brevo.com/v3/smtp/email',
         {
-            sender: { name: "Symposium 2026", email: account.email },
+            sender: { name: sympTitle, email: account.email }, // ← now dynamic
             to: [{ email: mailOptions.to }],
             subject: mailOptions.subject,
             htmlContent: mailOptions.html,
@@ -157,46 +167,37 @@ app.post("/register/send-otp", async (req, res) => {
              VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE), 'register')`, 
             [email, otp]
         );
-
-        // 4. Send via Email Switcher
+       const sympTitle = await getSymposiumTitle();
        await sendSymposiumEmail({
     to: email,
     subject: `🔐 Registration OTP: ${otp}`,
     html: `
     <div style="background-color: #0f2027; background: linear-gradient(180deg, #0f2027 0%, #203a43 100%); padding: 50px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif;">
         <div style="max-width: 500px; margin: 0 auto; background: #16262e; border: 1px solid rgba(0, 198, 255, 0.2); border-radius: 28px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.4);">
-            
             <div style="background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%); padding: 30px; text-align: center;">
-                <h1 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 3px; font-weight: 800; text-transform: uppercase;">SYMPOSIUM <span style="color: #0b1419; opacity: 0.7;">2026</span></h1>
+                <h1 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 3px; font-weight: 800; text-transform: uppercase;">${sympTitle}</h1>
                 <div style="height: 2px; width: 40px; background: #ffffff; margin: 10px auto; border-radius: 2px;"></div>
                 <p style="color: #ffffff; margin: 0; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Registration Verification</p>
             </div>
-
             <div style="padding: 40px 35px; text-align: center;">
                 <h2 style="color: #ffffff; font-size: 20px; margin-top: 0; font-weight: 600;">Complete Your Registration</h2>
                 <p style="color: #8899a0; font-size: 15px; line-height: 1.6;">
-                    You're almost there! Use the secure code below to verify your email and complete your enrollment for Symposium 2026:
+                    You're almost there! Use the secure code below to verify your email and complete your enrollment for ${sympTitle}:
                 </p>
-
                 <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;">
-                    <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">
-                        Double-Click to Copy
-                    </span>
-                    <div style="font-size: 48px; font-weight: 800; letter-spacing: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; cursor: pointer; display: inline-block; user-select: all; -webkit-user-select: all; -moz-user-select: all; -ms-user-select: all;">
+                    <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
+                    <div style="font-size: 48px; font-weight: 800; letter-spacing: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; cursor: pointer; display: inline-block; user-select: all; -webkit-user-select: all;">
                         ${otp}
                     </div>
                 </div>
-
                 <p style="color: #556a75; font-size: 12px; line-height: 1.6;">
                     This code is valid for <strong>10 minutes</strong>.<br>
                     If you did not request this code, please ignore this email.
                 </p>
             </div>
-
             <div style="background: rgba(0, 0, 0, 0.2); padding: 25px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05);">
                 <p style="color: #44555e; font-size: 10px; margin: 0; line-height: 1.5; text-transform: uppercase; letter-spacing: 1px;">
-                    © 2026 SYMPOSIUM ORGANIZING COMMITTEE <br>
-                    SECURED BY INNOVATION CELL
+                    © 2026 ${sympTitle.toUpperCase()} ORGANIZING COMMITTEE<br>SECURED BY INNOVATION CELL
                 </p>
             </div>
         </div>
@@ -225,7 +226,7 @@ app.post("/register", async (req, res) => {
     if (eventNames.length === 0) {
         return res.status(400).json({ success: false, message: "Invalid event data received." });
     }
-
+    
     try {
         const [eventRows] = await promiseDb.query(
             "SELECT id, event_name FROM events WHERE event_name IN (?)",
@@ -285,6 +286,7 @@ app.post("/register", async (req, res) => {
             // Background email (unchanged)
             setTimeout(async () => {
                 try {
+                    const sympTitle = await getSymposiumTitle(); 
                    const [details] = await promiseDb.query(
     `SELECT e.event_name, e.event_category, e.event_type, se.team_token 
      FROM student_events se 
@@ -299,7 +301,7 @@ app.post("/register", async (req, res) => {
 
           await sendSymposiumEmail({
     to: email,
-    subject: `🎉 Registration Confirmed — ${name} | Symposium 2026`,
+    subject: `🎉 Registration Confirmed — ${name} | ${sympTitle}`,
     html: `
 <!DOCTYPE html>
 <html>
@@ -323,8 +325,7 @@ app.post("/register", async (req, res) => {
           <div style="display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:50px;padding:5px 18px;margin-bottom:14px;">
             <span style="color:#ffffff;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;">Official Confirmation</span>
           </div>
-          <h1 style="color:#ffffff;margin:0 0 6px 0;font-size:28px;font-weight:800;letter-spacing:4px;text-transform:uppercase;text-shadow:0 2px 20px rgba(0,0,0,0.3);">SYMPOSIUM</h1>
-          <h2 style="color:rgba(255,255,255,0.85);margin:0;font-size:15px;font-weight:300;letter-spacing:8px;">2 0 2 6</h2>
+         <h1 style="color:#ffffff;margin:0 0 6px 0;font-size:28px;font-weight:800;letter-spacing:4px;text-transform:uppercase;text-shadow:0 2px 20px rgba(0,0,0,0.3);">${sympTitle}</h1>
           <div style="width:40px;height:2px;background:rgba(255,255,255,0.5);margin:16px auto 0;border-radius:2px;"></div>
         </td>
       </tr>
@@ -485,7 +486,7 @@ app.post("/register", async (req, res) => {
         <td style="padding:32px 40px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);margin-top:28px;">
           <div style="margin-top:8px;">
             <div style="color:#2a3a4a;font-size:10px;letter-spacing:2px;text-transform:uppercase;line-height:1.8;">
-              © 2026 Symposium Organizing Committee<br>
+              © ${sympTitle} Organizing Committee<br>
               <span style="color:#1e2d3d;">Secured by Innovation Cell</span>
             </div>
           </div>
@@ -572,51 +573,43 @@ app.post("/send-otp", async (req, res) => {
              VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE), 'view')`, 
             [reg_no, otp]
         );
-        
-        // 3. Send the Email using the Alternating Logic
-        await sendSymposiumEmail({
-            to: student.email,
-            subject: `🔐 Access Code: ${otp}`,
-           html: `
+       const sympTitle = await getSymposiumTitle();
+
+await sendSymposiumEmail({
+    to: student.email,
+    subject: `🔐 Access Code: ${otp}`,
+    html: `
 <div style="background-color: #0f2027; background: linear-gradient(180deg, #0f2027 0%, #203a43 100%); padding: 50px 20px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif;">
     <div style="max-width: 500px; margin: 0 auto; background: #16262e; border: 1px solid rgba(0, 198, 255, 0.2); border-radius: 28px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.4);">
-        
         <div style="background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 3px; font-weight: 800; text-transform: uppercase;">SYMPOSIUM <span style="color: #0b1419; opacity: 0.7;">2026</span></h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 3px; font-weight: 800; text-transform: uppercase;">${sympTitle}</h1>
             <div style="height: 2px; width: 40px; background: #ffffff; margin: 10px auto; border-radius: 2px;"></div>
             <p style="color: #ffffff; margin: 0; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Security Verification</p>
         </div>
-
         <div style="padding: 40px 35px; text-align: center;">
             <h2 style="color: #ffffff; font-size: 20px; margin-top: 0; font-weight: 600;">Verify Your Identity</h2>
             <p style="color: #8899a0; font-size: 15px; line-height: 1.6;">
-                To access your live registration status and digital pass, please use the secure verification code below:
+                To access your live registration status and digital pass for ${sympTitle}, please use the secure verification code below:
             </p>
-
             <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;">
-                <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">
-                    Double-Click to Copy
-                </span>
+                <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
                 <div style="font-size: 48px; font-weight: 800; letter-spacing: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; display: inline-block; padding: 10px; border-radius: 8px; cursor: pointer; user-select: all; -webkit-user-select: all;">
                     ${otp}
                 </div>
             </div>
-
             <p style="color: #556a75; font-size: 12px; line-height: 1.6;">
                 This code is valid for <strong>10 minutes</strong>.<br>
                 If you did not request this code, please ignore this email.
             </p>
         </div>
-
         <div style="background: rgba(0, 0, 0, 0.2); padding: 25px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05);">
             <p style="color: #44555e; font-size: 10px; margin: 0; line-height: 1.5; text-transform: uppercase; letter-spacing: 1px;">
-                © 2026 SYMPOSIUM ORGANIZING COMMITTEE <br>
-                SECURED BY INNOVATION CELL
+                © 2026 ${sympTitle.toUpperCase()} ORGANIZING COMMITTEE<br>SECURED BY INNOVATION CELL
             </p>
         </div>
     </div>
 </div>`
-        });
+});
 
        res.json({ success: true, message: "OTP Sent" });
 
