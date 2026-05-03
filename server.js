@@ -210,7 +210,7 @@ app.post("/register/send-otp", async (req, res) => {
         console.error("❌ Email OTP Error:", err);
         res.status(500).json({ success: false, message: "Error sending OTP" });
     }
-});QW   
+});
 /* ---------- REGISTRATION: STEP 3 - FINAL SUBMISSION ---------- */
 app.post("/register", async (req, res) => {
    const { name, reg_no, college, department, year, level, degree, email, phone, events } = req.body;
