@@ -246,6 +246,33 @@
 }
 
         .deadline-box.active, .alert-box.active { transform: scale(1); }
+        /* Navbar logo loading state */
+.logo {
+    transition: opacity 0.4s ease;
+}
+
+.logo.loading {
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0.1) 25%, 
+        rgba(255,255,255,0.2) 50%, 
+        rgba(255,255,255,0.1) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 4px;
+    color: transparent !important;
+    min-width: 120px;
+    display: inline-block;
+}
+
+.logo.loading span {
+    color: transparent !important;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
     </style>
 
 </head>
@@ -432,33 +459,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 async function loadNavbarTitle() {
+    const logoEl = document.querySelector('.logo');
+    if (!logoEl) return;
+
+    // Show shimmer skeleton while loading
+    logoEl.classList.add('loading');
+
     try {
         const API_BASE_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000' 
             : 'https://login-system-1-nowr.onrender.com';
-        
+
         const res = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await res.json();
-        
+
         if (data && data.symposium_title) {
-            // Update navbar logo text
-            const logoEl = document.querySelector('.logo');
-            if (logoEl) {
-                // Split title smartly — e.g. "QUBIT' 26" → "QUBIT'" + "26"
-                const title = data.symposium_title;
-                const parts = title.split(/(\d{2,4})/); // splits on year numbers
-                if (parts.length >= 2) {
-                    const mainPart = parts[0].trim();
-                    const yearPart = parts[1].trim();
-                    logoEl.innerHTML = `${mainPart} <span>${yearPart}</span>`;
-                } else {
-                    logoEl.innerHTML = `${title.slice(0,-2)} <span>${title.slice(-2)}</span>`;
-                }
+            const title = data.symposium_title;
+            const parts = title.split(/(\d{2,4})/);
+
+            // Remove shimmer, set content, fade in
+            logoEl.classList.remove('loading');
+            logoEl.style.opacity = '0';
+            logoEl.style.transition = 'opacity 0.5s ease';
+
+            if (parts.length >= 2) {
+                logoEl.innerHTML = `${parts[0].trim()} <span>${parts[1].trim()}</span>`;
+            } else {
+                logoEl.textContent = title;
             }
+
+            requestAnimationFrame(() => {
+                logoEl.style.opacity = '1';
+            });
         }
     } catch(err) {
-        console.error("Navbar title load failed:", err);
-        // Fallback — keep existing hardcoded text
+        // Fallback — just show what's already there
+        logoEl.classList.remove('loading');
+        logoEl.style.opacity = '1';
     }
 }
 
