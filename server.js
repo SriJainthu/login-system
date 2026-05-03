@@ -211,104 +211,131 @@ app.post("/register/send-otp", async (req, res) => {
         res.status(500).json({ success: false, message: "Error sending OTP" });
     }
 });
-/* ---------- REGISTRATION: STEP 3 - FINAL SUBMISSION ---------- */
 app.post("/register", async (req, res) => {
-   const { name, reg_no, college, department, year, level, degree, email, phone, events } = req.body;
-    const eventNames = events.map(e => e.name);
-    
+    const { name, reg_no, college, department, year, level, degree, email, phone, events } = req.body;
+
+    // ✅ FIX 1: Validate events exists and is a non-empty array
+    if (!events || !Array.isArray(events) || events.length === 0) {
+        return res.status(400).json({ success: false, message: "No events selected." });
+    }
+
+    // ✅ FIX 2: Safely extract event names (handle both .name and .event_name)
+    const eventNames = events.map(e => e.name || e.event_name).filter(Boolean);
+
+    if (eventNames.length === 0) {
+        return res.status(400).json({ success: false, message: "Invalid event data received." });
+    }
+
     try {
-        const [eventRows] = await promiseDb.query("SELECT id, event_name FROM events WHERE event_name IN (?)", [eventNames]);
+        const [eventRows] = await promiseDb.query(
+            "SELECT id, event_name FROM events WHERE event_name IN (?)",
+            [eventNames]
+        );
+
+        // ✅ FIX 3: Check that we actually found events in DB
+        if (eventRows.length === 0) {
+            return res.status(400).json({ success: false, message: "Selected events not found in database." });
+        }
+
         const connection = await db.promise().getConnection();
 
         try {
             await connection.beginTransaction();
+            console.log("Register payload:", req.body);
 
-            // 1. Insert Student
             const [studentResult] = await connection.query(
-               "INSERT INTO students (name, reg_no, college, department, year, level, degree, email, phone) VALUES (?,?,?,?,?,?,?,?,?)"
-// Values:
-[name, reg_no, college, department, year, level || 'UG', degree || 'B.E', email, phone]
+                "INSERT INTO students (name, reg_no, college, department, year, email, phone, degree, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [name, reg_no, college, department, year, email, phone, degree, level]
             );
             const studentId = studentResult.insertId;
 
-            // 2. Map Events and Tokens
-            const mappingValues = eventRows.map(row => {
-                const originalEvent = events.find(e => e.name.toLowerCase() === row.event_name.toLowerCase());
-                const token = (originalEvent.token && originalEvent.token.trim() !== "") ? originalEvent.token.trim() : null;
-                return [studentId, row.id, token];
-            });
+            // ✅ FIX 4: Build mappingValues safely, skip events not found in DB
+            const mappingValues = [];
+            for (const row of eventRows) {
+                const originalEvent = events.find(e =>
+                    (e.name || e.event_name || '').toLowerCase() === row.event_name.toLowerCase()
+                );
 
-            await connection.query("INSERT INTO student_events (student_id, event_id, team_token) VALUES ?", [mappingValues]);
-            
-            // 3. Commit Transaction
+                if (!originalEvent) continue; // skip if no match
+
+                const token = (originalEvent.token && originalEvent.token.trim() !== "")
+                    ? originalEvent.token.trim()
+                    : null;
+
+                mappingValues.push([studentId, row.id, token]);
+            }
+
+            // ✅ FIX 5: Guard against empty mappingValues before bulk insert
+            if (mappingValues.length === 0) {
+                await connection.rollback();
+                connection.release();
+                return res.status(400).json({ success: false, message: "Could not map any events. Please try again." });
+            }
+
+            await connection.query(
+                "INSERT INTO student_events (student_id, event_id, team_token) VALUES ?",
+                [mappingValues]
+            );
+
             await connection.commit();
 
-            // --- RESPOND TO USER IMMEDIATELY ---
             res.json({ success: true, redirect: "/registration-success.html" });
             console.log(`🚀 Registration instant-success for ${name}.`);
 
-          // --- BACKGROUND PROCESSING (Email Confirmation) ---
-const emailDelay = 2000; // Small 2-second delay to ensure DB is updated
-setTimeout(async () => {
-    try {
-        // Fetch event details to list them in the email
-        const [details] = await promiseDb.query(
-            `SELECT e.event_name, se.team_token FROM student_events se JOIN events e ON se.event_id = e.id WHERE se.student_id = ?`, 
-            [studentId]
-        );
+            // Background email (unchanged)
+            setTimeout(async () => {
+                try {
+                    const [details] = await promiseDb.query(
+                        `SELECT e.event_name, se.team_token FROM student_events se JOIN events e ON se.event_id = e.id WHERE se.student_id = ?`,
+                        [studentId]
+                    );
 
-        const eventListHtml = details.map(d => 
-            `<li style="color: #ffffff; margin-bottom: 8px;">✅ <strong>${d.event_name}</strong> <span style="color: #8899a0; font-size: 13px;">(${d.team_token || 'Solo'})</span></li>`
-        ).join('');
+                    const eventListHtml = details.map(d =>
+                        `<li style="color: #ffffff; margin-bottom: 8px;">✅ <strong>${d.event_name}</strong> <span style="color: #8899a0; font-size: 13px;">(${d.team_token || 'Solo'})</span></li>`
+                    ).join('');
 
-        await sendSymposiumEmail({
-            to: email,
-            subject: `🎉 Registration Confirmed: ${name}`,
-            html: `
-            <div style="background-color: #0f2027; padding: 50px 20px; font-family: 'Segoe UI', Arial, sans-serif;">
-                <div style="max-width: 550px; margin: 0 auto; background: #16262e; border-radius: 28px; overflow: hidden; border: 1px solid rgba(0, 198, 255, 0.2);">
-                    <div style="background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%); padding: 30px; text-align: center;">
-                        <h1 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 3px;">SYMPOSIUM 2026</h1>
-                        <p style="color: #ffffff; margin: 0; font-size: 12px; text-transform: uppercase;">Official Confirmation Receipt</p>
-                    </div>
-                    <div style="padding: 40px 35px;">
-                        <h2 style="color: #ffffff; font-size: 20px;">Congratulations, ${name}!</h2>
-                        <p style="color: #8899a0; font-size: 15px;">Your registration has been successfully processed. Below are your event details:</p>
-                        
-                        <div style="background: rgba(255, 255, 255, 0.03); border-radius: 15px; padding: 20px; margin: 20px 0;">
-                            <p style="color: #00c6ff; margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; font-weight: bold;">Registered Events:</p>
-                            <ul style="list-style: none; padding: 0; margin: 0;">
-                                ${eventListHtml}
-                            </ul>
-                        </div>
+                    await sendSymposiumEmail({
+                        to: email,
+                        subject: `🎉 Registration Confirmed: ${name}`,
+                        html: `
+                        <div style="background-color: #0f2027; padding: 50px 20px; font-family: 'Segoe UI', Arial, sans-serif;">
+                            <div style="max-width: 550px; margin: 0 auto; background: #16262e; border-radius: 28px; overflow: hidden; border: 1px solid rgba(0, 198, 255, 0.2);">
+                                <div style="background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%); padding: 30px; text-align: center;">
+                                    <h1 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 3px;">SYMPOSIUM 2026</h1>
+                                    <p style="color: #ffffff; margin: 0; font-size: 12px; text-transform: uppercase;">Official Confirmation Receipt</p>
+                                </div>
+                                <div style="padding: 40px 35px;">
+                                    <h2 style="color: #ffffff; font-size: 20px;">Congratulations, ${name}!</h2>
+                                    <p style="color: #8899a0; font-size: 15px;">Your registration has been successfully processed. Below are your event details:</p>
+                                    <div style="background: rgba(255, 255, 255, 0.03); border-radius: 15px; padding: 20px; margin: 20px 0;">
+                                        <p style="color: #00c6ff; margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; font-weight: bold;">Registered Events:</p>
+                                        <ul style="list-style: none; padding: 0; margin: 0;">${eventListHtml}</ul>
+                                    </div>
+                                </div>
+                                <div style="background: rgba(0, 0, 0, 0.2); padding: 20px; text-align: center; color: #44555e; font-size: 10px;">
+                                    © 2026 SYMPOSIUM ORGANIZING COMMITTEE
+                                </div>
+                            </div>
+                        </div>`
+                    });
 
-                        <div style="text-align: center; margin: 30px 0;">
-                            <a href="http://yourdomain.com/view-registration.html?reg=${reg_no}" style="background: #00c6ff; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px;">View Digital Pass</a>
-                        </div>
-                    </div>
-                    <div style="background: rgba(0, 0, 0, 0.2); padding: 20px; text-align: center; color: #44555e; font-size: 10px;">
-                        © 2026 SYMPOSIUM ORGANIZING COMMITTEE
-                    </div>
-                </div>
-            </div>`
-        });
-
-        console.log(`✅ Confirmation Email sent to ${name}`);
-    } catch (mailErr) {
-        console.error("❌ Background Confirmation Email Error:", mailErr.message);
-    }
-}, emailDelay);
+                    console.log(`✅ Confirmation Email sent to ${name}`);
+                } catch (mailErr) {
+                    console.error("❌ Background Confirmation Email Error:", mailErr.message);
+                }
+            }, 2000);
 
         } catch (err) {
             await connection.rollback();
             throw err;
         } finally {
-            connection.release(); // Returns connection to pool so other users can use it
+            connection.release();
         }
-    } catch (err) { 
+
+    } catch (err) {
         console.error("❌ Final Register Error:", err);
         if (!res.headersSent) {
-            return res.status(500).json({ success: false, message: "Database Error during registration" }); 
+            return res.status(500).json({ success: false, message: "Database Error during registration" });
         }
     }
 });
@@ -619,7 +646,7 @@ app.post("/admin/delete-all-students", verifyAdmin, async (req, res) => {
 
         // 1. Delete child table FIRST
         await connection.query("DELETE FROM student_events");
-
+        await connection.query("DELETE FROM otp_verification");
         // 2. Then delete students
         await connection.query("DELETE FROM students");
 
