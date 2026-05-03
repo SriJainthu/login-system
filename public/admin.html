@@ -1080,7 +1080,41 @@
     </div>
     <div class="events-grid" id="addedEventsList"></div>
   </div>
+<!-- ACADEMIC MANAGER -->
+<div class="card reveal d3" style="animation-delay: 2.2s;">
+    <div class="card-header">
+        <span class="card-title">Academic Structure Manager</span>
+        <span class="card-chip" id="deptCount">0 Departments</span>
+    </div>
 
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+        <!-- DEPARTMENTS -->
+        <div>
+            <div style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">Departments</div>
+            <div style="display:flex; gap:8px; margin-bottom:14px;">
+                <input type="text" id="newDeptName" placeholder="e.g. Computer Science" style="flex:1;">
+                <button class="btn btn-primary" onclick="addDepartment()" style="padding:11px 16px; white-space:nowrap;">+ Add</button>
+            </div>
+            <div id="deptList" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- DEGREES -->
+        <div>
+            <div style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">Degrees</div>
+            <div style="display:grid; grid-template-columns:1fr 0.6fr auto; gap:8px; margin-bottom:14px;">
+                <input type="text" id="newDegreeName" placeholder="e.g. B.Tech">
+                <select id="newDegreeLevel">
+                    <option value="UG">UG</option>
+                    <option value="PG">PG</option>
+                </select>
+                <button class="btn btn-primary" onclick="addDegree()" style="padding:11px 16px;">+</button>
+            </div>
+            <div id="degreeList" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;"></div>
+        </div>
+
+    </div>
+</div>
   <!-- CHART + CONTROLS -->
   <div class="two-col reveal d4">
     <div class="card" style="display:flex; flex-direction:column;">
@@ -1722,9 +1756,87 @@ function renderStandardRows(data) {
         row.innerHTML = `<td class="td-name">${s.name}</td><td class="td-mono">${s.reg_no}</td><td>${s.college}</td><td>${s.department}</td><td class="td-mono">${s.year}</td><td>${events}</td>`;
     });
 }
+// ─── DEPARTMENTS & DEGREES ───
+async function loadDepartmentsAndDegrees() {
+    try {
+        const [deptRes, degRes] = await Promise.all([
+            fetch(`${API_BASE_URL}/api/departments`),
+            fetch(`${API_BASE_URL}/api/degrees`)
+        ]);
+        const depts   = await deptRes.json();
+        const degrees = await degRes.json();
 
+        renderDeptList(depts);
+        renderDegreeList(degrees);
+
+        document.getElementById("deptCount").textContent = `${depts.length} Department${depts.length !== 1 ? 's' : ''}`;
+    } catch(e) { console.error(e); }
+}
+
+function renderDeptList(depts) {
+    const list = document.getElementById("deptList");
+    list.innerHTML = depts.map(d => `
+        <div style="display:flex; align-items:center; justify-content:space-between; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px 14px;">
+            <span style="font-size:13px; color:var(--text);">${d.name}</span>
+            <button onclick="deleteDepartment('${d.name.replace(/'/g, "\\'")}')" style="background:rgba(255,77,109,0.1); border:1px solid rgba(255,77,109,0.2); color:var(--danger); border-radius:6px; width:26px; height:26px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='var(--danger)';this.style.color='white'" onmouseout="this.style.background='rgba(255,77,109,0.1)';this.style.color='var(--danger)'">×</button>
+        </div>`).join('');
+}
+
+function renderDegreeList(degrees) {
+    const list = document.getElementById("degreeList");
+    const ug = degrees.filter(d => d.level === 'UG');
+    const pg = degrees.filter(d => d.level === 'PG');
+
+    function group(title, items, color) {
+        if (!items.length) return '';
+        return `
+            <div style="font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:${color}; margin:4px 0 6px;">${title}</div>
+            ${items.map(d => `
+                <div style="display:flex; align-items:center; justify-content:space-between; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:9px 14px; margin-bottom:6px;">
+                    <span style="font-size:13px; color:var(--text);">${d.name}</span>
+                    <button onclick="deleteDegree(${d.id})" style="background:rgba(255,77,109,0.1); border:1px solid rgba(255,77,109,0.2); color:var(--danger); border-radius:6px; width:26px; height:26px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:0.2s;" onmouseover="this.style.background='var(--danger)';this.style.color='white'" onmouseout="this.style.background='rgba(255,77,109,0.1)';this.style.color='var(--danger)'">×</button>
+                </div>`).join('')}`;
+    }
+
+    list.innerHTML = group('UG Degrees', ug, 'var(--accent)') + group('PG Degrees', pg, 'var(--accent2)');
+}
+
+async function addDepartment() {
+    const name = document.getElementById("newDeptName").value.trim();
+    if (!name) return alert("Enter department name");
+    const r = await adminFetch(`${API_BASE_URL}/admin/add-department`, { method: "POST", body: JSON.stringify({ name }) });
+    const d = await r.json();
+    if (d.success) { showToast("✓ Department added"); document.getElementById("newDeptName").value = ""; loadDepartmentsAndDegrees(); }
+    else showToast("✗ " + (d.error || "Error"));
+}
+
+async function deleteDepartment(name) {
+    if (!confirm(`Delete department "${name}"?`)) return;
+    const r = await adminFetch(`${API_BASE_URL}/admin/delete-department?name=${encodeURIComponent(name)}`, { method: "DELETE" });
+    if (r.ok) { showToast("✓ Department deleted"); loadDepartmentsAndDegrees(); }
+}
+
+async function addDegree() {
+    const name  = document.getElementById("newDegreeName").value.trim();
+    const level = document.getElementById("newDegreeLevel").value;
+    if (!name) return alert("Enter degree name");
+    const r = await adminFetch(`${API_BASE_URL}/admin/add-degree`, { method: "POST", body: JSON.stringify({ name, level }) });
+    const d = await r.json();
+    if (d.success) { showToast("✓ Degree added"); document.getElementById("newDegreeName").value = ""; loadDepartmentsAndDegrees(); }
+    else showToast("✗ " + (d.error || "Error"));
+}
+
+async function deleteDegree(id) {
+    if (!confirm("Delete this degree?")) return;
+    const r = await adminFetch(`${API_BASE_URL}/admin/delete-degree?id=${id}`, { method: "DELETE" });
+    if (r.ok) { showToast("✓ Degree deleted"); loadDepartmentsAndDegrees(); }
+}
 /* ─── INIT ─── */
-document.addEventListener("DOMContentLoaded", () => { loadAdminSettings(); fetchEventsFromServer(); });
+document.addEventListener("DOMContentLoaded", () => {
+    loadAdminSettings();
+    fetchEventsFromServer();
+    loadDepartmentsAndDegrees(); // ← Add this
+});
 </script>
 </body>
 </html>

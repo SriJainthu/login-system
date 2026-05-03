@@ -355,7 +355,27 @@
 </div>
 
 <div class="input-field">
-    <input type="text" id="department" placeholder=" " required oninput="validateField('department')">
+    <select id="level" required onchange="onLevelChange()">
+        <option value="" disabled selected>Select Level</option>
+        <option value="UG">UG — Undergraduate</option>
+        <option value="PG">PG — Postgraduate</option>
+    </select>
+    <label>Level</label>
+    <span class="error-text" id="levelError"></span>
+</div>
+
+<div class="input-field">
+    <select id="degree" required>
+        <option value="" disabled selected>Select Degree</option>
+    </select>
+    <label>Degree</label>
+    <span class="error-text" id="degreeError"></span>
+</div>
+
+<div class="input-field">
+    <select id="department" required>
+        <option value="" disabled selected>Select Department</option>
+    </select>
     <label>Department</label>
     <span class="error-text" id="departmentError"></span>
 </div>
@@ -498,7 +518,42 @@ async function loadNavbarTitle() {
         logoEl.style.opacity = '1';
     }
 }
+async function loadDepartments() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/departments`);
+        const data = await res.json();
+        const sel = document.getElementById("department");
+        sel.innerHTML = '<option value="" disabled selected>Select Department</option>';
+        data.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.name;
+            opt.textContent = d.name;
+            sel.appendChild(opt);
+        });
+    } catch(err) { console.error("Departments load failed:", err); }
+}
 
+async function onLevelChange() {
+    const level = document.getElementById("level").value;
+    if (!level) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/degrees?level=${level}`);
+        const data = await res.json();
+        const sel = document.getElementById("degree");
+        sel.innerHTML = '<option value="" disabled selected>Select Degree</option>';
+        data.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.name;
+            opt.textContent = d.name;
+            sel.appendChild(opt);
+        });
+    } catch(err) { console.error("Degrees load failed:", err); }
+}
+
+// Call on page load
+document.addEventListener("DOMContentLoaded", () => {
+    loadDepartments();
+});
 loadNavbarTitle();
 
 </script>

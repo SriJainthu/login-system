@@ -2,14 +2,15 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000' 
     : 'https://login-system-1-nowr.onrender.com';
 const validators = {
-    name: value => /^[A-Za-z\s]+$/.test(value),
-    college: value => /^[A-Za-z\s]+$/.test(value),
-    department: value => /^[A-Za-z\s]+$/.test(value),
-    // Updated: Now strictly requires exactly 12 digits
-    reg_no: value => /^[0-9]{12}$/.test(value),
-    year: value => /^[1-4]$/.test(value),
-    phone: value => /^[0-9]{10}$/.test(value),
-    email: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+    name:       value => /^[A-Za-z\s]+$/.test(value),
+    college:    value => /^[A-Za-z\s]+$/.test(value),
+    level:      value => ['UG','PG'].includes(value),
+    degree:     value => value.length > 0,
+    department: value => value.length > 0,
+    reg_no:     value => /^[0-9]{12}$/.test(value),
+    year:       value => /^[1-4]$/.test(value),
+    phone:      value => /^[0-9]{10}$/.test(value),
+    email:      value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 };
 
 function getErrorMessage(fieldId) {
@@ -59,14 +60,16 @@ async function initiateRegistrationOTP() {
 
     // Get values
     const fields = {
-        name: document.getElementById("name").value.trim(),
-        reg_no: document.getElementById("reg_no").value.trim(),
-        college: document.getElementById("college").value.trim(),
-        department: document.getElementById("department").value.trim(),
-        year: document.getElementById("year").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        phone: document.getElementById("phone").value.trim()
-    };
+    name:       document.getElementById("name").value.trim(),
+    reg_no:     document.getElementById("reg_no").value.trim(),
+    college:    document.getElementById("college").value.trim(),
+    level:      document.getElementById("level").value,
+    degree:     document.getElementById("degree").value,
+    department: document.getElementById("department").value,
+    year:       document.getElementById("year").value.trim(),
+    email:      document.getElementById("email").value.trim(),
+    phone:      document.getElementById("phone").value.trim()
+};
 
     const fieldsToValidate = ["name", "reg_no", "college", "department", "year", "email", "phone"];
     const isFormValid = fieldsToValidate.every(field => validateField(field));

@@ -210,10 +210,10 @@ app.post("/register/send-otp", async (req, res) => {
         console.error("❌ Email OTP Error:", err);
         res.status(500).json({ success: false, message: "Error sending OTP" });
     }
-});
+});QW   
 /* ---------- REGISTRATION: STEP 3 - FINAL SUBMISSION ---------- */
 app.post("/register", async (req, res) => {
-    const { name, reg_no, college, department, year, email, phone, events } = req.body;
+   const { name, reg_no, college, department, year, level, degree, email, phone, events } = req.body;
     const eventNames = events.map(e => e.name);
     
     try {
@@ -225,8 +225,9 @@ app.post("/register", async (req, res) => {
 
             // 1. Insert Student
             const [studentResult] = await connection.query(
-                "INSERT INTO students (name, reg_no, college, department, year, email, phone) VALUES (?,?,?,?,?,?,?)", 
-                [name, reg_no, college, department, year, email, phone]
+               "INSERT INTO students (name, reg_no, college, department, year, level, degree, email, phone) VALUES (?,?,?,?,?,?,?,?,?)"
+// Values:
+[name, reg_no, college, department, year, level || 'UG', degree || 'B.E', email, phone]
             );
             const studentId = studentResult.insertId;
 
@@ -679,7 +680,60 @@ app.get("/api/public-settings", async (req, res) => {
         res.status(500).json({ error: "Could not load settings" });
     }
 });
+// Public — for registration form dropdowns
+app.get("/api/departments", async (req, res) => {
+    try {
+        const [rows] = await promiseDb.query("SELECT * FROM departments ORDER BY name ASC");
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: "Failed" }); }
+});
 
+app.get("/api/degrees", async (req, res) => {
+    const { level } = req.query;
+    try {
+        let query = "SELECT * FROM degrees ORDER BY name ASC";
+        let params = [];
+        if (level) { query = "SELECT * FROM degrees WHERE level = ? ORDER BY name ASC"; params = [level]; }
+        const [rows] = await promiseDb.query(query, params);
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: "Failed" }); }
+});
+
+// Admin — manage departments
+app.post("/admin/add-department", verifyAdmin, async (req, res) => {
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ success: false });
+    try {
+        await promiseDb.query("INSERT INTO departments (name) VALUES (?)", [name]);
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ success: false, error: err.sqlMessage }); }
+});
+
+app.delete("/admin/delete-department", verifyAdmin, async (req, res) => {
+    const { name } = req.query;
+    try {
+        await promiseDb.query("DELETE FROM departments WHERE name = ?", [name]);
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ success: false }); }
+});
+
+// Admin — manage degrees
+app.post("/admin/add-degree", verifyAdmin, async (req, res) => {
+    const { name, level } = req.body;
+    if (!name || !level) return res.status(400).json({ success: false });
+    try {
+        await promiseDb.query("INSERT INTO degrees (name, level) VALUES (?, ?)", [name, level]);
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ success: false, error: err.sqlMessage }); }
+});
+
+app.delete("/admin/delete-degree", verifyAdmin, async (req, res) => {
+    const { id } = req.query;
+    try {
+        await promiseDb.query("DELETE FROM degrees WHERE id = ?", [id]);
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ success: false }); }
+});
 app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));
