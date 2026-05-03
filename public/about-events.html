@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Events </title>
+  <title>About Events-Sympoisum 2026 </title>
 
   <style>
     :root {
@@ -551,6 +551,7 @@ body { padding-bottom: 80px; }
     body { padding-bottom: 110px; }
 }
   </style>
+
 </head>
 <body>
 
@@ -674,6 +675,10 @@ body { padding-bottom: 80px; }
       logoEl.classList.remove('loading');
     }
   }
+  fetch(`${API_BASE_URL}/api/public-settings`)
+  .then(r => r.json())
+  .then(d => { if (d?.symposium_title) document.title = `About Events | ${d.symposium_title}`; })
+  .catch(() => {});
 
   /* ── BUILD CARD ── */
   function buildCard(event, catClass) {

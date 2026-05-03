@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us </title>
+    <title>Contact Us-Symposium 2026 </title>
     <link rel="stylesheet" href="style.css">
     <style>
         :root {
@@ -535,7 +535,10 @@ async function loadNavbarTitle() {
         logoEl.style.opacity = '1';
     }
 }
-
+fetch(`${API_BASE_URL}/api/public-settings`)
+  .then(r => r.json())
+  .then(d => { if (d?.symposium_title) document.title = `Contact Us | ${d.symposium_title}`; })
+  .catch(() => {});
 loadNavbarTitle();
 
     </script>

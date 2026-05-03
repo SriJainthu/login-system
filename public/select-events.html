@@ -531,6 +531,8 @@
 
       const settings    = await settingsRes.json();
       const adminEvents = await eventRes.json();
+      // Already fetching settings here — just add this line:
+if (settings?.symposium_title) document.title = `Select Events | ${settings.symposium_title}`;
 
       adminEventLimit = parseInt(settings.event_selection_limit) || 3;
       document.getElementById('max-limit-display').textContent = adminEventLimit;

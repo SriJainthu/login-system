@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registration Successful </title>
+<title>Registration Successful- Symposium 2026 </title>
 <style>
   :root {
     --primary: #00c6ff;
@@ -204,7 +204,12 @@
   letter-spacing: 1px;
 }
 </style>
-
+<script>
+  fetch(`${API_BASE_URL}/api/public-settings`)
+    .then(r => r.json())
+    .then(d => { if (d?.symposium_title) document.title = `Registration Successful | ${d.symposium_title}`; })
+    .catch(() => {});
+</script>
 </head>
 <body>
 <div id="loader">
