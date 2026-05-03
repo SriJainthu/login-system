@@ -586,11 +586,11 @@ app.delete("/admin/delete-event", verifyAdmin, (req, res) => {
         res.json({ success: true });
     });
 });
-app.post('/admin/add-event',  verifyAdmin, (req, res) => {
-    const { name, description, type, max_team_size } = req.body;
-    if (!name || !type) return res.status(400).json({ success: false, error: "Missing fields" });
-    const sql = "INSERT INTO events (event_name, description, event_type, max_team_size) VALUES (?, ?, ?, ?)";
-    db.query(sql, [name, description, type, max_team_size], (err) => {
+app.post('/admin/add-event', verifyAdmin, (req, res) => {
+    const { name, description, type, category, max_team_size } = req.body;
+    if (!name || !type || !category) return res.status(400).json({ success: false, error: "Missing fields" });
+    const sql = "INSERT INTO events (event_name, description, event_type, event_category, max_team_size) VALUES (?, ?, ?, ?, ?)";
+    db.query(sql, [name, description, type, category, max_team_size], (err) => {
         if (err) return res.status(500).json({ success: false, error: err.sqlMessage });
         res.json({ success: true });
     });

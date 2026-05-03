@@ -1061,6 +1061,14 @@
           <option value="solo">Solo</option>
           <option value="group">Group</option>
         </select>
+        <!-- Add this AFTER the Type select group -->
+<div class="fg">
+    <label class="fg-label">Category</label>
+    <select id="newEventCategory">
+        <option value="technical">Technical</option>
+        <option value="non-technical">Non-Technical</option>
+    </select>
+</div>
       </div>
       <div class="fg" id="teamSizeGroup" style="display:none;">
         <label class="fg-label">Size</label>
@@ -1337,47 +1345,108 @@ function adminFetch(url, options = {}) {
 
 function logoutAdmin() { localStorage.removeItem("adminToken"); window.location.href = "admin-login.html"; }
 
-/* ─── EVENTS ─── */
 async function fetchEventsFromServer() {
-  try {
-    const res = await fetch(`${API_BASE_URL}/events`);
-    const data = await res.json();
-    eventsList = data.map(e => ({ name: e.event_name, desc: e.description, type: e.event_type, max_size: e.max_team_size }));
-    renderEvents();
-    loadStudents();
-  } catch (err) { console.error(err); }
+    try {
+        const res = await fetch(`${API_BASE_URL}/events`);
+        const data = await res.json();
+        eventsList = data.map(e => ({
+            name:     e.event_name,
+            desc:     e.description,
+            type:     e.event_type,
+            category: e.event_category || 'technical', // fallback
+            max_size: e.max_team_size
+        }));
+        renderEvents();
+        loadStudents();
+    } catch (err) { console.error(err); }
 }
-
 function renderEvents() {
-  const list = document.getElementById("addedEventsList");
-  const sel  = document.getElementById("event");
-  list.innerHTML = "";
-  sel.innerHTML = '<option value="">All Events</option>';
+    const list = document.getElementById("addedEventsList");
+    const sel  = document.getElementById("event");
+    list.innerHTML = "";
+    sel.innerHTML  = '<option value="">All Events</option>';
 
-  eventsList.forEach((e, i) => {
-    const div = document.createElement("div");
-    div.className = "event-item";
-    div.style.animationDelay = (i * 0.06) + 's';
-    div.innerHTML = `
-      <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
-          <span class="event-name">${e.name}</span>
-          <span class="event-badge ${e.type === 'group' ? 'badge-group' : 'badge-solo'}">${e.type}${e.type==='group'?' · '+e.max_size:''}</span>
-        </div>
-        <div class="event-desc">${e.desc}</div>
-      </div>
-      <button class="delete-event" onclick="openModal(${i})">×</button>`;
-    list.appendChild(div);
-    const opt = document.createElement("option");
-    opt.value = e.name; opt.textContent = e.name;
-    sel.appendChild(opt);
-  });
+    // Group by category
+    const technical    = eventsList.filter(e => e.category === 'technical');
+    const nonTechnical = eventsList.filter(e => e.category === 'non-technical');
 
-  const count = eventsList.length;
-  animateCounter(document.getElementById("stat-events"), count);
-  document.getElementById("eventCount").textContent = `${count} Event${count !== 1 ? 's' : ''}`;
+    function renderGroup(title, events, startIndex) {
+        if (events.length === 0) return;
+        const header = document.createElement("div");
+        header.style.cssText = `grid-column: 1/-1; font-family: var(--syne); font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 4px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 4px;`;
+        header.textContent = title;
+        list.appendChild(header);
+
+        events.forEach((e, i) => {
+            const globalIndex = eventsList.indexOf(e);
+            const div = document.createElement("div");
+            div.className = "event-item";
+            div.style.animationDelay = (i * 0.06) + 's';
+            div.innerHTML = `
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+                        <span class="event-name">${e.name}</span>
+                        <span class="event-badge ${e.type === 'group' ? 'badge-group' : 'badge-solo'}">${e.type}${e.type==='group'?' · '+e.max_size:''}</span>
+                        <span class="event-badge" style="background:${e.category==='technical'?'rgba(79,142,247,0.1)':'rgba(168,85,247,0.1)'}; color:${e.category==='technical'?'var(--accent2)':'#a855f7'}; border-color:${e.category==='technical'?'rgba(79,142,247,0.2)':'rgba(168,85,247,0.2)'};">${e.category === 'technical' ? '⚡ Tech' : '🎨 Non-Tech'}</span>
+                    </div>
+                    <div class="event-desc">${e.desc}</div>
+                </div>
+                <button class="delete-event" onclick="openModal(${globalIndex})">×</button>`;
+            list.appendChild(div);
+
+            const opt = document.createElement("option");
+            opt.value = e.name; opt.textContent = e.name;
+            sel.appendChild(opt);
+        });
+    }
+
+    // Add category groups to dropdown too
+    if (technical.length > 0) {
+        const optGroup1 = document.createElement("optgroup");
+        optGroup1.label = "⚡ Technical";
+        technical.forEach(e => {
+            const opt = document.createElement("option");
+            opt.value = e.name; opt.textContent = e.name;
+            optGroup1.appendChild(opt);
+        });
+        sel.appendChild(optGroup1);
+    }
+
+    if (nonTechnical.length > 0) {
+        const optGroup2 = document.createElement("optgroup");
+        optGroup2.label = "🎨 Non-Technical";
+        nonTechnical.forEach(e => {
+            const opt = document.createElement("option");
+            opt.value = e.name; opt.textContent = e.name;
+            optGroup2.appendChild(opt);
+        });
+        sel.appendChild(optGroup2);
+    }
+
+    // Clear and re-render without grouped optgroups in above code
+    // Render cards grouped
+    sel.innerHTML = '<option value="">All Events</option>';
+    renderGroup("⚡ Technical Events", technical);
+    renderGroup("🎨 Non-Technical Events", nonTechnical);
+
+    // Rebuild select with optgroups
+    if (technical.length > 0) {
+        const og1 = document.createElement("optgroup");
+        og1.label = "⚡ Technical";
+        technical.forEach(e => { const o = document.createElement("option"); o.value = e.name; o.textContent = e.name; og1.appendChild(o); });
+        sel.appendChild(og1);
+    }
+    if (nonTechnical.length > 0) {
+        const og2 = document.createElement("optgroup");
+        og2.label = "🎨 Non-Technical";
+        nonTechnical.forEach(e => { const o = document.createElement("option"); o.value = e.name; o.textContent = e.name; og2.appendChild(o); });
+        sel.appendChild(og2);
+    }
+
+    const count = eventsList.length;
+    animateCounter(document.getElementById("stat-events"), count);
+    document.getElementById("eventCount").textContent = `${count} Event${count !== 1 ? 's' : ''}`;
 }
-
 function applyFilterConstraints() {
   const sel  = eventsList.find(e => e.name === document.getElementById("event").value);
   const dept = document.getElementById("department");
@@ -1403,16 +1472,27 @@ function applyFilterConstraints() {
 }
 
 async function addEvent() {
-  const name = document.getElementById("newEventName").value.trim();
-  const desc = document.getElementById("newEventDesc").value.trim();
-  const type = document.getElementById("newEventType").value;
-  const size = type === 'solo' ? 1 : parseInt(document.getElementById("newEventSize").value);
-  if (!name || !desc) return alert("Fill event name and description");
-  try {
-    const r = await adminFetch(`${API_BASE_URL}/admin/add-event`, { method: "POST", body: JSON.stringify({ name, description: desc, type, max_team_size: size }) });
-    const d = await r.json();
-    if (d.success) { showToast("✓ Event added"); document.getElementById("newEventName").value = ""; document.getElementById("newEventDesc").value = ""; fetchEventsFromServer(); }
-  } catch { alert("Server error"); }
+    const name     = document.getElementById("newEventName").value.trim();
+    const desc     = document.getElementById("newEventDesc").value.trim();
+    const type     = document.getElementById("newEventType").value;
+    const category = document.getElementById("newEventCategory").value;
+    const size     = type === 'solo' ? 1 : parseInt(document.getElementById("newEventSize").value);
+
+    if (!name || !desc) return alert("Fill event name and description");
+
+    try {
+        const r = await adminFetch(`${API_BASE_URL}/admin/add-event`, {
+            method: "POST",
+            body: JSON.stringify({ name, description: desc, type, category, max_team_size: size })
+        });
+        const d = await r.json();
+        if (d.success) {
+            showToast("✓ Event added");
+            document.getElementById("newEventName").value = "";
+            document.getElementById("newEventDesc").value = "";
+            fetchEventsFromServer();
+        }
+    } catch { alert("Server error"); }
 }
 
 /* ─── LOAD STUDENTS ─── */

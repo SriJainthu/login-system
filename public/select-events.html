@@ -425,9 +425,10 @@
                     }
                 };
 
-                card.innerHTML = `
-                    <span class="indicator">✓</span>
-                    <h3>${eName}</h3>
+               card.innerHTML = `
+    <span class="indicator">✓</span>
+    <span style="font-size:9px; opacity:0.5; position:absolute; top:8px; left:10px;">${(event.event_category||'technical')==='technical'?'⚡':'🎨'}</span>
+    <h3>${eName}</h3>
                     ${isGroup ? `
                     <div class="team-code-container">
                         <label>Join Team (Leave blank if Leader)</label>
@@ -443,8 +444,24 @@
                     </div>` : ''}
                 `;
 
-                if (isGroup) groupContainer.appendChild(card);
-                else soloContainer.appendChild(card);
+                // Get or create category sub-sections
+const cat = (event.event_category || 'technical');
+const targetContainer = isGroup ? groupContainer : soloContainer;
+
+// Add a section header if this is the first of this category in this container
+const sectionId = `section_${isGroup ? 'group' : 'solo'}_${cat}`;
+let section = document.getElementById(sectionId);
+if (!section) {
+    section = document.createElement('div');
+    section.id = sectionId;
+    section.style.cssText = 'margin-bottom: 12px;';
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#aaa; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.08);';
+    label.textContent = cat === 'technical' ? '⚡ Technical' : '🎨 Non-Technical';
+    section.appendChild(label);
+    targetContainer.appendChild(section);
+}
+section.appendChild(card);
             });
 
         } else {
