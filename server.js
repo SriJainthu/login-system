@@ -513,8 +513,9 @@ app.post("/admin/login", (req, res) => {
     }
 });
 
+// Find this in your /admin/students route and replace:
 app.get("/admin/students", verifyAdmin, (req, res) => {
-    const { year, department, college, event, reg_no } = req.query;
+    const { year, department, college, event, reg_no, degree, level } = req.query;
     
     let sql = `
         SELECT 
@@ -524,6 +525,8 @@ app.get("/admin/students", verifyAdmin, (req, res) => {
             s.department, 
             s.year, 
             s.phone,
+            s.degree,
+            s.level,
             COALESCE(GROUP_CONCAT(DISTINCT e.event_name SEPARATOR ', '), 'None') AS events
         FROM students s
         LEFT JOIN student_events se ON s.id = se.student_id
@@ -531,17 +534,19 @@ app.get("/admin/students", verifyAdmin, (req, res) => {
         WHERE 1=1 `;
 
     const params = [];
-    if (reg_no) { sql += " AND s.reg_no = ?"; params.push(reg_no); }
-    if (year) { sql += " AND s.year = ?"; params.push(year); }
-    if (department) { sql += " AND s.department = ?"; params.push(department); }
-    if (college) { sql += " AND s.college = ?"; params.push(college); }
-    if (event) { sql += " AND e.event_name = ?"; params.push(event); }
+    if (reg_no)     { sql += " AND s.reg_no = ?";       params.push(reg_no); }
+    if (year)       { sql += " AND s.year = ?";         params.push(year); }
+    if (department) { sql += " AND s.department = ?";   params.push(department); }
+    if (college)    { sql += " AND s.college = ?";      params.push(college); }
+    if (event)      { sql += " AND e.event_name = ?";   params.push(event); }
+    if (degree)     { sql += " AND s.degree = ?";       params.push(degree); }
+    if (level)      { sql += " AND s.level = ?";        params.push(level); }
 
     sql += " GROUP BY s.id ORDER BY s.id DESC";
 
     db.query(sql, params, (err, rows) => {
         if (err) return res.status(500).json({ error: "Load failed" });
-        res.json(rows); // Now 'rows' contains keys like 'name' and 'events'
+        res.json(rows);
     });
 });
 
