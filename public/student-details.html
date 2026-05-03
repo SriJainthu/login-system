@@ -431,6 +431,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Deadline sync failed:", error);
     }
 });
+async function loadNavbarTitle() {
+    try {
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : 'https://login-system-1-nowr.onrender.com';
+        
+        const res = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const data = await res.json();
+        
+        if (data && data.symposium_title) {
+            // Update navbar logo text
+            const logoEl = document.querySelector('.logo');
+            if (logoEl) {
+                // Split title smartly — e.g. "QUBIT' 26" → "QUBIT'" + "26"
+                const title = data.symposium_title;
+                const parts = title.split(/(\d{2,4})/); // splits on year numbers
+                if (parts.length >= 2) {
+                    const mainPart = parts[0].trim();
+                    const yearPart = parts[1].trim();
+                    logoEl.innerHTML = `${mainPart} <span>${yearPart}</span>`;
+                } else {
+                    logoEl.innerHTML = `${title.slice(0,-2)} <span>${title.slice(-2)}</span>`;
+                }
+            }
+        }
+    } catch(err) {
+        console.error("Navbar title load failed:", err);
+        // Fallback — keep existing hardcoded text
+    }
+}
+
+loadNavbarTitle();
+
 </script>
 </body>
 </html>
