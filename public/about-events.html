@@ -455,6 +455,101 @@
       .wrapper { padding: 36px 16px 60px; }
       .navbar { padding: 18px 20px; }
     }
+    /* ── STICKY FOOTER CTA ── */
+.cta-footer {
+    position: fixed;
+    bottom: 0; left: 0; width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    background: rgba(10, 20, 25, 0.92);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(0, 198, 255, 0.15);
+    z-index: 9000;
+    gap: 20px;
+    animation: slideUpBar 0.6s 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes slideUpBar {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.cta-quote {
+    font-size: 14px;
+    color: #aaa;
+    font-style: italic;
+    margin: 0;
+    flex: 1;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.cta-quote.fade-out {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+/* THE BUTTON — matches your screenshot */
+.cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 36px;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #00d4ff, #00a8ff, #0077ff);
+    color: #fff;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    box-shadow:
+        0 0 20px rgba(0, 198, 255, 0.6),
+        0 0 40px rgba(0, 198, 255, 0.3),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer sweep on the button */
+.cta-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    animation: btnShimmer 2.5s infinite;
+}
+
+@keyframes btnShimmer {
+    0%   { left: -100%; }
+    100% { left: 200%; }
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow:
+        0 0 30px rgba(0, 198, 255, 0.8),
+        0 0 60px rgba(0, 198, 255, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.cta-btn:active { transform: scale(0.97); }
+
+/* Push page content above the bar */
+body { padding-bottom: 80px; }
+
+@media (max-width: 600px) {
+    .cta-footer { flex-direction: column; padding: 14px 20px; gap: 10px; text-align: center; }
+    .cta-quote  { font-size: 12px; }
+    body { padding-bottom: 110px; }
+}
   </style>
 </head>
 <body>
@@ -522,7 +617,11 @@
       </div>
     </div>
   </div>
-
+<!-- STICKY FOOTER CTA -->
+<div class="cta-footer" id="ctaFooter">
+  <p class="cta-quote" id="ctaQuote">⏳ The clock is ticking — grab your spot!</p>
+  <a href="student-details.html" class="cta-btn">Register Now</a>
+</div>
 </main>
 
 <script>
@@ -663,7 +762,28 @@
         </div>`;
     }
   }
+/* ── ROTATING QUOTES ── */
+const quotes = [
+    "⏳ The clock is ticking — grab your spot!",
+    "🚀 Every champion started by signing up.",
+    "💡 Your next big win starts with one click.",
+    "🎯 Don't watch from the sidelines — compete!",
+    "🔥 Seats are limited. Regrets are not.",
+    "⚡ Winners register early. Are you one?",
+    "🎓 This is your moment. Don't scroll past it.",
+];
 
+let quoteIndex = 0;
+const quoteEl = document.getElementById("ctaQuote");
+
+setInterval(() => {
+    quoteEl.classList.add("fade-out");
+    setTimeout(() => {
+        quoteIndex = (quoteIndex + 1) % quotes.length;
+        quoteEl.textContent = quotes[quoteIndex];
+        quoteEl.classList.remove("fade-out");
+    }, 500);
+}, 3500);
   loadNavbarTitle();
   loadEvents();
 </script>
