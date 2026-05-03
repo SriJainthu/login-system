@@ -4,152 +4,120 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Events - Symposium 2026</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  <style>
     :root {
-      --primary:  #00c6ff;
-      --accent:   #00ffae;
-      --tech:     #4f8ef7;
-      --nontech:  #a855f7;
-      --warn:     #fbbf24;
-      --bg:       #0a1520;
-      --surface:  rgba(255,255,255,0.04);
-      --border:   rgba(255,255,255,0.07);
-      --text:     #e8f0f8;
-      --muted:    #5a7080;
-      --label:    #8899a8;
-      --ease:     cubic-bezier(0.23, 1, 0.32, 1);
+      --primary-blue: #00c6ff;
+      --dark-bg: #0f2027;
+      --glass-bg: rgba(255, 255, 255, 0.07);
+      --error-red: #ff4b2b;
+      --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      --tech:    #4f8ef7;
+      --nontech: #a855f7;
+      --warn:    #fbbf24;
+      --surface: rgba(255,255,255,0.07);
+      --border:  rgba(255,255,255,0.1);
+      --text:    #ffffff;
+      --muted:   #8899a8;
+      --label:   #aaaaaa;
+      --ease:    cubic-bezier(0.23, 1, 0.32, 1);
     }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
-      padding-top: 72px;
+      padding-top: 80px;
     }
 
-    /* ── ANIMATED BG ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 80% 0%, rgba(0,198,255,0.07) 0%, transparent 55%),
-        radial-gradient(ellipse at 20% 80%, rgba(168,85,247,0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(10,21,32,1) 0%, rgba(7,14,24,1) 100%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── NAVBAR ── */
+    /* ── NAVBAR (matches student-details.html) ── */
     .navbar {
       position: fixed;
       top: 0; left: 0; width: 100%;
-      height: 72px;
-      padding: 0 32px;
+      padding: 20px 40px;
       display: flex;
       align-items: center;
-      gap: 18px;
-      z-index: 1000;
-      background: rgba(10,21,32,0.8);
-      backdrop-filter: blur(20px) saturate(180%);
-      border-bottom: 1px solid var(--border);
+      gap: 20px;
+      z-index: 10001;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      box-sizing: border-box;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .logo {
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text);
-      transition: opacity 0.4s;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      transition: opacity 0.4s ease;
     }
+    .logo span { color: var(--primary-blue); }
+    .logo.loading {
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.1) 25%,
+        rgba(255,255,255,0.2) 50%,
+        rgba(255,255,255,0.1) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+      min-width: 120px;
+      display: inline-block;
+    }
+    .logo.loading span { color: transparent !important; }
 
-    .logo span { color: var(--primary); }
-    .logo.loading { opacity: 0.4; }
+    .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+    .bar { width: 25px; height: 2px; background-color: var(--primary-blue); margin: 5px 0; transition: 0.4s; }
+    .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+    .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
 
-    .menu-toggle { cursor: pointer; flex-shrink: 0; }
-    .bar { width: 22px; height: 2px; background: var(--primary); margin: 5px 0; transition: 0.35s var(--ease); border-radius: 2px; }
-    .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background: #fff; }
-    .menu-toggle.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background: #fff; }
-
-    /* ── SIDE MENU ── */
+    /* ── SIDE MENU (matches student-details.html) ── */
     .nav-overlay {
+      height: 100vh;
+      width: 280px;
       position: fixed;
+      z-index: 10000;
       top: 0; left: 0;
-      width: 280px; height: 100vh;
-      background: #060e16;
-      border-right: 1px solid rgba(0,198,255,0.15);
+      background: #0a1419;
+      border-right: 1px solid var(--primary-blue);
       transform: translateX(-100%);
-      transition: transform 0.4s var(--ease);
-      z-index: 999;
+      transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
     }
-
     .nav-overlay.open { transform: translateX(0); }
 
     .overlay-content {
-      padding: 100px 28px 40px;
+      padding: 120px 30px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 10px;
     }
 
     .nav-item {
       text-decoration: none;
-      padding: 14px 16px;
-      border-radius: 12px;
+      padding: 15px 0;
       display: block;
-      transition: background 0.2s;
+      transition: 0.3s;
     }
 
-    .nav-item:hover, .nav-item.active { background: rgba(0,198,255,0.06); }
+    .nav-number { font-size: 10px; color: var(--primary-blue); font-weight: bold; margin-bottom: 5px; display: block; }
+    .nav-text { color: #ffffff; font-size: 18px; font-weight: 600; transition: 0.3s; }
+    .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
 
-    .nav-number {
-      font-family: 'Syne', sans-serif;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      color: var(--primary);
-      text-transform: uppercase;
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .nav-text {
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--label);
-      transition: color 0.2s, transform 0.2s;
-      display: block;
-    }
-
-    .nav-text small {
-      display: block;
-      font-size: 10px;
-      font-weight: 400;
-      color: var(--muted);
-      margin-top: 2px;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .nav-item:hover .nav-text { color: var(--text); transform: translateX(4px); }
-    .nav-item.active .nav-text { color: var(--primary); }
+    .nav-item:hover .nav-text,
+    .nav-item.active .nav-text { color: #4fdcff; transform: translateX(10px); }
+    .nav-item.active .nav-text { color: var(--primary-blue); }
 
     /* ── MAIN WRAPPER ── */
     .wrapper {
-      position: relative;
-      z-index: 1;
-      max-width: 1240px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 52px 28px 80px;
     }
@@ -157,7 +125,7 @@
     /* ── PAGE HEADER ── */
     .page-header {
       text-align: center;
-      margin-bottom: 64px;
+      margin-bottom: 56px;
       animation: fadeUp 0.7s var(--ease) both;
     }
 
@@ -167,12 +135,11 @@
     }
 
     .page-eyebrow {
-      font-family: 'Syne', sans-serif;
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--primary);
+      color: var(--primary-blue);
       margin-bottom: 14px;
       display: flex;
       align-items: center;
@@ -183,27 +150,25 @@
     .page-eyebrow::before, .page-eyebrow::after {
       content: '';
       width: 32px; height: 1px;
-      background: var(--primary);
+      background: var(--primary-blue);
       opacity: 0.5;
     }
 
     .page-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 48px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1;
+      font-size: 42px;
+      font-weight: 300;
+      letter-spacing: 1px;
       color: var(--text);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
-    .page-title em {
-      font-style: normal;
-      color: var(--primary);
+    .page-title span {
+      color: var(--primary-blue);
+      font-weight: 700;
     }
 
     .page-sub {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--muted);
       font-weight: 300;
       max-width: 500px;
@@ -213,10 +178,9 @@
 
     /* ── CATEGORY SECTION ── */
     .category-section {
-      margin-bottom: 64px;
+      margin-bottom: 56px;
       animation: fadeUp 0.7s var(--ease) both;
     }
-
     .category-section:nth-child(2) { animation-delay: 0.1s; }
     .category-section:nth-child(3) { animation-delay: 0.2s; }
 
@@ -224,8 +188,8 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      margin-bottom: 28px;
-      padding-bottom: 18px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
       border-bottom: 1px solid var(--border);
     }
 
@@ -240,36 +204,30 @@
     }
 
     .cat-tech .category-icon {
-      background: rgba(79,142,247,0.12);
-      border: 1px solid rgba(79,142,247,0.25);
+      background: rgba(79,142,247,0.15);
+      border: 1px solid rgba(79,142,247,0.3);
     }
 
     .cat-nontech .category-icon {
-      background: rgba(168,85,247,0.12);
-      border: 1px solid rgba(168,85,247,0.25);
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.3);
     }
 
     .category-info { flex: 1; }
 
     .category-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .cat-tech .category-name { color: var(--tech); }
+    .cat-tech .category-name    { color: var(--tech); }
     .cat-nontech .category-name { color: var(--nontech); }
 
-    .category-desc {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
+    .category-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
     .category-count {
-      font-family: 'Syne', sans-serif;
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.1em;
@@ -280,34 +238,37 @@
     .cat-tech .category-count {
       background: rgba(79,142,247,0.1);
       color: var(--tech);
-      border: 1px solid rgba(79,142,247,0.2);
+      border: 1px solid rgba(79,142,247,0.25);
     }
 
     .cat-nontech .category-count {
       background: rgba(168,85,247,0.1);
       color: var(--nontech);
-      border: 1px solid rgba(168,85,247,0.2);
+      border: 1px solid rgba(168,85,247,0.25);
     }
 
     /* ── EVENTS GRID ── */
     .events-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 18px;
     }
 
-    /* ── EVENT CARD ── */
+    /* ── EVENT CARD (glass style matching student-details) ── */
     .event-card {
-      background: var(--surface);
+      background: var(--glass-bg);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 28px;
       position: relative;
       overflow: hidden;
-      cursor: default;
       opacity: 0;
       transform: translateY(20px);
-      transition: border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+      transition: border-color 0.3s var(--ease),
+                  background 0.3s var(--ease),
+                  transform 0.35s var(--ease),
+                  box-shadow 0.35s var(--ease);
+      backdrop-filter: blur(10px);
     }
 
     .event-card.show {
@@ -315,7 +276,7 @@
       transform: translateY(0);
     }
 
-    /* Top accent line */
+    /* Top accent bar */
     .event-card::before {
       content: '';
       position: absolute;
@@ -326,7 +287,7 @@
     }
 
     .cat-tech .event-card::before {
-      background: linear-gradient(90deg, var(--tech), var(--primary));
+      background: linear-gradient(90deg, var(--tech), var(--primary-blue));
     }
 
     .cat-nontech .event-card::before {
@@ -338,11 +299,18 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
 
-    .cat-tech .event-card:hover { border-color: rgba(79,142,247,0.4); background: rgba(79,142,247,0.04); }
-    .cat-nontech .event-card:hover { border-color: rgba(168,85,247,0.4); background: rgba(168,85,247,0.04); }
+    .cat-tech .event-card:hover {
+      border-color: rgba(79,142,247,0.5);
+      background: rgba(79,142,247,0.05);
+    }
+
+    .cat-nontech .event-card:hover {
+      border-color: rgba(168,85,247,0.5);
+      background: rgba(168,85,247,0.05);
+    }
+
     .event-card:hover::before { opacity: 1; }
 
-    /* Card top row */
     .card-top {
       display: flex;
       align-items: flex-start;
@@ -352,13 +320,12 @@
     }
 
     .event-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       color: var(--text);
-      line-height: 1.2;
+      line-height: 1.25;
     }
 
     .event-badges {
@@ -370,19 +337,18 @@
     }
 
     .badge {
-      font-family: 'Syne', sans-serif;
-      font-size: 8px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      padding: 3px 9px;
-      border-radius: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
       white-space: nowrap;
     }
 
-    .badge-solo   { background: rgba(0,229,190,0.1); color: #00e5be; border: 1px solid rgba(0,229,190,0.2); }
-    .badge-group  { background: rgba(251,191,36,0.1); color: var(--warn); border: 1px solid rgba(251,191,36,0.2); }
-    .badge-team   { background: rgba(255,255,255,0.06); color: var(--label); border: 1px solid var(--border); }
+    .badge-solo  { background: rgba(0,198,255,0.12); color: var(--primary-blue); border: 1px solid rgba(0,198,255,0.25); }
+    .badge-group { background: rgba(251,191,36,0.12); color: var(--warn); border: 1px solid rgba(251,191,36,0.25); }
+    .badge-team  { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
 
     .event-desc {
       font-size: 13px;
@@ -403,9 +369,8 @@
     .footer-item {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-family: 'Syne', sans-serif;
-      font-size: 9px;
+      gap: 6px;
+      font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -421,27 +386,27 @@
     .cat-nontech .footer-dot { background: var(--nontech); }
 
     /* ── SKELETON ── */
-    .skeleton-section { margin-bottom: 56px; animation: fadeUp 0.5s var(--ease) both; }
+    .skeleton-section { margin-bottom: 48px; animation: fadeUp 0.5s var(--ease) both; }
 
     .skeleton-header {
       height: 56px;
-      background: var(--surface);
+      background: var(--glass-bg);
       border-radius: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       overflow: hidden;
       position: relative;
     }
 
     .skeleton-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 18px;
     }
 
     .skeleton-card {
-      height: 160px;
-      background: var(--surface);
-      border-radius: 18px;
+      height: 155px;
+      background: var(--glass-bg);
+      border-radius: 20px;
       overflow: hidden;
       position: relative;
     }
@@ -450,7 +415,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
       animation: shimmer 1.4s infinite;
     }
 
@@ -465,32 +430,30 @@
       padding: 80px 24px;
       color: var(--muted);
     }
-
     .empty-state p { font-size: 14px; margin-top: 8px; }
 
     .retry-btn {
       margin-top: 20px;
-      padding: 10px 24px;
-      background: rgba(0,198,255,0.1);
-      color: var(--primary);
-      border: 1px solid rgba(0,198,255,0.25);
-      border-radius: 10px;
-      font-family: 'Syne', sans-serif;
-      font-size: 10px;
+      padding: 12px 28px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: var(--transition);
     }
-
-    .retry-btn:hover { background: rgba(0,198,255,0.2); }
+    .retry-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,198,255,0.3); }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      .page-title { font-size: 32px; }
+      .page-title { font-size: 28px; }
       .events-grid { grid-template-columns: 1fr; }
-      .wrapper { padding: 40px 16px 60px; }
+      .wrapper { padding: 36px 16px 60px; }
+      .navbar { padding: 18px 20px; }
     }
   </style>
 </head>
@@ -537,13 +500,12 @@
 
   <div class="page-header">
     <div class="page-eyebrow">Symposium 2026</div>
-    <h1 class="page-title">Event <em>Catalog</em></h1>
+    <h1 class="page-title">Event <span>Catalog</span></h1>
     <p class="page-sub">Explore all technical and non-technical competitions and challenges</p>
   </div>
 
-  <!-- Content injected by JS -->
   <div id="eventsContent">
-    <!-- Skeleton -->
+    <!-- Skeleton loader -->
     <div class="skeleton-section">
       <div class="skeleton-header"></div>
       <div class="skeleton-grid">
@@ -568,41 +530,53 @@
     ? 'http://localhost:3000'
     : 'https://login-system-1-nowr.onrender.com';
 
-  /* ── NAV MENU ── */
-  const menuToggle = document.getElementById("menuToggle");
-  const sideMenu   = document.getElementById("sideMenu");
+  /* ── MENU ── */
+  const menuToggle = document.getElementById('menuToggle');
+  const sideMenu   = document.getElementById('sideMenu');
 
-  menuToggle.addEventListener("click", e => {
+  menuToggle.addEventListener('click', e => {
     e.stopPropagation();
-    sideMenu.classList.toggle("open");
-    menuToggle.classList.toggle("open");
+    sideMenu.classList.toggle('open');
+    menuToggle.classList.toggle('open');
   });
 
-  document.addEventListener("click", e => {
-    if (sideMenu.classList.contains("open") && !sideMenu.contains(e.target) && !menuToggle.contains(e.target)) {
-      sideMenu.classList.remove("open");
-      menuToggle.classList.remove("open");
+  document.addEventListener('click', e => {
+    if (sideMenu.classList.contains('open') &&
+        !sideMenu.contains(e.target) &&
+        !menuToggle.contains(e.target)) {
+      sideMenu.classList.remove('open');
+      menuToggle.classList.remove('open');
     }
   });
 
-  /* ── NAVBAR TITLE ── */
+  /* ── NAVBAR TITLE (matches student-details.html) ── */
   async function loadNavbarTitle() {
     const logoEl = document.getElementById('navLogo');
+    if (!logoEl) return;
     logoEl.classList.add('loading');
     try {
       const res  = await fetch(`${API_BASE_URL}/api/public-settings`);
       const data = await res.json();
-      if (data?.symposium_title) {
+      if (data && data.symposium_title) {
         const parts = data.symposium_title.split(/(\d{2,4})/);
-        logoEl.innerHTML = parts.length >= 2
-          ? `${parts[0].trim()} <span>${parts[1].trim()}</span>`
-          : data.symposium_title;
+        logoEl.classList.remove('loading');
+        logoEl.style.opacity = '0';
+        logoEl.style.transition = 'opacity 0.5s ease';
+        if (parts.length >= 2) {
+          logoEl.innerHTML = `${parts[0].trim()} <span>${parts[1].trim()}</span>`;
+        } else {
+          logoEl.textContent = data.symposium_title;
+        }
+        requestAnimationFrame(() => { logoEl.style.opacity = '1'; });
+      } else {
+        logoEl.classList.remove('loading');
       }
-    } catch {}
-    logoEl.classList.remove('loading');
+    } catch {
+      logoEl.classList.remove('loading');
+    }
   }
 
-  /* ── BUILD CARD HTML ── */
+  /* ── BUILD CARD ── */
   function buildCard(event, catClass) {
     const isGroup  = event.event_type === 'group';
     const teamSize = event.max_team_size || 1;
@@ -627,13 +601,11 @@
       </div>`;
   }
 
-  /* ── BUILD SECTION HTML ── */
+  /* ── BUILD SECTION ── */
   function buildSection(catClass, icon, title, desc, events) {
     if (events.length === 0) return '';
-
     const countLabel = `${events.length} Event${events.length !== 1 ? 's' : ''}`;
     const cardsHtml  = events.map(e => buildCard(e, catClass)).join('');
-
     return `
       <div class="category-section ${catClass}">
         <div class="category-header">
@@ -657,10 +629,10 @@
 
   /* ── LOAD EVENTS ── */
   async function loadEvents() {
-    const content = document.getElementById("eventsContent");
+    const content = document.getElementById('eventsContent');
     try {
       const res    = await fetch(`${API_BASE_URL}/events`);
-      if (!res.ok) throw new Error("Server error");
+      if (!res.ok) throw new Error('Server error');
       const events = await res.json();
 
       if (!events || events.length === 0) {
