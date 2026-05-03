@@ -1400,48 +1400,31 @@ function renderEvents() {
         });
     }
 
-    // Add category groups to dropdown too
-    if (technical.length > 0) {
-        const optGroup1 = document.createElement("optgroup");
-        optGroup1.label = "⚡ Technical";
-        technical.forEach(e => {
-            const opt = document.createElement("option");
-            opt.value = e.name; opt.textContent = e.name;
-            optGroup1.appendChild(opt);
-        });
-        sel.appendChild(optGroup1);
-    }
+   // Render event cards grouped by category
+renderGroup("⚡ Technical Events", technical);
+renderGroup("🎨 Non-Technical Events", nonTechnical);
 
-    if (nonTechnical.length > 0) {
-        const optGroup2 = document.createElement("optgroup");
-        optGroup2.label = "🎨 Non-Technical";
-        nonTechnical.forEach(e => {
-            const opt = document.createElement("option");
-            opt.value = e.name; opt.textContent = e.name;
-            optGroup2.appendChild(opt);
-        });
-        sel.appendChild(optGroup2);
-    }
-
-    // Clear and re-render without grouped optgroups in above code
-    // Render cards grouped
-    sel.innerHTML = '<option value="">All Events</option>';
-    renderGroup("⚡ Technical Events", technical);
-    renderGroup("🎨 Non-Technical Events", nonTechnical);
-
-    // Rebuild select with optgroups
-    if (technical.length > 0) {
-        const og1 = document.createElement("optgroup");
-        og1.label = "⚡ Technical";
-        technical.forEach(e => { const o = document.createElement("option"); o.value = e.name; o.textContent = e.name; og1.appendChild(o); });
-        sel.appendChild(og1);
-    }
-    if (nonTechnical.length > 0) {
-        const og2 = document.createElement("optgroup");
-        og2.label = "🎨 Non-Technical";
-        nonTechnical.forEach(e => { const o = document.createElement("option"); o.value = e.name; o.textContent = e.name; og2.appendChild(o); });
-        sel.appendChild(og2);
-    }
+// Build dropdown with optgroups (single pass, no duplicates)
+if (technical.length > 0) {
+    const og1 = document.createElement("optgroup");
+    og1.label = "⚡ Technical";
+    technical.forEach(e => {
+        const o = document.createElement("option");
+        o.value = e.name; o.textContent = e.name;
+        og1.appendChild(o);
+    });
+    sel.appendChild(og1);
+}
+if (nonTechnical.length > 0) {
+    const og2 = document.createElement("optgroup");
+    og2.label = "🎨 Non-Technical";
+    nonTechnical.forEach(e => {
+        const o = document.createElement("option");
+        o.value = e.name; o.textContent = e.name;
+        og2.appendChild(o);
+    });
+    sel.appendChild(og2);
+}
 
     const count = eventsList.length;
     animateCounter(document.getElementById("stat-events"), count);
