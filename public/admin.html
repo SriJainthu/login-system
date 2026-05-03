@@ -1740,11 +1740,16 @@ async function addDepartment() {
 }
 
 async function deleteDepartment(name) {
-  if (!confirm(`Delete department "${name}"?`)) return;
-  const r = await adminFetch(`${API_BASE_URL}/admin/delete-department?name=${encodeURIComponent(name)}`, { method:"DELETE" });
-  if (r.ok) { showToast("✓ Department deleted"); loadDepartmentsAndDegrees(); populateFilterDropdowns(); }
+    document.getElementById("modalIcon").textContent = "🗑";
+    document.getElementById("modalTitle").textContent = "Delete Department?";
+    document.getElementById("modalBody").textContent = `Delete "${name}"? This cannot be undone.`;
+    document.getElementById("adminPasswordInput").style.display = "none";
+    document.getElementById("modalConfirmBtn").onclick = async () => {
+        const r = await adminFetch(`${API_BASE_URL}/admin/delete-department?name=${encodeURIComponent(name)}`, { method: "DELETE" });
+        if (r.ok) { showToast("✓ Department deleted"); closeModal(); loadDepartmentsAndDegrees(); populateFilterDropdowns(); }
+    };
+    document.getElementById("confirmModal").classList.add("active");
 }
-
 async function addDegree() {
   const name  = document.getElementById("newDegreeName").value.trim();
   const level = document.getElementById("newDegreeLevel").value;
@@ -1756,11 +1761,16 @@ async function addDegree() {
 }
 
 async function deleteDegree(id) {
-  if (!confirm("Delete this degree?")) return;
-  const r = await adminFetch(`${API_BASE_URL}/admin/delete-degree?id=${id}`, { method:"DELETE" });
-  if (r.ok) { showToast("✓ Degree deleted"); loadDepartmentsAndDegrees(); populateFilterDropdowns(); }
+    document.getElementById("modalIcon").textContent = "🗑";
+    document.getElementById("modalTitle").textContent = "Delete Degree?";
+    document.getElementById("modalBody").textContent = "Delete this degree? This cannot be undone.";
+    document.getElementById("adminPasswordInput").style.display = "none";
+    document.getElementById("modalConfirmBtn").onclick = async () => {
+        const r = await adminFetch(`${API_BASE_URL}/admin/delete-degree?id=${id}`, { method: "DELETE" });
+        if (r.ok) { showToast("✓ Degree deleted"); closeModal(); loadDepartmentsAndDegrees(); populateFilterDropdowns(); }
+    };
+    document.getElementById("confirmModal").classList.add("active");
 }
-
 /* ─── TOAST ─── */
 let toastTimer;
 function showToast(msg) {
