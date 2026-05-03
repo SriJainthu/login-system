@@ -1622,6 +1622,46 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 3200);
 }
+function renderStandardRows(data) {
+    const tbody = document.getElementById("studentTable");
+    tbody.innerHTML = "";
+    const total = data.length;
+    animateCounter(document.getElementById("stat-total"), total);
+    document.getElementById("tableCount").textContent = `${total} record${total !== 1 ? 's' : ''}`;
+
+    // ✅ ADD THIS — Calculate Top College
+    if (data.length > 0) {
+        const collegeCounts = {};
+        data.forEach(s => {
+            const name = s.college?.trim();
+            if (name) collegeCounts[name] = (collegeCounts[name] || 0) + 1;
+        });
+        const topCollege = Object.entries(collegeCounts)
+            .sort((a, b) => b[1] - a[1])[0];
+        
+        const collegeEl = document.getElementById("stat-college");
+        if (topCollege) {
+            // Shorten long college names for display
+            const shortName = topCollege[0].length > 20 
+                ? topCollege[0].substring(0, 18) + '…' 
+                : topCollege[0];
+            collegeEl.textContent = shortName;
+            collegeEl.title = topCollege[0]; // Full name on hover
+        }
+    } else {
+        document.getElementById("stat-college").textContent = "—";
+    }
+
+    // existing row rendering below — keep this unchanged
+    data.forEach((s, i) => {
+        const row = tbody.insertRow();
+        row.style.animationDelay = (i * 0.03) + 's';
+        const events = (s.events && s.events !== 'None') 
+            ? s.events.split(', ').map(ev => `<span class="epill">${ev}</span>`).join('') 
+            : '<span style="color:var(--muted);font-size:11px;">—</span>';
+        row.innerHTML = `<td class="td-name">${s.name}</td><td class="td-mono">${s.reg_no}</td><td>${s.college}</td><td>${s.department}</td><td class="td-mono">${s.year}</td><td>${events}</td>`;
+    });
+}
 
 /* ─── INIT ─── */
 document.addEventListener("DOMContentLoaded", () => { loadAdminSettings(); fetchEventsFromServer(); });
