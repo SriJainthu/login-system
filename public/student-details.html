@@ -188,15 +188,19 @@
     color: #999;
 }
         
-        .input-field label {
-            position: absolute; top: 14px; left: 14px; pointer-events: none;
-            transition: 0.3s; color: #999; font-size: 15px;
-        }
-
-        .input-field input:focus + label,
-        .input-field input:not(:placeholder-shown) + label {
-            top: -22px; left: 5px; font-size: 12px; color: var(--primary-blue);
-        }
+      .input-field label {
+    position: absolute; top: 50%; left: 14px; pointer-events: none;
+    transform: translateY(-50%);
+    transition: 0.3s; color: #999; font-size: 15px;
+}
+       .input-field input:focus + label,
+.input-field input:not(:placeholder-shown) + label {
+    top: -22px;
+    left: 5px;
+    font-size: 12px;
+    color: var(--primary-blue);
+    transform: translateY(0);
+}
 
         /* BUTTON FAST TRANSITION */
         button {
