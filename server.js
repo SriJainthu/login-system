@@ -186,24 +186,8 @@ app.post("/register/send-otp", async (req, res) => {
                 </p>
                 <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;">
                     <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
-                 <div style="display:inline-flex; gap:6px; justify-content:center; flex-wrap:nowrap; max-width:100%;">
-  ${otp.split('').map(digit => `
-    <div style="
-      width: 36px;
-      height: 50px;
-      background: rgba(0,198,255,0.08);
-      border: 1px solid rgba(0,198,255,0.3);
-      border-radius: 10px;
-      text-align: center;
-      line-height: 50px;
-      font-size: 24px;
-      font-weight: 800;
-      color: #ffffff;
-      font-family: 'Courier New', monospace;
-      text-shadow: 0 0 15px rgba(0,198,255,0.6);
-      flex-shrink: 0;
-    ">${digit}</div>
-  `).join('')}
+              <div style="font-size: 42px; font-weight: 800; letter-spacing: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; display: block; padding: 10px 0; user-select: all; -webkit-user-select: all;">
+    ${otp}
 </div>
                 </div>
                 <p style="color: #556a75; font-size: 12px; line-height: 1.6;">
@@ -608,9 +592,9 @@ await sendSymposiumEmail({
                 To access your live registration status and digital pass for ${sympTitle}, please use the secure verification code below:
             </p>
             <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;"><span style="display: block; color: #00ffae; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 18px; font-weight: 800;">Your Verification Code</span>  <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
-                <div style="font-size: 48px; font-weight: 800; letter-spacing: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; display: inline-block; padding: 10px; border-radius: 8px; cursor: pointer; user-select: all; -webkit-user-select: all;">
-                    ${otp}
-                </div>
+               <div style="font-size: 42px; font-weight: 800; letter-spacing: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; display: block; padding: 10px 0; user-select: all; -webkit-user-select: all;">
+    ${otp}
+</div>
             </div>
             <p style="color: #556a75; font-size: 12px; line-height: 1.6;">
                 This code is valid for <strong>10 minutes</strong>.<br>
