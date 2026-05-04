@@ -457,9 +457,10 @@ function checkFormCompletion() {
     } else {
         btn.disabled = false; // keep enabled so click works for the warning
         btn.style.background = "#2a3a40";
-        btn.style.opacity = "0.6";
+        btn.style.opacity = "1"; // keep visible
         btn.style.boxShadow = "none";
-        btn.style.cursor = "not-allowed";
+        btn.style.filter = "grayscale(60%) brightness(0.8)";
+btn.style.cursor = "not-allowed";
         btn.dataset.ready = "false";
     }
 }
