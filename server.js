@@ -653,9 +653,20 @@ app.get("/registration/:reg_no", async (req, res) => {
         if (students.length === 0) return res.status(404).json({ message: "Not found" });
         const student = students[0];
         const [events] = await promiseDb.query(`
-            SELECT e.event_name, se.team_token,
-            (SELECT GROUP_CONCAT(s2.name SEPARATOR ', ') FROM student_events se2 JOIN students s2 ON se2.student_id = s2.id WHERE se2.team_token = se.team_token AND se2.event_id = se.event_id) AS team_members
-            FROM student_events se JOIN events e ON se.event_id = e.id WHERE se.student_id = ?`, [student.id]);
+    SELECT 
+        e.event_name, 
+        e.event_category,
+        e.event_type,
+        se.team_token,
+        (SELECT GROUP_CONCAT(s2.name SEPARATOR ', ') 
+         FROM student_events se2 
+         JOIN students s2 ON se2.student_id = s2.id 
+         WHERE se2.team_token = se.team_token 
+         AND se2.event_id = se.event_id) AS team_members
+    FROM student_events se 
+    JOIN events e ON se.event_id = e.id 
+    WHERE se.student_id = ?
+    ORDER BY e.event_category, e.event_type`, [student.id]);
         res.json({ student, events });
     } catch (err) { res.status(500).json({ message: "Error fetching data" }); }
 });

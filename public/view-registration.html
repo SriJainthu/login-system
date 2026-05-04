@@ -108,27 +108,22 @@
         button:disabled { background: #444; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* ---------- STATUS DISPLAY ---------- */
-        .result-wrapper { 
-            display: none; 
-            margin-top: 30px; 
-            opacity: 0; 
-            transform: translateY(20px);
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        .result-wrapper.visible {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .result-wrapper {
+    display: none;
+    margin-top: 30px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.result-wrapper.visible { display: block; opacity: 1; transform: translateY(0); }
 
-        .status-card {
-            background: #fff;
-            color: #333;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            position: relative;
-        }
+.status-card {
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,198,255,0.1);
+    position: relative;
+}
         .status-card::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
             background: linear-gradient(90deg, var(--primary), var(--accent));
@@ -513,6 +508,333 @@
     grid-template-columns: 1fr 1fr;
     gap: 0;
 }
+/* Animated top strip */
+.pass-top-strip {
+    height: 5px;
+    background: linear-gradient(90deg, #00c6ff, #00ffae, #0072ff, #00c6ff);
+    background-size: 300%;
+    animation: stripShift 4s linear infinite;
+}
+@keyframes stripShift {
+    0%   { background-position: 0%; }
+    100% { background-position: 300%; }
+}
+
+/* HEADER */
+.pass-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 26px 18px;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 60%, #1a3a4a 100%);
+    border-bottom: 1px solid rgba(0,198,255,0.15);
+}
+.pass-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.pass-event-logo {
+    width: 44px; height: 44px;
+    background: rgba(0,198,255,0.12);
+    border: 1px solid rgba(0,198,255,0.3);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+}
+.pass-event-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.pass-tagline {
+    font-size: 10px;
+    color: #00c6ff;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 3px;
+}
+.pass-qr-wrap {
+    text-align: center;
+}
+.pass-qr-wrap #qrcode {
+    background: #fff;
+    padding: 6px;
+    border-radius: 10px;
+    border: 2px solid rgba(0,198,255,0.3);
+    box-shadow: 0 0 20px rgba(0,198,255,0.15);
+}
+.pass-qr-label {
+    font-size: 8px;
+    color: #6b8099;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+/* IDENTITY STRIP */
+.pass-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 26px;
+    background: linear-gradient(90deg, #f0f8ff, #e8f4f8);
+    border-bottom: 2px dashed #d0e8f0;
+}
+.pass-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(0,198,255,0.35);
+    flex-shrink: 0;
+}
+.pass-identity-info { flex: 1; }
+.pass-student-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a3a4a;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.pass-reg-no {
+    font-size: 12px;
+    color: #7aaabb;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-top: 2px;
+    font-family: 'Courier New', monospace;
+}
+.pass-verified-chip {
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    border: 1px solid #a5d6a7;
+    white-space: nowrap;
+}
+
+/* DETAILS GRID */
+.pass-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: #fff;
+    border-bottom: 1px solid #e8f0f4;
+}
+.pass-detail-cell {
+    padding: 14px 22px;
+    border-right: 1px solid #e8f0f4;
+    border-bottom: 1px solid #e8f0f4;
+}
+.pass-detail-cell:nth-child(even) { border-right: none; }
+.pass-detail-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: #9bbccc;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.pass-detail-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a3a4a;
+    line-height: 1.4;
+}
+.degree-chip {
+    display: inline-block;
+    background: rgba(0,198,255,0.1);
+    color: #0099bb;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* EVENTS SECTION */
+.pass-events-section {
+    background: #f8fbff;
+    padding: 20px 22px;
+}
+.pass-events-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.pass-events-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: #7aaabb;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.pass-event-count {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 12px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+}
+
+/* Individual event card */
+.pass-event-card {
+    background: #fff;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    animation: eventSlideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e8f0f4;
+}
+.pass-event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+@keyframes eventSlideIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.pass-event-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px 10px;
+}
+.pass-event-name-text {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1a3a4a;
+    letter-spacing: 0.5px;
+}
+.pass-event-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.badge {
+    font-size: 8px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.badge-technical    { background: rgba(0,198,255,0.12); color: #0088bb; border: 1px solid rgba(0,198,255,0.2); }
+.badge-nontechnical { background: rgba(168,85,247,0.1);  color: #7c3aed; border: 1px solid rgba(168,85,247,0.2); }
+.badge-solo         { background: rgba(0,229,190,0.12);  color: #00897b; border: 1px solid rgba(0,229,190,0.2); }
+.badge-group        { background: rgba(251,191,36,0.12); color: #b45309; border: 1px solid rgba(251,191,36,0.2); }
+
+.pass-event-card-bottom {
+    border-top: 1px solid #f0f4f8;
+    padding: 10px 16px 12px;
+    background: #fafcff;
+}
+.pass-token-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.pass-token-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: #9bbccc;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.pass-token-value {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    color: #0072ff;
+    background: rgba(0,114,255,0.07);
+    border: 1px solid rgba(0,114,255,0.15);
+    padding: 3px 12px;
+    border-radius: 6px;
+    letter-spacing: 2px;
+}
+.pass-team-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: #9bbccc;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.pass-team-member {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.pass-team-member-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    flex-shrink: 0;
+}
+.pass-team-member span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2c5364;
+}
+
+/* PASS FOOTER */
+.pass-footer-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 22px;
+    background: linear-gradient(90deg, #0f2027, #203a43);
+}
+.pass-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: #4a6070;
+    letter-spacing: 1px;
+}
+.pass-footer-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #00ffae;
+    box-shadow: 0 0 6px rgba(0,255,174,0.6);
+    animation: dotBlink 2s ease-in-out infinite;
+}
+@keyframes dotBlink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+}
+.pass-footer-right {
+    font-size: 9px;
+    font-weight: 800;
+    color: rgba(0,198,255,0.4);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
     </style>
 </head>
 <body>
@@ -593,37 +915,82 @@
         <div class="error" id="error" style="color: #ff6b6b; text-align: center; margin-top: 15px; font-size: 0.9em; font-weight: 500;"></div>
 
         <div id="capture-area" class="result-wrapper">
-            <div class="status-card" id="result">
-                <div class="status-header">
-                    <h3>Digital Pass</h3>
-                    <div id="qrcode"></div>
-                </div>
+        <div class="status-card" id="result">
 
-                <div class="data-row"><div class="data-label">NAME</div><div class="data-value" id="disp-name"></div></div>
-                <div class="data-row"><div class="data-label">REG NO</div><div class="data-value" id="disp-reg"></div></div>
-                <div class="data-row"><div class="data-label">DEPARTMENT</div><div class="data-value" id="disp-dept"></div></div>
-                <div class="data-row"><div class="data-label">COLLEGE</div><div class="data-value" id="disp-college"></div></div>
-<div class="info-grid">
-    <div class="data-row"><div class="data-label">LEVEL</div><div class="data-value" id="disp-level"></div></div>
-    <div class="data-row"><div class="data-label">DEGREE</div><div class="data-value" id="disp-degree"></div></div>
-</div>
-<div class="info-grid">
-    <div class="data-row"><div class="data-label">YEAR</div><div class="data-value" id="disp-year"></div></div>
-    <div class="data-row"><div class="data-label">PHONE</div><div class="data-value" id="disp-phone"></div></div>
-</div>
+  <!-- TOP GRADIENT STRIP (animated) -->
+  <div class="pass-top-strip"></div>
 
-                <div class="event-section">
-                    <h4 style="color: #bbb; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Live Event Schedule</h4>
-                    <div id="event-list"></div>
-                </div>
-            </div>
-       <div class="pass-footer">
-    <span class="pass-verified-badge">✓ Verified Pass</span>
-    <span id="footerVerifiedText" style="font-size:10px; color:#aaa;">Symposium 2026</span>
-</div>
-        </div>
+  <!-- PASS HEADER -->
+  <div class="pass-header">
+    <div class="pass-header-left">
+      <div class="pass-event-logo">🎓</div>
+      <div>
+        <div class="pass-event-name" id="pass-title">SYMPOSIUM 2026</div>
+        <div class="pass-tagline">Official Digital Pass</div>
+      </div>
     </div>
+    <div class="pass-qr-wrap">
+      <div id="qrcode"></div>
+      <div class="pass-qr-label">Scan to Verify</div>
+    </div>
+  </div>
 
+  <!-- STUDENT IDENTITY STRIP -->
+  <div class="pass-identity">
+    <div class="pass-avatar" id="pass-avatar">S</div>
+    <div class="pass-identity-info">
+      <div class="pass-student-name" id="disp-name"></div>
+      <div class="pass-reg-no" id="disp-reg"></div>
+    </div>
+    <div class="pass-verified-chip">✓ VERIFIED</div>
+  </div>
+
+  <!-- STUDENT DETAILS GRID -->
+  <div class="pass-details-grid">
+    <div class="pass-detail-cell">
+      <div class="pass-detail-label">COLLEGE</div>
+      <div class="pass-detail-value" id="disp-college"></div>
+    </div>
+    <div class="pass-detail-cell">
+      <div class="pass-detail-label">DEPARTMENT</div>
+      <div class="pass-detail-value" id="disp-dept"></div>
+    </div>
+    <div class="pass-detail-cell">
+      <div class="pass-detail-label">LEVEL & DEGREE</div>
+      <div class="pass-detail-value">
+        <span id="disp-level"></span>
+        <span class="degree-chip" id="disp-degree-chip"></span>
+      </div>
+    </div>
+    <div class="pass-detail-cell">
+      <div class="pass-detail-label">YEAR & PHONE</div>
+      <div class="pass-detail-value">
+        Year <span id="disp-year"></span>
+        &nbsp;·&nbsp;
+        <span id="disp-phone"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENTS SECTION -->
+  <div class="pass-events-section">
+    <div class="pass-events-header">
+      <span class="pass-events-title">🎯 Registered Events</span>
+      <span class="pass-event-count" id="pass-event-count">0 Events</span>
+    </div>
+    <div id="event-list"></div>
+  </div>
+
+  <!-- PASS FOOTER -->
+  <div class="pass-footer-bar">
+    <div class="pass-footer-left">
+      <span class="pass-footer-dot"></span>
+      <span id="footerVerifiedText">Verified Digital ID • Symposium 2026</span>
+    </div>
+    <div class="pass-footer-right">ENTRY PASS</div>
+  </div>
+
+</div>
 <script>
     window.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -789,71 +1156,83 @@ function maskEmail(email) {
         }
     }
 
-    function displayStatus() {
+   function displayStatus() {
     const { student, events } = cachedData;
 
+    // Avatar initial
+    document.getElementById("pass-avatar").textContent = student.name.charAt(0).toUpperCase();
     document.getElementById("disp-name").textContent = student.name.toUpperCase();
     document.getElementById("disp-reg").textContent = student.reg_no;
     document.getElementById("disp-dept").textContent = student.department;
+    document.getElementById("disp-college").textContent = student.college || '—';
+    document.getElementById("disp-year").textContent = student.year || '—';
+    document.getElementById("disp-phone").textContent = student.phone || '—';
+    document.getElementById("disp-level").textContent = student.level || '—';
+    const degreeChip = document.getElementById("disp-degree-chip");
+    if (student.degree) { degreeChip.textContent = student.degree; }
 
-    // Add extra fields if they exist
-    const extraFields = ['level', 'degree', 'college', 'year', 'phone'];
-    extraFields.forEach(field => {
-        const el = document.getElementById(`disp-${field}`);
-        if (el && student[field]) el.textContent = student[field];
-    });
+    // Event count
+    document.getElementById("pass-event-count").textContent = `${events.length} Event${events.length !== 1 ? 's' : ''}`;
 
-    let qrData = `STUDENT: ${student.name.toUpperCase()}\nREG: ${student.reg_no}\n--- EVENTS ---\n`;
+    let qrData = `${student.name.toUpperCase()}\n${student.reg_no}\n`;
 
     const eventListDiv = document.getElementById("event-list");
     eventListDiv.innerHTML = "";
 
     events.forEach((ev, index) => {
-        const isGroup = ev.team_token && ev.team_token.trim() !== "";
-        const cat = (ev.event_category || '').toLowerCase();
-        const isNonTech = cat.includes('non');
-        const catTag = cat
-            ? `<span class="event-category-tag ${isNonTech ? 'tag-nontechnical' : 'tag-technical'}">
-                 ${isNonTech ? '🎨 Non-Technical' : '⚡ Technical'}
-               </span>`
-            : '';
+        const isGroup  = ev.event_type === 'group';
+        const isTech   = (ev.event_category || '').toLowerCase() === 'technical';
+        const catClass = isTech ? 'badge-technical' : 'badge-nontechnical';
+        const catLabel = isTech ? '⚡ Technical' : '🎨 Non-Tech';
+        const typeLabel = isGroup ? '👥 Group' : '👤 Solo';
+        const typeClass = isGroup ? 'badge-group' : 'badge-solo';
 
-        qrData += `- ${ev.event_name.toUpperCase()} (${isGroup ? 'Group' : 'Solo'})\n`;
+        qrData += `${ev.event_name} (${isGroup ? 'Group' : 'Solo'})\n`;
 
-        let membersHtml = '';
-        if (isGroup && ev.team_members) {
-            const names = ev.team_members.split(',');
-            membersHtml = `
-                <div class="team-lineup-label">Team Lineup</div>
-                ${names.map(name => `
-                    <div class="team-member-row">
-                        <span style="color:var(--primary);">👤</span>
-                        <span>${name.trim().toUpperCase()}</span>
-                    </div>`).join('')}`;
+        let bottomHtml = '';
+        if (isGroup && ev.team_token) {
+            let membersHtml = '';
+            if (ev.team_members) {
+                membersHtml = ev.team_members.split(',').map(n =>
+                    `<div class="pass-team-member">
+                        <div class="pass-team-member-dot"></div>
+                        <span>${n.trim().toUpperCase()}</span>
+                    </div>`
+                ).join('');
+            }
+            bottomHtml = `
+                <div class="pass-event-card-bottom">
+                    <div class="pass-token-row">
+                        <span class="pass-token-label">Team Token</span>
+                        <span class="pass-token-value">${ev.team_token}</span>
+                    </div>
+                    ${membersHtml ? `<div class="pass-team-label">Team Lineup</div>${membersHtml}` : ''}
+                </div>`;
         }
 
-        const item = document.createElement("div");
-        item.className = "event-item";
-        item.style.animationDelay = `${index * 100}ms`;
-        item.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="event-name">${ev.event_name.toUpperCase()}</span>
-                <span class="event-badge ${isGroup ? 'badge-group' : 'badge-solo'}">${isGroup ? 'GROUP' : 'SOLO'}</span>
+        const card = document.createElement("div");
+        card.className = "pass-event-card";
+        card.style.animationDelay = `${index * 120}ms`;
+        card.innerHTML = `
+            <div class="pass-event-card-top">
+                <span class="pass-event-name-text">${ev.event_name.toUpperCase()}</span>
+                <div class="pass-event-badges">
+                    <span class="badge ${catClass}">${catLabel}</span>
+                    <span class="badge ${typeClass}">${typeLabel}</span>
+                </div>
             </div>
-            ${catTag}
-            ${isGroup ? `<div class="event-meta">Team Token: <b>${ev.team_token}</b></div>` : ''}
-            ${membersHtml}
-        `;
-        eventListDiv.appendChild(item);
+            ${bottomHtml}`;
+        eventListDiv.appendChild(card);
     });
 
+    // QR Code
     const qrContainer = document.getElementById("qrcode");
     qrContainer.innerHTML = "";
-    new QRCode(qrContainer, { text: qrData, width: 100, height: 100, correctLevel: QRCode.CorrectLevel.M });
+    new QRCode(qrContainer, { text: qrData, width: 90, height: 90, correctLevel: QRCode.CorrectLevel.M });
 
+    // Transition
     const stepOtp = document.getElementById("step-otp");
     const wrapper = document.getElementById("capture-area");
-
     stepOtp.style.opacity = '0';
     stepOtp.style.transform = 'translateY(-10px)';
     setTimeout(() => {
@@ -905,6 +1284,8 @@ async function loadNavbarTitle() {
              document.title = `Registration Status | ${title}`;
              const footerText = document.getElementById('footerVerifiedText');
 if (footerText) footerText.textContent = `Verified Digital ID • ${title}`;
+const passTitle = document.getElementById('pass-title');
+if (passTitle) passTitle.textContent = title.toUpperCase();
             requestAnimationFrame(() => {
                 logoEl.style.opacity = '1';
             });
