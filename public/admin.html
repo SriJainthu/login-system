@@ -1836,10 +1836,44 @@ async function saveYearSetting(level) {
     } catch(e) { showToast('✗ Save failed'); }
 }
 
+// Store year settings globally for reuse
+let yearSettingsCache = [];
+
 function populateYearFilter(yearData) {
+    yearSettingsCache = yearData;
     const sel = document.getElementById("year");
-    // Find the max across both levels for showing all possible years
     const maxYears = Math.max(...yearData.map(y => y.max_years));
+    sel.innerHTML = '<option value="">All Years</option>';
+    for (let i = 1; i <= maxYears; i++) {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `Year ${i}`;
+        sel.appendChild(opt);
+    }
+}
+
+function updateYearFilterByLevel() {
+    const level = document.getElementById("level").value;
+    const sel = document.getElementById("year");
+    sel.value = ""; // reset selection
+
+    if (!level || !yearSettingsCache.length) {
+        // No level selected — show all years across both UG and PG
+        const maxYears = Math.max(...yearSettingsCache.map(y => y.max_years));
+        sel.innerHTML = '<option value="">All Years</option>';
+        for (let i = 1; i <= maxYears; i++) {
+            const opt = document.createElement("option");
+            opt.value = i;
+            opt.textContent = `Year ${i}`;
+            sel.appendChild(opt);
+        }
+        return;
+    }
+
+    // Find the max years for the selected level
+    const setting = yearSettingsCache.find(y => y.level === level);
+    const maxYears = setting ? setting.max_years : 4;
+
     sel.innerHTML = '<option value="">All Years</option>';
     for (let i = 1; i <= maxYears; i++) {
         const opt = document.createElement("option");
@@ -1863,6 +1897,11 @@ document.addEventListener("DOMContentLoaded", () => {
   loadDepartmentsAndDegrees();
   populateFilterDropdowns();
   loadYearSettings();
+
+  // Year dropdown responds to Level filter selection
+  document.getElementById("level").addEventListener("change", () => {
+    updateYearFilterByLevel();
+  });
 });
 </script>
 </body>
