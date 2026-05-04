@@ -431,7 +431,7 @@
 
 <div class="input-field">
     <select id="level" required onchange="onLevelChange()">
-        <option value="" disabled selected>Select Level</option>
+        <option value="" disabled selected></option>
         <option value="UG">UG — Undergraduate</option>
         <option value="PG">PG — Postgraduate</option>
     </select>
@@ -441,7 +441,7 @@
 
 <div class="input-field">
     <select id="degree" required>
-        <option value="" disabled selected>Select Degree</option>
+        <option value="" disabled selected></option>
     </select>
     <label>Degree</label>
     <span class="error-text" id="degreeError"></span>
@@ -449,7 +449,7 @@
 
 <div class="input-field">
     <select id="department" required>
-        <option value="" disabled selected>Select Department</option>
+        <option value="" disabled selected></option>
     </select>
     <label>Department</label>
     <span class="error-text" id="departmentError"></span>
@@ -662,7 +662,9 @@ document.getElementById("department").addEventListener("change", () => updateSel
 document.addEventListener("DOMContentLoaded", () => {
     loadDepartments();
     applyInputRestrictions();  // ← ADD THIS
-
+ ["level", "degree", "department"].forEach(id => {
+        updateSelectColor(id);
+    });
     // Live check on every input/change
     ["name", "reg_no", "college", "year", "email", "phone"].forEach(id => {
         document.getElementById(id)?.addEventListener("input", checkFormCompletion);
@@ -670,9 +672,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ["level", "degree", "department"].forEach(id => {
         document.getElementById(id)?.addEventListener("change", checkFormCompletion);
     });
-     ["level", "degree", "department"].forEach(id => {
-        updateSelectColor(id);
-    });
+    
     checkFormCompletion(); // run once on load so button starts dim  ← ADD THIS
 });
 
