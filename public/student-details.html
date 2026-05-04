@@ -649,8 +649,18 @@ document.getElementById("department").addEventListener("change", () => updateSel
 // Call on page load
 document.addEventListener("DOMContentLoaded", () => {
     loadDepartments();
+    applyInputRestrictions();  // ← ADD THIS
+
+    // Live check on every input/change
+    ["name", "reg_no", "college", "year", "email", "phone"].forEach(id => {
+        document.getElementById(id)?.addEventListener("input", checkFormCompletion);
+    });
+    ["level", "degree", "department"].forEach(id => {
+        document.getElementById(id)?.addEventListener("change", checkFormCompletion);
+    });
+
+    checkFormCompletion(); // run once on load so button starts dim  ← ADD THIS
 });
-loadNavbarTitle();
 
 </script>
 </body>

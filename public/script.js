@@ -50,42 +50,39 @@ function validateField(fieldId) {
     }
 }
 
-/* ---------- REGISTRATION STEP 1: DUPLICATION CHECK & OTP ---------- */
-/* Update only this function in your script.js */
-/* Update only this function in your script.js */
 async function initiateRegistrationOTP() {
     const btn = document.getElementById("nextStepBtn");
+
+    // If form not ready, show dialog and stop
+    if (btn.dataset.ready !== "true") {
+        showCustomAlert("Please ensure all fields are correctly filled before proceeding.");
+        return;
+    }
+
     const btnText = document.getElementById("btnText");
     const loader = document.getElementById("btnLoader");
 
-    // Get values
     const fields = {
-    name:       document.getElementById("name").value.trim(),
-    reg_no:     document.getElementById("reg_no").value.trim(),
-    college:    document.getElementById("college").value.trim(),
-    level:      document.getElementById("level").value,
-    degree:     document.getElementById("degree").value,
-    department: document.getElementById("department").value,
-    year:       document.getElementById("year").value.trim(),
-    email:      document.getElementById("email").value.trim(),
-    phone:      document.getElementById("phone").value.trim()
-};
-
-    const fieldsToValidate = ["name", "reg_no", "college", "department", "year", "email", "phone"];
-    const isFormValid = fieldsToValidate.every(field => validateField(field));
-    
-    if (!isFormValid) return; 
+        name:       document.getElementById("name").value.trim(),
+        reg_no:     document.getElementById("reg_no").value.trim(),
+        college:    document.getElementById("college").value.trim(),
+        level:      document.getElementById("level").value,
+        degree:     document.getElementById("degree").value,
+        department: document.getElementById("department").value,
+        year:       document.getElementById("year").value.trim(),
+        email:      document.getElementById("email").value.trim(),
+        phone:      document.getElementById("phone").value.trim()
+    };
 
     // UI Loading State
     if (btn) btn.disabled = true;
     if (loader) loader.style.display = "inline-block";
-    if (btnText) btnText.innerText = "Verifying..."; 
+    if (btnText) btnText.innerText = "Verifying...";
 
     try {
         const response = await fetch(`${API_BASE_URL}/register/send-otp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // ADDED phone: fields.phone BELOW
             body: JSON.stringify({ 
                 email: fields.email, 
                 reg_no: fields.reg_no, 
@@ -95,32 +92,26 @@ async function initiateRegistrationOTP() {
 
         const data = await response.json();
         if (!response.ok) {
-    // This will show you the exact error message from the backend 'details'
-    showCustomAlert(data.details || data.message || "An error occurred");
-    resetBtn();
-    return;
-}
+            showCustomAlert(data.details || data.message || "An error occurred");
+            resetBtn();
+            return;
+        }
         if (response.status === 409) {
             showCustomAlert(data.message || "Already registered.");
             resetBtn(); 
         } else if (response.ok && data.success) {
-    localStorage.setItem("studentData", JSON.stringify(fields));
-    
-    const otpOverlay = document.getElementById('otpOverlay');
-    const otpMessage = document.getElementById('otpMessage'); // Ensure this ID exists in your HTML
-
-    if (otpOverlay) {
-        // Update the message text to show the masked email specifically
-        if (otpMessage) {
-            otpMessage.innerHTML = `OTP Verification code sent to:<br>
-                <b style="color:var(--primary-blue)">${maskEmail(fields.email)}</b><br>`;
-        }
-
-        otpOverlay.style.display = 'flex';
-        setTimeout(() => { otpOverlay.style.opacity = "1"; }, 10);
-    }
-}else {
-            // This will now tell you the EXACT error from the server
+            localStorage.setItem("studentData", JSON.stringify(fields));
+            const otpOverlay = document.getElementById('otpOverlay');
+            const otpMessage = document.getElementById('otpMessage');
+            if (otpOverlay) {
+                if (otpMessage) {
+                    otpMessage.innerHTML = `OTP Verification code sent to:<br>
+                        <b style="color:var(--primary-blue)">${maskEmail(fields.email)}</b><br>`;
+                }
+                otpOverlay.style.display = 'flex';
+                setTimeout(() => { otpOverlay.style.opacity = "1"; }, 10);
+            }
+        } else {
             showCustomAlert(`Server Error: ${data.details || data.message || "Failed to send OTP"}`);
             resetBtn();
         }
@@ -129,31 +120,6 @@ async function initiateRegistrationOTP() {
         resetBtn();
     }
 }
-function resetBtn() {
-    const btn = document.getElementById("nextStepBtn");
-    const btnText = document.getElementById("btnText");
-    const loader = document.getElementById("btnLoader");
-
-    if (btn) {
-        btn.disabled = false;
-        btn.style.background = ""; // Restores your original CSS gradient
-        btn.style.opacity = "1";
-    }
-    
-    // Hide the spinner
-    if (loader) {
-        loader.style.display = "none";
-    }
-    
-    // Restore the original text
-    if (btnText) {
-        btnText.innerText = "Next Step →";
-    } else if (btn) {
-        // Fallback in case btnText span is missing but btn exists
-        btn.innerText = "Next Step →";
-    }
-}
-/* ---------- REGISTRATION STEP 2: VERIFY OTP ---------- */
 function verifyAndProceed() {
     const email = document.getElementById("email").value.trim();
     const otp = document.getElementById("registrationOtp").value.trim();
@@ -434,4 +400,66 @@ function maskPhone(phone) {
     const str = phone.toString();
     // Shows first 2 and last 2 digits (e.g., 96*****43)
     return str.slice(0, 2) + "*****" + str.slice(-2);
+}
+function applyInputRestrictions() {
+    // Name & College: only letters and spaces
+    ["name", "college"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("keypress", (e) => {
+            if (!/[a-zA-Z\s]/.test(e.key)) e.preventDefault();
+        });
+        el.addEventListener("input", () => {
+            el.value = el.value.replace(/[^a-zA-Z\s]/g, "");
+        });
+    });
+
+    // reg_no & phone: only numbers
+    ["reg_no", "phone"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("keypress", (e) => {
+            if (!/[0-9]/.test(e.key)) e.preventDefault();
+        });
+        el.addEventListener("input", () => {
+            el.value = el.value.replace(/[^0-9]/g, "");
+        });
+    });
+}
+function checkFormCompletion() {
+    const fields = {
+        name:       document.getElementById("name")?.value.trim(),
+        reg_no:     document.getElementById("reg_no")?.value.trim(),
+        college:    document.getElementById("college")?.value.trim(),
+        level:      document.getElementById("level")?.value,
+        degree:     document.getElementById("degree")?.value,
+        department: document.getElementById("department")?.value,
+        year:       document.getElementById("year")?.value.trim(),
+        email:      document.getElementById("email")?.value.trim(),
+        phone:      document.getElementById("phone")?.value.trim()
+    };
+
+    const allValid = Object.entries(fields).every(([key, value]) => {
+        return validators[key] ? validators[key](value) : (value && value.length > 0);
+    });
+
+    const btn = document.getElementById("nextStepBtn");
+    const btnText = document.getElementById("btnText");
+    if (!btn) return;
+
+    if (allValid) {
+        btn.disabled = false;
+        btn.style.background = "linear-gradient(90deg, #00c6ff, #0072ff)";
+        btn.style.opacity = "1";
+        btn.style.boxShadow = "0 0 20px rgba(0, 198, 255, 0.5)";
+        btn.style.cursor = "pointer";
+        btn.dataset.ready = "true";
+    } else {
+        btn.disabled = false; // keep enabled so click works for the warning
+        btn.style.background = "#2a3a40";
+        btn.style.opacity = "0.6";
+        btn.style.boxShadow = "none";
+        btn.style.cursor = "not-allowed";
+        btn.dataset.ready = "false";
+    }
 }
