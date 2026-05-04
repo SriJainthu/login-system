@@ -347,6 +347,10 @@
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
 }
+.input-field select:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
 
     </style>
 
@@ -448,9 +452,9 @@
 </div>
 
 <div class="input-field">
-    <select id="department" required>
-        <option value="" disabled selected></option>
-    </select>
+   <select id="department" required disabled>
+    <option value="" disabled selected></option>
+</select>
     <label>Department</label>
     <span class="error-text" id="departmentError"></span>
 </div>
@@ -634,6 +638,17 @@ async function onLevelChange() {
         const sel = document.getElementById("degree");
         sel.innerHTML = '<option value="" disabled selected></option>';
         sel.classList.remove("has-value");
+        // Reset department when level changes
+const deptSel = document.getElementById("department");
+deptSel.disabled = true;
+deptSel.value = "";
+deptSel.classList.remove("has-value");
+
+// Reset year too
+const yearSel = document.getElementById("year");
+yearSel.disabled = true;
+yearSel.value = "";
+yearSel.classList.remove("has-value");
         data.forEach(d => {
             const opt = document.createElement("option");
             opt.value = d.name;
@@ -663,7 +678,18 @@ async function onLevelChange() {
     } catch(err) { console.error("Year settings load failed:", err); }
 }
 
-document.getElementById("degree").addEventListener("change", () => updateSelectColor("degree"));
+document.getElementById("degree").addEventListener("change", () => {
+    updateSelectColor("degree");
+    const dept = document.getElementById("department");
+    if (document.getElementById("degree").value) {
+        dept.disabled = false;
+    } else {
+        dept.disabled = true;
+        dept.value = "";
+        dept.classList.remove("has-value");
+    }
+    checkFormCompletion();
+});
 document.getElementById("department").addEventListener("change", () => updateSelectColor("department"));
 document.getElementById("year").addEventListener("change", () => updateSelectColor("year"));
 // Call on page load
