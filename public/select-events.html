@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Select Events | Symposium 2026</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+ 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -21,7 +21,7 @@
     }
 
     body {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
       background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
       color: var(--text);
       min-height: 100vh;
@@ -29,7 +29,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 0 20px 48px;
+      padding-top: 80px;
       overflow-x: hidden;
     }
 
@@ -89,51 +89,14 @@
 
     @keyframes pulse { 0%,100%{ opacity:0.5 } 50%{ opacity:1 } }
 
-    /* ── PROGRESS NAV ── */
-    .progress-nav {
-      width: 100%;
-      max-width: 760px;
-      padding: 28px 0 24px;
-      position: relative;
-      z-index: 1;
-      animation: slideDown 0.6s var(--ease) 0.1s both;
-    }
+  
 
     @keyframes slideDown {
       from { opacity: 0; transform: translateY(-16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .steps {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      position: relative;
-    }
-
-    .step-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .step-circle {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: 'Outfit', sans-serif;
-      transition: all 0.4s var(--ease);
-      position: relative;
-    }
-
+  
     .step-circle.done {
       background: var(--green);
       color: #07111a;
@@ -177,16 +140,7 @@
     .step-item.active .step-label { color: var(--accent); }
     .step-item.done .step-label   { color: var(--green); }
 
-    .step-line {
-      flex: 1;
-      height: 2px;
-      background: rgba(255,255,255,0.08);
-      margin: 0 8px;
-      margin-bottom: 24px;
-      position: relative;
-      overflow: hidden;
-      border-radius: 2px;
-    }
+   
 
     .step-line.filled {
       background: linear-gradient(90deg, var(--green), var(--accent));
@@ -227,7 +181,7 @@
     }
 
     .page-title {
-      font-family: 'Orbitron', sans-serif;
+     font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 34px;
       font-weight: 400;
       letter-spacing: 2px;
@@ -281,7 +235,7 @@
     .section-icon { font-size: 14px; }
 
     .section-label {
-      font-family: 'Orbitron', sans-serif;
+     
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.18em;
@@ -387,7 +341,7 @@
     }
 
     .event-card h3 {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -515,7 +469,7 @@
       border: none;
       border-radius: 12px;
       color: #fff;
-      font-family: 'Orbitron', sans-serif;
+     font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -573,7 +527,7 @@
     .alert-box .alert-icon { font-size: 36px; margin-bottom: 14px; }
 
     .alert-box h3 {
-      font-family: 'Orbitron', sans-serif;
+     
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.1em;
@@ -643,23 +597,19 @@
   </div>
 </div>
 
-<!-- PROGRESS NAV -->
-<div class="progress-nav">
-  <div class="steps">
-    <div class="step-item done">
-      <div class="step-circle done"></div>
-      <span class="step-label">Student</span>
-    </div>
-    <div class="step-line filled"></div>
-    <div class="step-item active">
-      <div class="step-circle active">2</div>
-      <span class="step-label">Events</span>
-    </div>
-    <div class="step-line"></div>
-    <div class="step-item">
-      <div class="step-circle pending">3</div>
-      <span class="step-label">Confirm</span>
-    </div>
+<div class="progress" style="display:flex; justify-content:space-between; margin-bottom:28px; position:relative;">
+  <div style="content:''; position:absolute; top:15px; left:10%; width:80%; height:2px; background:rgba(255,255,255,0.1); z-index:0;"></div>
+  <div class="step" style="text-align:center; z-index:1; width:33%;">
+    <div class="circle" style="width:30px;height:30px;border-radius:50%;background:#00c6ff;margin:0 auto 8px;line-height:30px;font-size:13px;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(0,198,255,0.5);">✓</div>
+    <div style="font-size:11px;">Student</div>
+  </div>
+  <div class="step" style="text-align:center; z-index:1; width:33%;">
+    <div class="circle" style="width:30px;height:30px;border-radius:50%;background:#00c6ff;margin:0 auto 8px;line-height:30px;font-size:13px;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(0,198,255,0.5);">2</div>
+    <div style="font-size:11px;">Events</div>
+  </div>
+  <div class="step" style="text-align:center; z-index:1; width:33%;">
+    <div class="circle" style="width:30px;height:30px;border-radius:50%;background:#162a31;margin:0 auto 8px;line-height:30px;font-size:13px;color:#fff;border:1px solid rgba(255,255,255,0.2);">3</div>
+    <div style="font-size:11px;">Confirm</div>
   </div>
 </div>
 
