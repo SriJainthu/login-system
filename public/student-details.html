@@ -616,7 +616,7 @@ async function onLevelChange() {
         const res = await fetch(`${API_BASE_URL}/api/degrees?level=${level}`);
         const data = await res.json();
         const sel = document.getElementById("degree");
-        sel.innerHTML = '<option value="" disabled selected>Select Degree</option>';
+        sel.innerHTML = '<option value="" disabled selected></option>';
         data.forEach(d => {
             const opt = document.createElement("option");
             opt.value = d.name;
@@ -644,7 +644,7 @@ async function onLevelChange() {
         const res = await fetch(`${API_BASE_URL}/api/degrees?level=${level}`);
         const data = await res.json();
         const sel = document.getElementById("degree");
-        sel.innerHTML = '<option value="" disabled selected>Select Degree</option>';
+        sel.innerHTML = '<option value="" disabled selected></option>';
         sel.classList.remove("has-value"); // Reset Degree color to dim
         
         data.forEach(d => {
