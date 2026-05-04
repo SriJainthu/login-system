@@ -197,7 +197,7 @@ app.post("/register/send-otp", async (req, res) => {
             </div>
             <div style="background: rgba(0, 0, 0, 0.2); padding: 25px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05);">
                 <p style="color: #44555e; font-size: 10px; margin: 0; line-height: 1.5; text-transform: uppercase; letter-spacing: 1px;">
-                    © 2026 ${sympTitle.toUpperCase()} ORGANIZING COMMITTEE<br>SECURED BY INNOVATION CELL
+                    © ${sympTitle.toUpperCase()} ORGANIZING COMMITTEE<br>SECURED BY INNOVATION CELL
                 </p>
             </div>
         </div>
@@ -591,7 +591,7 @@ await sendSymposiumEmail({
             <p style="color: #8899a0; font-size: 15px; line-height: 1.6;">
                 To access your live registration status and digital pass for ${sympTitle}, please use the secure verification code below:
             </p>
-            <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;"><span style="display: block; color: #00ffae; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 18px; font-weight: 800;">Your Verification Code</span>  <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
+            <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;"><span style="display: block; color: #00ffae; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 18px; font-weight: 800;"></span>  <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
            <div style="font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; display: block; padding: 10px 0; white-space: nowrap; user-select: all; -webkit-user-select: all;">
     ${otp}
 </div>
@@ -603,7 +603,7 @@ await sendSymposiumEmail({
         </div>
         <div style="background: rgba(0, 0, 0, 0.2); padding: 25px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05);">
             <p style="color: #44555e; font-size: 10px; margin: 0; line-height: 1.5; text-transform: uppercase; letter-spacing: 1px;">
-                © 2026 ${sympTitle.toUpperCase()} ORGANIZING COMMITTEE<br>SECURED BY INNOVATION CELL
+                © ${sympTitle.toUpperCase()} ORGANIZING COMMITTEE<br>SECURED BY INNOVATION CELL
             </p>
         </div>
     </div>
