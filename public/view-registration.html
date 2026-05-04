@@ -298,6 +298,221 @@
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
 }
+/* ── DIGITAL PASS ENHANCEMENTS ── */
+.status-card {
+    background: linear-gradient(145deg, #ffffff, #f0f7ff);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+.status-card::before {
+    height: 6px;
+    background: linear-gradient(90deg, #00c6ff, #00ffae, #0072ff);
+    background-size: 200%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0%; }
+    50% { background-position: 100%; }
+    100% { background-position: 0%; }
+}
+
+.status-header {
+    background: linear-gradient(135deg, #e8f4f8, #d0ecf8);
+    padding: 20px 25px;
+    margin: -30px -30px 20px -30px;
+    border-bottom: 1px dashed #c0dce8;
+}
+
+.status-header h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #1a3a4a;
+}
+
+.pass-subtitle {
+    font-size: 10px;
+    color: #7aaabb;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 3px;
+    font-weight: 600;
+}
+
+.data-row {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+}
+
+.data-row:last-of-type { border-bottom: none; }
+
+.data-label {
+    color: #7aaabb;
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.data-value {
+    color: #1a3a4a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Event section */
+.event-section h4 {
+    color: #7aaabb;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-weight: 700;
+}
+
+.event-item {
+    background: #fff;
+    border-left: 4px solid var(--primary);
+    border-radius: 0 14px 14px 0;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    animation: slideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) both;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.event-item:hover {
+    transform: translateX(6px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.event-name {
+    font-weight: 800;
+    color: #1a3a4a;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.event-badge {
+    font-size: 9px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.badge-solo {
+    background: #e0f7fa;
+    color: #00838f;
+}
+
+.badge-group {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.event-meta {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #888;
+}
+
+.event-meta b { color: var(--primary); font-size: 12px; }
+
+.event-category-tag {
+    display: inline-block;
+    font-size: 8px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 6px;
+    text-transform: uppercase;
+}
+
+.tag-technical {
+    background: rgba(0,198,255,0.1);
+    color: #0099cc;
+    border: 1px solid rgba(0,198,255,0.2);
+}
+
+.tag-nontechnical {
+    background: rgba(255,160,0,0.1);
+    color: #cc7700;
+    border: 1px solid rgba(255,160,0,0.2);
+}
+
+.team-lineup-label {
+    font-size: 9px;
+    color: #aaa;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.team-member-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.team-member-row span {
+    font-size: 12px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Pass footer */
+.pass-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px dashed #dde;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pass-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #2e7d32;
+    background: #e8f5e9;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+
+/* QR styling */
+#qrcode {
+    background: #fff;
+    padding: 6px;
+    border-radius: 10px;
+    border: 2px solid #e0ecf4;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Info rows - level, degree */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
     </style>
 </head>
 <body>
@@ -387,13 +602,25 @@
                 <div class="data-row"><div class="data-label">NAME</div><div class="data-value" id="disp-name"></div></div>
                 <div class="data-row"><div class="data-label">REG NO</div><div class="data-value" id="disp-reg"></div></div>
                 <div class="data-row"><div class="data-label">DEPARTMENT</div><div class="data-value" id="disp-dept"></div></div>
+                <div class="data-row"><div class="data-label">COLLEGE</div><div class="data-value" id="disp-college"></div></div>
+<div class="info-grid">
+    <div class="data-row"><div class="data-label">LEVEL</div><div class="data-value" id="disp-level"></div></div>
+    <div class="data-row"><div class="data-label">DEGREE</div><div class="data-value" id="disp-degree"></div></div>
+</div>
+<div class="info-grid">
+    <div class="data-row"><div class="data-label">YEAR</div><div class="data-value" id="disp-year"></div></div>
+    <div class="data-row"><div class="data-label">PHONE</div><div class="data-value" id="disp-phone"></div></div>
+</div>
 
                 <div class="event-section">
                     <h4 style="color: #bbb; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Live Event Schedule</h4>
                     <div id="event-list"></div>
                 </div>
             </div>
-           <p id="footerVerifiedText" style="text-align: center; font-size: 11px; color: #888; margin-top: 20px; opacity: 0.7;">Verified Digital ID • Symposium 2026</p>
+       <div class="pass-footer">
+    <span class="pass-verified-badge">✓ Verified Pass</span>
+    <span id="footerVerifiedText" style="font-size:10px; color:#aaa;">Symposium 2026</span>
+</div>
         </div>
     </div>
 
@@ -563,71 +790,78 @@ function maskEmail(email) {
     }
 
     function displayStatus() {
-        const { student, events } = cachedData;
-        
-        document.getElementById("disp-name").textContent = student.name.toUpperCase();
-        document.getElementById("disp-reg").textContent = student.reg_no;
-        document.getElementById("disp-dept").textContent = student.department;
+    const { student, events } = cachedData;
 
-        let qrData = `STUDENT: ${student.name.toUpperCase()}\nREG: ${student.reg_no}\n--- EVENTS ---\n`;
+    document.getElementById("disp-name").textContent = student.name.toUpperCase();
+    document.getElementById("disp-reg").textContent = student.reg_no;
+    document.getElementById("disp-dept").textContent = student.department;
 
-        const eventListDiv = document.getElementById("event-list");
-        eventListDiv.innerHTML = "";
-        
-        events.forEach(ev => {
-            const isGroup = ev.team_token && ev.team_token.trim() !== "";
-            let membersHtml = '';
-            
-            qrData += `- ${ev.event_name.toUpperCase()} (${isGroup ? 'Group' : 'Solo'})\n`;
+    // Add extra fields if they exist
+    const extraFields = ['level', 'degree', 'college', 'year', 'phone'];
+    extraFields.forEach(field => {
+        const el = document.getElementById(`disp-${field}`);
+        if (el && student[field]) el.textContent = student[field];
+    });
 
-            if (isGroup && ev.team_members) {
-                const names = ev.team_members.split(',');
-                membersHtml = `
-                    <div class="members-container" style="margin-top: 10px; border-top: 1px solid #f0f0f0; padding-top: 8px;">
-                        <div style="font-size: 10px; color: #aaa; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">Team Lineup</div>
-                        ${names.map(name => `
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                <span style="color: var(--primary); font-size: 12px;">👤</span>
-                                <span style="font-size: 13px; color: #444; font-weight: 500;">${name.trim().toUpperCase()}</span>
-                            </div>
-                        `).join('')}
-                    </div>`;
-            }
+    let qrData = `STUDENT: ${student.name.toUpperCase()}\nREG: ${student.reg_no}\n--- EVENTS ---\n`;
 
-            const item = document.createElement("div");
-            item.className = "event-item";
-            item.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: 700; color: #2c5364; font-size: 15px;">${ev.event_name.toUpperCase()}</span>
-                    <span style="font-size: 9px; background: #e0f7fa; color: #00838f; padding: 3px 10px; border-radius: 20px; font-weight: bold;">${isGroup ? "GROUP" : "SOLO"}</span>
-                </div>
-                ${isGroup ? `<div style="font-size: 12px; margin-top: 4px; color: #666;">Team Token: <b style="color:var(--primary)">${ev.team_token}</b></div>` : ''}
-                ${membersHtml}
-            `;
-            eventListDiv.appendChild(item);
-        });
+    const eventListDiv = document.getElementById("event-list");
+    eventListDiv.innerHTML = "";
 
-        const qrContainer = document.getElementById("qrcode");
-        qrContainer.innerHTML = "";
-        new QRCode(qrContainer, { 
-            text: qrData, 
-            width: 100, 
-            height: 100,
-            correctLevel : QRCode.CorrectLevel.M 
-        });
+    events.forEach((ev, index) => {
+        const isGroup = ev.team_token && ev.team_token.trim() !== "";
+        const cat = (ev.event_category || '').toLowerCase();
+        const isNonTech = cat.includes('non');
+        const catTag = cat
+            ? `<span class="event-category-tag ${isNonTech ? 'tag-nontechnical' : 'tag-technical'}">
+                 ${isNonTech ? '🎨 Non-Technical' : '⚡ Technical'}
+               </span>`
+            : '';
 
-        const stepOtp = document.getElementById("step-otp");
-        const wrapper = document.getElementById("capture-area");
-        
-        stepOtp.style.opacity = '0';
-        stepOtp.style.transform = 'translateY(-10px)';
+        qrData += `- ${ev.event_name.toUpperCase()} (${isGroup ? 'Group' : 'Solo'})\n`;
 
-        setTimeout(() => {
-            stepOtp.style.display = "none";
-            wrapper.style.display = "block";
-            setTimeout(() => wrapper.classList.add('visible'), 50);
-        }, 400);
-    }
+        let membersHtml = '';
+        if (isGroup && ev.team_members) {
+            const names = ev.team_members.split(',');
+            membersHtml = `
+                <div class="team-lineup-label">Team Lineup</div>
+                ${names.map(name => `
+                    <div class="team-member-row">
+                        <span style="color:var(--primary);">👤</span>
+                        <span>${name.trim().toUpperCase()}</span>
+                    </div>`).join('')}`;
+        }
+
+        const item = document.createElement("div");
+        item.className = "event-item";
+        item.style.animationDelay = `${index * 100}ms`;
+        item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="event-name">${ev.event_name.toUpperCase()}</span>
+                <span class="event-badge ${isGroup ? 'badge-group' : 'badge-solo'}">${isGroup ? 'GROUP' : 'SOLO'}</span>
+            </div>
+            ${catTag}
+            ${isGroup ? `<div class="event-meta">Team Token: <b>${ev.team_token}</b></div>` : ''}
+            ${membersHtml}
+        `;
+        eventListDiv.appendChild(item);
+    });
+
+    const qrContainer = document.getElementById("qrcode");
+    qrContainer.innerHTML = "";
+    new QRCode(qrContainer, { text: qrData, width: 100, height: 100, correctLevel: QRCode.CorrectLevel.M });
+
+    const stepOtp = document.getElementById("step-otp");
+    const wrapper = document.getElementById("capture-area");
+
+    stepOtp.style.opacity = '0';
+    stepOtp.style.transform = 'translateY(-10px)';
+    setTimeout(() => {
+        stepOtp.style.display = "none";
+        wrapper.style.display = "block";
+        setTimeout(() => wrapper.classList.add('visible'), 50);
+    }, 400);
+}
     async function handleResendLogic() {
     const resendBtn = document.getElementById("resendBtnLink");
     resendBtn.style.pointerEvents = "none"; // Prevent double clicks
