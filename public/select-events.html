@@ -78,7 +78,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     #loader-text {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.2em;
@@ -254,7 +254,7 @@
       text-transform: uppercase;
       color: var(--muted);
       margin: 16px 0 12px;
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
     }
 
     .cat-label::after {
@@ -376,7 +376,7 @@
 
     .team-code-container label {
       display: block;
-      font-family: 'Outfit', sans-serif;
+     font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 9px;
       font-weight: 600;
       letter-spacing: 0.1em;
@@ -401,7 +401,7 @@
       background: rgba(0,0,0,0.3);
       color: var(--green);
       font-size: 12px;
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
       text-align: center;
       outline: none;
       transition: border-color 0.25s, box-shadow 0.25s;
@@ -419,7 +419,7 @@
       border: none;
       background: linear-gradient(90deg, #00c6ff, #0072ff);
       color: #fff;
-      font-family: 'Outfit', sans-serif;
+     font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -436,7 +436,7 @@
     }
 
     .token-msg {
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 10px;
       font-weight: 600;
       min-height: 14px;
@@ -455,7 +455,7 @@
     }
 
     .status-text {
-      font-family: 'Outfit', sans-serif;
+     font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 13px;
       color: var(--muted);
     }
@@ -537,7 +537,7 @@
     }
 
     .alert-box p {
-      font-family: 'Outfit', sans-serif;
+     font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 13px;
       color: var(--muted);
       line-height: 1.6;
@@ -550,7 +550,7 @@
       border-radius: 10px;
       background: linear-gradient(90deg, #00c6ff, #0072ff);
       color: #fff;
-      font-family: 'Outfit', sans-serif;
+     font-family: 'Segoe UI', Roboto, sans-serif;
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -567,7 +567,7 @@
       padding: 48px 24px;
       color: var(--muted);
       font-size: 13px;
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Segoe UI', Roboto, sans-serif;
     }
 
     /* ── RESPONSIVE ── */
@@ -597,21 +597,7 @@
   </div>
 </div>
 
-<div class="progress" style="display:flex; justify-content:space-between; margin-bottom:28px; position:relative;">
-  <div style="content:''; position:absolute; top:15px; left:10%; width:80%; height:2px; background:rgba(255,255,255,0.1); z-index:0;"></div>
-  <div class="step" style="text-align:center; z-index:1; width:33%;">
-    <div class="circle" style="width:30px;height:30px;border-radius:50%;background:#00c6ff;margin:0 auto 8px;line-height:30px;font-size:13px;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(0,198,255,0.5);">✓</div>
-    <div style="font-size:11px;">Student</div>
-  </div>
-  <div class="step" style="text-align:center; z-index:1; width:33%;">
-    <div class="circle" style="width:30px;height:30px;border-radius:50%;background:#00c6ff;margin:0 auto 8px;line-height:30px;font-size:13px;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(0,198,255,0.5);">2</div>
-    <div style="font-size:11px;">Events</div>
-  </div>
-  <div class="step" style="text-align:center; z-index:1; width:33%;">
-    <div class="circle" style="width:30px;height:30px;border-radius:50%;background:#162a31;margin:0 auto 8px;line-height:30px;font-size:13px;color:#fff;border:1px solid rgba(255,255,255,0.2);">3</div>
-    <div style="font-size:11px;">Confirm</div>
-  </div>
-</div>
+
 
 <!-- PAGE -->
 <div class="wrapper">
@@ -621,6 +607,27 @@
   </div>
 
   <div class="card">
+    <div class="progress" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; position:relative;">
+  
+  <!-- connector line as a real pseudo-element via a span -->
+  <div style="position:absolute; top:15px; left:calc(16% + 15px); right:calc(16% + 15px); height:2px; background:rgba(255,255,255,0.1); z-index:0;"></div>
+
+  <div style="text-align:center; z-index:1; width:33%; flex-shrink:0;">
+    <div style="width:30px;height:30px;border-radius:50%;background:#00c6ff;margin:0 auto 8px;line-height:30px;font-size:13px;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(0,198,255,0.5);">✓</div>
+    <div style="font-size:11px; white-space:nowrap;">Student</div>
+  </div>
+
+  <div style="text-align:center; z-index:1; width:33%; flex-shrink:0;">
+    <div style="width:30px;height:30px;border-radius:50%;background:#00c6ff;margin:0 auto 8px;line-height:30px;font-size:13px;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(0,198,255,0.5);">2</div>
+    <div style="font-size:11px; white-space:nowrap;">Events</div>
+  </div>
+
+  <div style="text-align:center; z-index:1; width:33%; flex-shrink:0;">
+    <div style="width:30px;height:30px;border-radius:50%;background:#162a31;margin:0 auto 8px;line-height:30px;font-size:13px;color:#fff;border:1px solid rgba(255,255,255,0.2);">3</div>
+    <div style="font-size:11px; white-space:nowrap;">Confirm</div>
+  </div>
+
+</div>
     <div class="scroll-area" id="scrollArea">
 
       <div class="participation-section" id="soloSection">
