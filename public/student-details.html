@@ -599,7 +599,7 @@ async function loadDepartments() {
         const res = await fetch(`${API_BASE_URL}/api/departments`);
         const data = await res.json();
         const sel = document.getElementById("department");
-        sel.innerHTML = '<option value="" disabled selected>Select Department</option>';
+        sel.innerHTML = '<option value="" disabled selected></option>';
         data.forEach(d => {
             const opt = document.createElement("option");
             opt.value = d.name;
