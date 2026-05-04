@@ -186,9 +186,28 @@ app.post("/register/send-otp", async (req, res) => {
                 </p>
                 <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;">
                     <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
-                    <div style="font-size: 48px; font-weight: 800; letter-spacing: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; cursor: pointer; display: inline-block; user-select: all; -webkit-user-select: all;">
-                        ${otp}
-                    </div>
+                   <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+  <tr>
+    ${otp.split('').map(digit => `
+      <td style="padding: 0 4px;">
+        <div style="
+          width: 40px;
+          height: 54px;
+          background: rgba(0,198,255,0.08);
+          border: 1px solid rgba(0,198,255,0.3);
+          border-radius: 10px;
+          text-align: center;
+          line-height: 54px;
+          font-size: 28px;
+          font-weight: 800;
+          color: #ffffff;
+          font-family: 'Courier New', monospace;
+          text-shadow: 0 0 15px rgba(0,198,255,0.6);
+        ">${digit}</div>
+      </td>
+    `).join('')}
+  </tr>
+</table>
                 </div>
                 <p style="color: #556a75; font-size: 12px; line-height: 1.6;">
                     This code is valid for <strong>10 minutes</strong>.<br>
@@ -433,7 +452,7 @@ app.post("/register", async (req, res) => {
                     const typeColor= d.event_type === 'group' ? '#fbbf24' : '#00e5be';
                     const typeLabel= d.event_type === 'group' ? '👥 Group' : '👤 Solo';
                     return `
-                    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;margin-bottom:${i < details.length - 1 ? '10px' : '0'};">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(0,255,174,0.03);border:1px solid rgba(0,255,174,0.12);border-radius:16px;overflow:hidden;">
                       <tr>
                         <td style="padding:14px 16px;">
                           <table width="100%" cellpadding="0" cellspacing="0">
@@ -591,8 +610,7 @@ await sendSymposiumEmail({
             <p style="color: #8899a0; font-size: 15px; line-height: 1.6;">
                 To access your live registration status and digital pass for ${sympTitle}, please use the secure verification code below:
             </p>
-            <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;">
-                <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
+            <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;"><span style="display: block; color: #00ffae; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 18px; font-weight: 800;">Your Verification Code</span>  <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
                 <div style="font-size: 48px; font-weight: 800; letter-spacing: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; display: inline-block; padding: 10px; border-radius: 8px; cursor: pointer; user-select: all; -webkit-user-select: all;">
                     ${otp}
                 </div>
