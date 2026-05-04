@@ -1006,7 +1006,7 @@
       <span class="card-title">Academic Structure Manager</span>
       <span class="card-chip" id="deptCount">0 Departments</span>
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+   <div style="display: grid; grid-template-columns: 1fr 1fr 0.7fr; gap: 24px;">
       <!-- DEPARTMENTS -->
       <div>
         <div style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">Departments</div>
@@ -1027,9 +1027,40 @@
           </select>
           <button class="btn btn-primary" onclick="addDegree()" style="padding:11px 16px;">+</button>
         </div>
-        <div id="degreeList" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;"></div>
+     <div id="degreeList" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;"></div>
       </div>
+
+      <!-- YEAR SETTINGS -->
+      <div>
+        <div style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">Year Settings</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 16px;">
+            <div style="font-family:var(--syne); font-size:10px; font-weight:700; color:var(--accent); margin-bottom:10px;">UG — Undergraduate</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <select id="ugMaxYears" style="flex:1;">
+                <option value="3">3 Years</option>
+                <option value="4" selected>4 Years</option>
+                <option value="5">5 Years</option>
+              </select>
+              <button class="btn btn-primary" onclick="saveYearSetting('UG')" style="padding:11px 14px; white-space:nowrap;">Save</button>
+            </div>
+          </div>
+          <div style="background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 16px;">
+            <div style="font-family:var(--syne); font-size:10px; font-weight:700; color:var(--accent2); margin-bottom:10px;">PG — Postgraduate</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <select id="pgMaxYears" style="flex:1;">
+                <option value="1">1 Year</option>
+                <option value="2" selected>2 Years</option>
+                <option value="3">3 Years</option>
+              </select>
+              <button class="btn btn-primary" onclick="saveYearSetting('PG')" style="padding:11px 14px; white-space:nowrap;">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
   </div>
 
   <!-- CHART + CONTROLS -->
@@ -1068,7 +1099,9 @@
             <option value="PG">PG</option>
           </select>
 
-          <input type="number" id="year" placeholder="Year (1–4)">
+         <select id="year">
+  <option value="">All Years</option>
+</select>
           <input type="text" id="teamTokenFilter" placeholder="Search Team Token">
           <select id="event" onchange="applyFilterConstraints()">
             <option value="">All Events</option>
@@ -1771,6 +1804,46 @@ async function deleteDegree(id) {
     };
     document.getElementById("confirmModal").classList.add("active");
 }
+/* ─── YEAR SETTINGS ─── */
+async function loadYearSettings() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/year-settings`);
+        const data = await res.json();
+        data.forEach(y => {
+            if (y.level === 'UG') document.getElementById("ugMaxYears").value = y.max_years;
+            if (y.level === 'PG') document.getElementById("pgMaxYears").value = y.max_years;
+        });
+        populateYearFilter(data);
+    } catch(e) { console.error('Year settings load error:', e); }
+}
+
+async function saveYearSetting(level) {
+    const max_years = document.getElementById(level === 'UG' ? 'ugMaxYears' : 'pgMaxYears').value;
+    try {
+        const r = await adminFetch(`${API_BASE_URL}/admin/update-year-settings`, {
+            method: 'POST',
+            body: JSON.stringify({ level, max_years: parseInt(max_years) })
+        });
+        const d = await r.json();
+        if (d.success) {
+            showToast(`✓ ${level} year setting saved`);
+            loadYearSettings(); // refresh filter dropdown
+        }
+    } catch(e) { showToast('✗ Save failed'); }
+}
+
+function populateYearFilter(yearData) {
+    const sel = document.getElementById("year");
+    // Find the max across both levels for showing all possible years
+    const maxYears = Math.max(...yearData.map(y => y.max_years));
+    sel.innerHTML = '<option value="">All Years</option>';
+    for (let i = 1; i <= maxYears; i++) {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `Year ${i}`;
+        sel.appendChild(opt);
+    }
+}
 /* ─── TOAST ─── */
 let toastTimer;
 function showToast(msg) {
@@ -1780,12 +1853,12 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove("show"), 3200);
 }
 
-/* ─── INIT ─── */
 document.addEventListener("DOMContentLoaded", () => {
   loadAdminSettings();
   fetchEventsFromServer();
   loadDepartmentsAndDegrees();
-  populateFilterDropdowns();   // populate filter dropdowns from API
+  populateFilterDropdowns();
+  loadYearSettings();
 });
 </script>
 </body>

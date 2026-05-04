@@ -955,6 +955,26 @@ app.delete("/admin/delete-degree", verifyAdmin, async (req, res) => {
         res.json({ success: true });
     } catch (err) { res.status(500).json({ success: false }); }
 });
+// Get year settings (public — for registration form)
+app.get("/api/year-settings", async (req, res) => {
+    try {
+        const [rows] = await promiseDb.query("SELECT * FROM year_settings");
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: "Failed" }); }
+});
+
+// Update year settings (admin only)
+app.post("/admin/update-year-settings", verifyAdmin, async (req, res) => {
+    const { level, max_years } = req.body;
+    if (!level || !max_years) return res.status(400).json({ success: false });
+    try {
+        await promiseDb.query(
+            "INSERT INTO year_settings (level, max_years) VALUES (?, ?) ON DUPLICATE KEY UPDATE max_years = ?",
+            [level, max_years, max_years]
+        );
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ success: false, error: err.sqlMessage }); }
+});
 app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));

@@ -456,7 +456,9 @@
 </div>
 
 <div class="input-field">
-    <input type="number" id="year" placeholder=" " required oninput="validateField('year')">
+    <select id="year" required disabled>
+        <option value="" disabled selected></option>
+    </select>
     <label>Year of Study</label>
     <span class="error-text" id="yearError"></span>
 </div>
@@ -609,22 +611,7 @@ async function loadDepartments() {
     } catch(err) { console.error("Departments load failed:", err); }
 }
 
-async function onLevelChange() {
-    const level = document.getElementById("level").value;
-    if (!level) return;
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/degrees?level=${level}`);
-        const data = await res.json();
-        const sel = document.getElementById("degree");
-        sel.innerHTML = '<option value="" disabled selected></option>';
-        data.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d.name;
-            opt.textContent = d.name;
-            sel.appendChild(opt);
-        });
-    } catch(err) { console.error("Degrees load failed:", err); }
-}
+
 // Helper to toggle "dim" state
 function updateSelectColor(selectId) {
     const sel = document.getElementById(selectId);
@@ -635,18 +622,18 @@ function updateSelectColor(selectId) {
     }
 }
 
-// Modify your existing onLevelChange to include this
 async function onLevelChange() {
-    updateSelectColor("level"); // Update Level color
+    updateSelectColor("level");
     const level = document.getElementById("level").value;
     if (!level) return;
+
+    // Load degrees
     try {
         const res = await fetch(`${API_BASE_URL}/api/degrees?level=${level}`);
         const data = await res.json();
         const sel = document.getElementById("degree");
         sel.innerHTML = '<option value="" disabled selected></option>';
-        sel.classList.remove("has-value"); // Reset Degree color to dim
-        -
+        sel.classList.remove("has-value");
         data.forEach(d => {
             const opt = document.createElement("option");
             opt.value = d.name;
@@ -654,11 +641,31 @@ async function onLevelChange() {
             sel.appendChild(opt);
         });
     } catch(err) { console.error("Degrees load failed:", err); }
+
+    // Load years dynamically based on level
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/year-settings`);
+        const data = await res.json();
+        const setting = data.find(y => y.level === level);
+        const maxYears = setting ? setting.max_years : 4;
+
+        const yearSel = document.getElementById("year");
+        yearSel.innerHTML = '<option value="" disabled selected></option>';
+        yearSel.disabled = false;
+        yearSel.classList.remove("has-value");
+
+        for (let i = 1; i <= maxYears; i++) {
+            const opt = document.createElement("option");
+            opt.value = i;
+            opt.textContent = `Year ${i}`;
+            yearSel.appendChild(opt);
+        }
+    } catch(err) { console.error("Year settings load failed:", err); }
 }
 
-// Add listeners for the other dropdowns
 document.getElementById("degree").addEventListener("change", () => updateSelectColor("degree"));
 document.getElementById("department").addEventListener("change", () => updateSelectColor("department"));
+document.getElementById("year").addEventListener("change", () => updateSelectColor("year"));
 // Call on page load
 document.addEventListener("DOMContentLoaded", () => {
     loadDepartments();
@@ -666,14 +673,12 @@ document.addEventListener("DOMContentLoaded", () => {
  ["level", "degree", "department"].forEach(id => {
         updateSelectColor(id);
     });
-    // Live check on every input/change
-    ["name", "reg_no", "college", "year", "email", "phone"].forEach(id => {
-        document.getElementById(id)?.addEventListener("input", checkFormCompletion);
-    });
-    ["level", "degree", "department"].forEach(id => {
-        document.getElementById(id)?.addEventListener("change", checkFormCompletion);
-    });
-    
+   ["name", "reg_no", "college", "email", "phone"].forEach(id => {
+    document.getElementById(id)?.addEventListener("input", checkFormCompletion);
+});
+   ["level", "degree", "department", "year"].forEach(id => {
+    document.getElementById(id)?.addEventListener("change", checkFormCompletion);
+});
     checkFormCompletion(); // run once on load so button starts dim  ← ADD THIS
 });
 
