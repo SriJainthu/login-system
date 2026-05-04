@@ -186,28 +186,25 @@ app.post("/register/send-otp", async (req, res) => {
                 </p>
                 <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;">
                     <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
-                   <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
-  <tr>
-    ${otp.split('').map(digit => `
-      <td style="padding: 0 4px;">
-        <div style="
-          width: 40px;
-          height: 54px;
-          background: rgba(0,198,255,0.08);
-          border: 1px solid rgba(0,198,255,0.3);
-          border-radius: 10px;
-          text-align: center;
-          line-height: 54px;
-          font-size: 28px;
-          font-weight: 800;
-          color: #ffffff;
-          font-family: 'Courier New', monospace;
-          text-shadow: 0 0 15px rgba(0,198,255,0.6);
-        ">${digit}</div>
-      </td>
-    `).join('')}
-  </tr>
-</table>
+                 <div style="display:inline-flex; gap:6px; justify-content:center; flex-wrap:nowrap; max-width:100%;">
+  ${otp.split('').map(digit => `
+    <div style="
+      width: 36px;
+      height: 50px;
+      background: rgba(0,198,255,0.08);
+      border: 1px solid rgba(0,198,255,0.3);
+      border-radius: 10px;
+      text-align: center;
+      line-height: 50px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffffff;
+      font-family: 'Courier New', monospace;
+      text-shadow: 0 0 15px rgba(0,198,255,0.6);
+      flex-shrink: 0;
+    ">${digit}</div>
+  `).join('')}
+</div>
                 </div>
                 <p style="color: #556a75; font-size: 12px; line-height: 1.6;">
                     This code is valid for <strong>10 minutes</strong>.<br>
