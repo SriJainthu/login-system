@@ -115,10 +115,20 @@ async function initiateRegistrationOTP() {
             showCustomAlert(`Server Error: ${data.details || data.message || "Failed to send OTP"}`);
             resetBtn();
         }
-    } catch (error) {
-        showCustomAlert("Connection Refused. Is the server running?");
-        resetBtn();
-    }
+   } catch (err) {
+    // Re-enable button safely
+    const btn = document.getElementById("nextStepBtn");
+    const loader = document.getElementById("btnLoader");
+    const btnText = document.getElementById("btnText");
+    
+    if (btn) btn.disabled = false;
+    if (loader) loader.style.display = "none";
+    if (btnText) btnText.textContent = "Next Step →";
+
+    // Show the error message from server
+    const message = err.message || "An unexpected error occurred.";
+    showCustomAlert(message);
+}
 }
 function verifyAndProceed() {
     const email = document.getElementById("email").value.trim();
