@@ -124,7 +124,11 @@
             border-color: var(--primary-blue);
         }
 
-        .input-field { position: relative; margin-bottom: 30px; }
+       .input-field { 
+    position: relative; 
+    margin-bottom: 16px;   /* reduce bottom gap — consistent for all fields */
+    padding-top: 20px;     /* this reserves space for the floating label above */
+}
         .input-field input {
             width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
             outline: none; background: rgba(255,255,255,0.05); color: #fff; box-sizing: border-box;
@@ -186,16 +190,14 @@
     font-size: 15px;
     transition: 0.3s;
 }
-/* Fix label position for selects — always float up */
 .input-field select:focus ~ label,
 .input-field select.has-value ~ label {
-    top: -22px;
+    top: 0px;          /* same — floats into padding-top */
     left: 5px;
     font-size: 12px;
     color: var(--primary-blue);
     transform: translateY(0);
 }
-
 /* Placeholder option styling */
 .input-field select option[value=""] {
     color: #999;
@@ -206,9 +208,9 @@
     transform: translateY(-50%);
     transition: 0.3s; color: #999; font-size: 15px;
 }
-       .input-field input:focus + label,
+.input-field input:focus + label,
 .input-field input:not(:placeholder-shown) + label {
-    top: -22px;
+    top: 0px;          /* now floats into the padding-top space, not above the field */
     left: 5px;
     font-size: 12px;
     color: var(--primary-blue);
