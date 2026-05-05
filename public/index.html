@@ -228,6 +228,11 @@
         width: 100%;
         box-sizing: border-box;
     }
+    #headerText {
+        font-size: 0.85rem;
+        letter-spacing: 2px; /* Reduced from 4px */
+        line-height: 1.5;
+    }
 }
 /* ---------- HERO LOADER ---------- */
 #heroLoader {
@@ -290,6 +295,18 @@
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+#headerText {
+    text-align: center;
+    letter-spacing: 4px;
+    /* 1. Add line-height */
+    line-height: 1.6; 
+    /* 2. Add some padding/margin to breathe */
+    margin-bottom: 15px; 
+    /* 3. Constrain the width so it doesn't hit the screen edges on mobile */
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 /* Top Loading Bar */
 #topLoader {
