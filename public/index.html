@@ -49,14 +49,22 @@
             -webkit-text-fill-color: transparent;
             animation: fadeInDown 1s ease-out;
         }
+.hero p {
+    font-size: 1.2rem;
+    color: var(--primary);
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    animation: fadeInUp 1.2s ease-out;
+    
+    /* ── FIXES THE MOBILE WRAPPING ISSUE ── */
+    line-height: 1.8;          /* adds breathing room between wrapped lines */
+    max-width: 700px;          /* prevents ultra-wide text on desktop */
+    text-align: center;        /* keeps it centered when it wraps */
+    padding: 0 16px;           /* prevents text from touching screen edges */
+    word-break: break-word;    /* handles extremely long single words */
+}
 
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--primary);
-            letter-spacing: 4px;
-            margin-bottom: 30px;
-            animation: fadeInUp 1.2s ease-out;
-        }
+
 
         /* ---------- COUNTDOWN TIMER ---------- */
         .countdown {
@@ -193,8 +201,10 @@
     }
 
     .hero p {
-        font-size: 0.85rem;
+      font-size: 0.85rem;
         letter-spacing: 2px;
+        line-height: 2;        /* even more gap on mobile */
+        padding: 0 12px;
     }
 
     .countdown {
