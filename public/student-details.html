@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Registration </title>
     <link rel="stylesheet" href="style.css">
- <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
 
     <style>
@@ -124,7 +124,7 @@
             border-color: var(--primary-blue);
         }
 
-        .input-field { position: relative; margin-bottom: 0; height: 80px; display: flex; flex-direction: column; justify-content: center; }
+        .input-field { position: relative; margin-bottom: 30px; }
         .input-field input {
             width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
             outline: none; background: rgba(255,255,255,0.05); color: #fff; box-sizing: border-box;
@@ -189,7 +189,7 @@
 /* Fix label position for selects — always float up */
 .input-field select:focus ~ label,
 .input-field select.has-value ~ label {
-    top: 6px;
+    top: -22px;
     left: 5px;
     font-size: 12px;
     color: var(--primary-blue);
@@ -201,15 +201,14 @@
     color: #999;
 }
         
-.input-field label {
+      .input-field label {
     position: absolute; top: 50%; left: 14px; pointer-events: none;
     transform: translateY(-50%);
     transition: 0.3s; color: #999; font-size: 15px;
 }
-
-.input-field input:focus + label,
+       .input-field input:focus + label,
 .input-field input:not(:placeholder-shown) + label {
-    top: 10px;
+    top: -22px;
     left: 5px;
     font-size: 12px;
     color: var(--primary-blue);
