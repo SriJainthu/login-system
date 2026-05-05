@@ -90,16 +90,22 @@ async function initiateRegistrationOTP() {
             }) 
         });
 
-        const data = await response.json();
+       const data = await response.json();
+
+        // 409 = already registered — check BEFORE the !response.ok block
+        if (response.status === 409) {
+            showCustomAlert(data.message || "Already registered.");
+            resetBtn();
+            return;
+        }
+
         if (!response.ok) {
             showCustomAlert(data.details || data.message || "An error occurred");
             resetBtn();
             return;
         }
-        if (response.status === 409) {
-            showCustomAlert(data.message || "Already registered.");
-            resetBtn(); 
-        } else if (response.ok && data.success) {
+
+        if (data.success) {
             localStorage.setItem("studentData", JSON.stringify(fields));
             const otpOverlay = document.getElementById('otpOverlay');
             const otpMessage = document.getElementById('otpMessage');
@@ -404,6 +410,14 @@ function maskEmail(email) {
     const [user, domain] = email.split("@");
     // Shows first letter, then stars, then the domain (e.g., j*****@gmail.com)
     return user.charAt(0) + "*****@" + domain;
+}
+function resetBtn() {
+    const btn = document.getElementById("nextStepBtn");
+    const loader = document.getElementById("btnLoader");
+    const btnText = document.getElementById("btnText");
+    if (btn) { btn.disabled = false; btn.dataset.ready = "true"; }
+    if (loader) loader.style.display = "none";
+    if (btnText) btnText.textContent = "Next Step →";
 }
 function maskPhone(phone) {
     if (!phone) return "your number";
