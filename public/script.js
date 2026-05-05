@@ -471,19 +471,20 @@ function checkFormCompletion() {
     const btnText = document.getElementById("btnText");
     if (!btn) return;
 
-    if (allValid) {
-        btn.disabled = false;
-        btn.style.background = "linear-gradient(90deg, #00c6ff, #0072ff)";
-        btn.style.opacity = "1";
-        btn.style.boxShadow = "0 0 20px rgba(0, 198, 255, 0.5)";
-        btn.style.cursor = "pointer";
-        btn.dataset.ready = "true";
-    } else {
+   if (allValid) {
+    btn.disabled = false;
+    btn.style.background = "linear-gradient(90deg, #00c6ff, #0072ff)";
+    btn.style.opacity = "1";
+    btn.style.boxShadow = "0 0 28px rgba(0, 198, 255, 0.8), 0 0 60px rgba(0, 114, 255, 0.5), 0 8px 28px rgba(0, 198, 255, 0.6)";
+    btn.style.filter = "brightness(1.15) saturate(1.3)";
+    btn.style.cursor = "pointer";
+    btn.dataset.ready = "true";
+}else {
         btn.disabled = false; // keep enabled so click works for the warning
         btn.style.background = "#2a3a40";
         btn.style.opacity = "1"; // keep visible
         btn.style.boxShadow = "none";
-        btn.style.filter = "grayscale(60%) brightness(0.8)";
+        btn.style.filter = "grayscale(60%) brightness(1.15) saturate(1.3)";
 btn.style.cursor = "not-allowed";
         btn.dataset.ready = "false";
     }
