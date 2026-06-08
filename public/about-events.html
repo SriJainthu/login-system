@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Events-Sympoisum 2026 </title>
+   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+
+  <style>
+    :root {
+     --primary-blue: #00c6ff;
+      --dark-bg: #0f2027;
+      --glass-bg: rgba(255, 255, 255, 0.07);
+      --error-red: #ff4b2b;
+      --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      --tech:    #4f8ef7;
+      --nontech: #a855f7;
+      --warn:    #fbbf24;
+      --surface: rgba(255,255,255,0.07);
+      --border:  rgba(255,255,255,0.1);
+      --text:    #ffffff;
+      --muted:   #8899a8;
+      --label:   #aaaaaa;
+      --ease:    cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-top: 80px;
+    }
+
+    /* ── NAVBAR (matches student-details.html) ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 10001;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      box-sizing: border-box;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      transition: opacity 0.4s ease;
+    }
+    .logo span { color: var(--primary-blue); }
+    .logo.loading {
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.1) 25%,
+        rgba(255,255,255,0.2) 50%,
+        rgba(255,255,255,0.1) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+      min-width: 120px;
+      display: inline-block;
+    }
+    .logo.loading span { color: transparent !important; }
+
+    .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+    .bar { width: 25px; height: 2px; background-color: var(--primary-blue); margin: 5px 0; transition: 0.4s; }
+    .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+    .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
+
+    /* ── SIDE MENU (matches student-details.html) ── */
+    .nav-overlay {
+      height: 100vh;
+      width: 280px;
+      position: fixed;
+      z-index: 10000;
+      top: 0; left: 0;
+      background: #0a1419;
+      border-right: 1px solid var(--primary-blue);
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+    }
+    .nav-overlay.open { transform: translateX(0); }
+
+    .overlay-content {
+      padding: 120px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-item {
+      text-decoration: none;
+      padding: 15px 0;
+      display: block;
+      transition: 0.3s;
+    }
+
+    .nav-number { font-size: 10px; color: var(--primary-blue); font-weight: bold; margin-bottom: 5px; display: block; }
+    .nav-text { color: #ffffff; font-size: 18px; font-weight: 600; transition: 0.3s; }
+    .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
+
+    .nav-item:hover .nav-text,
+    .nav-item.active .nav-text { color: #4fdcff; transform: translateX(10px); }
+    .nav-item.active .nav-text { color: var(--primary-blue); }
+
+    /* ── MAIN WRAPPER ── */
+    .wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 52px 28px 80px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 56px;
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--primary-blue);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .page-eyebrow::before, .page-eyebrow::after {
+      content: '';
+      width: 32px; height: 1px;
+      background: var(--primary-blue);
+      opacity: 0.5;
+    }
+
+    .page-title {
+      font-size: 42px;
+      font-weight: 300;
+      letter-spacing: 1px;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .page-title span {
+      color: var(--primary-blue);
+      font-weight: 700;
+    }
+
+    .page-sub {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── CATEGORY SECTION ── */
+    .category-section {
+      margin-bottom: 56px;
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+    .category-section:nth-child(2) { animation-delay: 0.1s; }
+    .category-section:nth-child(3) { animation-delay: 0.2s; }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .category-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .cat-tech .category-icon {
+      background: rgba(79,142,247,0.15);
+      border: 1px solid rgba(79,142,247,0.3);
+    }
+
+    .cat-nontech .category-icon {
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.3);
+    }
+
+    .category-info { flex: 1; }
+
+    .category-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .cat-tech .category-name    { color: var(--tech); }
+    .cat-nontech .category-name { color: var(--nontech); }
+
+    .category-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .category-count {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 5px 14px;
+      border-radius: 20px;
+    }
+
+    .cat-tech .category-count {
+      background: rgba(79,142,247,0.1);
+      color: var(--tech);
+      border: 1px solid rgba(79,142,247,0.25);
+    }
+
+    .cat-nontech .category-count {
+      background: rgba(168,85,247,0.1);
+      color: var(--nontech);
+      border: 1px solid rgba(168,85,247,0.25);
+    }
+
+    /* ── EVENTS GRID ── */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    /* ── EVENT CARD (glass style matching student-details) ── */
+    .event-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: border-color 0.3s var(--ease),
+                  background 0.3s var(--ease),
+                  transform 0.35s var(--ease),
+                  box-shadow 0.35s var(--ease);
+      backdrop-filter: blur(10px);
+    }
+
+    .event-card.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Top accent bar */
+    .event-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .cat-tech .event-card::before {
+      background: linear-gradient(90deg, var(--tech), var(--primary-blue));
+    }
+
+    .cat-nontech .event-card::before {
+      background: linear-gradient(90deg, var(--nontech), #e879f9);
+    }
+
+    .event-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .cat-tech .event-card:hover {
+      border-color: rgba(79,142,247,0.5);
+      background: rgba(79,142,247,0.05);
+    }
+
+    .cat-nontech .event-card:hover {
+      border-color: rgba(168,85,247,0.5);
+      background: rgba(168,85,247,0.05);
+    }
+
+    .event-card:hover::before { opacity: 1; }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .event-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 1.25;
+    }
+
+    .event-badges {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .badge-solo  { background: rgba(0,198,255,0.12); color: var(--primary-blue); border: 1px solid rgba(0,198,255,0.25); }
+    .badge-group { background: rgba(251,191,36,0.12); color: var(--warn); border: 1px solid rgba(251,191,36,0.25); }
+    .badge-team  { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
+
+    .event-desc {
+      font-size: 13px;
+      color: var(--label);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .footer-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+    }
+
+    .cat-tech .footer-dot    { background: var(--tech); }
+    .cat-nontech .footer-dot { background: var(--nontech); }
+
+    /* ── SKELETON ── */
+    .skeleton-section { margin-bottom: 48px; animation: fadeUp 0.5s var(--ease) both; }
+
+    .skeleton-header {
+      height: 56px;
+      background: var(--glass-bg);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .skeleton-card {
+      height: 155px;
+      background: var(--glass-bg);
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .skeleton-header::after, .skeleton-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+      animation: shimmer 1.4s infinite;
+    }
+
+    @keyframes shimmer {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(100%); }
+    }
+
+    /* ── EMPTY / ERROR ── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--muted);
+    }
+    .empty-state p { font-size: 14px; margin-top: 8px; }
+
+    .retry-btn {
+      margin-top: 20px;
+      padding: 12px 28px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .retry-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,198,255,0.3); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .page-title { font-size: 28px; }
+      .events-grid { grid-template-columns: 1fr; }
+      .wrapper { padding: 36px 16px 60px; }
+      .navbar { padding: 18px 20px; }
+    }
+    /* ── STICKY FOOTER CTA ── */
+.cta-footer {
+    position: fixed;
+    bottom: 0; left: 0; width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    background: rgba(10, 20, 25, 0.92);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(0, 198, 255, 0.15);
+    z-index: 9000;
+    gap: 20px;
+    animation: slideUpBar 0.6s 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes slideUpBar {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.cta-quote {
+    font-size: 14px;
+    color: #aaa;
+    font-style: italic;
+    margin: 0;
+    flex: 1;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.cta-quote.fade-out {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+/* THE BUTTON — matches your screenshot */
+.cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 36px;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #00d4ff, #00a8ff, #0077ff);
+    color: #fff;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    box-shadow:
+        0 0 20px rgba(0, 198, 255, 0.6),
+        0 0 40px rgba(0, 198, 255, 0.3),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer sweep on the button */
+.cta-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    animation: btnShimmer 2.5s infinite;
+}
+
+@keyframes btnShimmer {
+    0%   { left: -100%; }
+    100% { left: 200%; }
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow:
+        0 0 30px rgba(0, 198, 255, 0.8),
+        0 0 60px rgba(0, 198, 255, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.cta-btn:active { transform: scale(0.97); }
+
+/* Push page content above the bar */
+body { padding-bottom: 80px; }
+
+@media (max-width: 600px) {
+    .cta-footer { flex-direction: column; padding: 14px 20px; gap: 10px; text-align: center; }
+    .cta-quote  { font-size: 12px; }
+    body { padding-bottom: 110px; }
+}
+  </style>
+
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="menu-toggle" id="menuToggle">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+  </div>
+  <div class="logo" id="navLogo">Symposium <span>2026</span></div>
+</header>
+
+<!-- SIDE MENU -->
+<nav id="sideMenu" class="nav-overlay">
+  <div class="overlay-content">
+    <a href="index.html" class="nav-item">
+      <span class="nav-number">01</span>
+      <div class="nav-text">Home <small>Landing Page</small></div>
+    </a>
+    <a href="student-details.html" class="nav-item">
+      <span class="nav-number">02</span>
+      <div class="nav-text">Registration <small>Step 1</small></div>
+    </a>
+    <a href="about-events.html" class="nav-item active">
+      <span class="nav-number">03</span>
+      <div class="nav-text">About Events <small>Details</small></div>
+    </a>
+    <a href="view-registration.html" class="nav-item">
+      <span class="nav-number">04</span>
+      <div class="nav-text">My History <small>View Entry</small></div>
+    </a>
+    <a href="contact.html" class="nav-item">
+      <span class="nav-number">05</span>
+      <div class="nav-text">Contact Us <small>Get in Touch</small></div>
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="wrapper">
+
+  <div class="page-header">
+   
+    <h1 class="page-title">Event <span>Catalog</span></h1>
+    <p class="page-sub">Explore all technical and non-technical competitions and challenges</p>
+  </div>
+
+  <div id="eventsContent">
+    <!-- Skeleton loader -->
+    <div class="skeleton-section">
+      <div class="skeleton-header"></div>
+      <div class="skeleton-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+    <div class="skeleton-section" style="animation-delay:0.1s;">
+      <div class="skeleton-header"></div>
+      <div class="skeleton-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+  </div>
+<!-- STICKY FOOTER CTA -->
+<div class="cta-footer" id="ctaFooter">
+  <p class="cta-quote" id="ctaQuote">⏳ The clock is ticking — grab your spot!</p>
+  <a href="student-details.html" class="cta-btn">Register Now</a>
+</div>
+</main>
+
+<script>
+  const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://login-system-1-nowr.onrender.com';
+
+  /* ── MENU ── */
+  const menuToggle = document.getElementById('menuToggle');
+  const sideMenu   = document.getElementById('sideMenu');
+
+  menuToggle.addEventListener('click', e => {
+    e.stopPropagation();
+    sideMenu.classList.toggle('open');
+    menuToggle.classList.toggle('open');
+  });
+
+  document.addEventListener('click', e => {
+    if (sideMenu.classList.contains('open') &&
+        !sideMenu.contains(e.target) &&
+        !menuToggle.contains(e.target)) {
+      sideMenu.classList.remove('open');
+      menuToggle.classList.remove('open');
+    }
+  });
+
+  /* ── NAVBAR TITLE (matches student-details.html) ── */
+  async function loadNavbarTitle() {
+    const logoEl = document.getElementById('navLogo');
+    if (!logoEl) return;
+    logoEl.classList.add('loading');
+    try {
+      const res  = await fetch(`${API_BASE_URL}/api/public-settings`);
+      const data = await res.json();
+      if (data && data.symposium_title) {
+        const parts = data.symposium_title.split(/(\d{2,4})/);
+        logoEl.classList.remove('loading');
+        logoEl.style.opacity = '0';
+        logoEl.style.transition = 'opacity 0.5s ease';
+        if (parts.length >= 2) {
+          logoEl.innerHTML = `${parts[0].trim()} <span>${parts[1].trim()}</span>`;
+        } else {
+          logoEl.textContent = data.symposium_title;
+        }
+        requestAnimationFrame(() => { logoEl.style.opacity = '1'; });
+      } else {
+        logoEl.classList.remove('loading');
+      }
+    } catch {
+      logoEl.classList.remove('loading');
+    }
+  }
+  fetch(`${API_BASE_URL}/api/public-settings`)
+  .then(r => r.json())
+  .then(d => { if (d?.symposium_title) document.title = `About Events | ${d.symposium_title}`; })
+  .catch(() => {});
+
+  /* ── BUILD CARD ── */
+  function buildCard(event, catClass) {
+    const isGroup  = event.event_type === 'group';
+    const teamSize = event.max_team_size || 1;
+    const typeBadge = isGroup
+      ? `<span class="badge badge-group">Group · ${teamSize}</span>`
+      : `<span class="badge badge-solo">Solo</span>`;
+
+    return `
+      <div class="event-card">
+        <div class="card-top">
+          <div class="event-name">${event.event_name}</div>
+          <div class="event-badges">${typeBadge}</div>
+        </div>
+        <div class="event-desc">${event.description || 'No description available.'}</div>
+        <div class="card-footer">
+          <div class="footer-item">
+            <div class="footer-dot"></div>
+            ${catClass === 'cat-tech' ? 'Technical' : 'Non-Technical'}
+          </div>
+          ${isGroup ? `<div class="footer-item"><span class="badge badge-team">Max ${teamSize} members</span></div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  /* ── BUILD SECTION ── */
+  function buildSection(catClass, icon, title, desc, events) {
+    if (events.length === 0) return '';
+    const countLabel = `${events.length} Event${events.length !== 1 ? 's' : ''}`;
+    const cardsHtml  = events.map(e => buildCard(e, catClass)).join('');
+    return `
+      <div class="category-section ${catClass}">
+        <div class="category-header">
+          <div class="category-icon">${icon}</div>
+          <div class="category-info">
+            <div class="category-name">${title}</div>
+            <div class="category-desc">${desc}</div>
+          </div>
+          <div class="category-count">${countLabel}</div>
+        </div>
+        <div class="events-grid">${cardsHtml}</div>
+      </div>`;
+  }
+
+  /* ── STAGGER ANIMATION ── */
+  function staggerCards() {
+    document.querySelectorAll('.event-card').forEach((card, i) => {
+      setTimeout(() => card.classList.add('show'), i * 80);
+    });
+  }
+
+  /* ── LOAD EVENTS ── */
+  async function loadEvents() {
+    const content = document.getElementById('eventsContent');
+    try {
+      const res    = await fetch(`${API_BASE_URL}/events`);
+      if (!res.ok) throw new Error('Server error');
+      const events = await res.json();
+
+      if (!events || events.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <div style="font-size:40px;">📭</div>
+            <p>No events have been added yet.</p>
+          </div>`;
+        return;
+      }
+
+      const technical    = events.filter(e => (e.event_category || 'technical') === 'technical');
+      const nonTechnical = events.filter(e => e.event_category === 'non-technical');
+
+      const techHTML    = buildSection('cat-tech',    '⚡', 'Technical Events',     'Coding, engineering & innovation challenges', technical);
+      const nonTechHTML = buildSection('cat-nontech', '🎨', 'Non-Technical Events', 'Creative, cultural & talent competitions',    nonTechnical);
+
+      content.innerHTML = techHTML + nonTechHTML;
+      staggerCards();
+
+    } catch (err) {
+      console.error(err);
+      content.innerHTML = `
+        <div class="empty-state">
+          <div style="font-size:40px;">⚠️</div>
+          <p>Failed to load events. Please check your connection.</p>
+          <button class="retry-btn" onclick="loadEvents()">Retry</button>
+        </div>`;
+    }
+  }
+/* ── ROTATING QUOTES ── */
+const quotes = [
+    "⏳ The clock is ticking — grab your spot!",
+    "🚀 Every champion started by signing up.",
+    "💡 Your next big win starts with one click.",
+    "🎯 Don't watch from the sidelines — compete!",
+    "🔥 Seats are limited. Regrets are not.",
+    "⚡ Winners register early. Are you one?",
+    "🎓 This is your moment. Don't scroll past it.",
+];
+
+let quoteIndex = 0;
+const quoteEl = document.getElementById("ctaQuote");
+
+setInterval(() => {
+    quoteEl.classList.add("fade-out");
+    setTimeout(() => {
+        quoteIndex = (quoteIndex + 1) % quotes.length;
+        quoteEl.textContent = quotes[quoteIndex];
+        quoteEl.classList.remove("fade-out");
+    }, 500);
+}, 3500);
+  loadNavbarTitle();
+  loadEvents();
+</script>
+</body>
+</html>

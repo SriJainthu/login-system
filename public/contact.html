@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us-Symposium 2026 </title>
+    <link rel="stylesheet" href="style.css">
+   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+    <style>
+        :root {
+            --primary: #00c6ff;
+            --dark-bg: #0f2027;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+            color: #fff;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 80px; 
+            box-sizing: border-box;
+        }
+
+        /* ---------- NAVBAR ---------- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 10001;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            box-sizing: border-box;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; color: #fff; }
+        .logo span { color: var(--primary); }
+
+        .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+        .bar { width: 25px; height: 2px; background-color: var(--primary); margin: 5px 0; transition: 0.4s; }
+
+        .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+        .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
+
+        /* ---------- SIDE MENU ---------- */
+        .nav-overlay {
+            height: 100vh; width: 280px; position: fixed; z-index: 10000; top: 0; left: 0;
+            background: #0a1419; border-right: 1px solid var(--primary);
+            transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+        }
+        .nav-overlay.open { transform: translateX(0); }
+        .overlay-content { padding: 120px 30px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .nav-item { text-decoration: none; padding: 15px 0; display: block; transition: 0.3s; }
+        .nav-number { font-size: 10px; color: var(--primary); font-weight: bold; margin-bottom: 5px; display: block; }
+        .nav-text { color: #ccc; font-size: 18px; font-weight: 600; transition: 0.3s; }
+        .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
+        .nav-item:hover .nav-text, .nav-item.active .nav-text { color: #fff; transform: translateX(10px); }
+        .nav-item.active .nav-text { color: var(--primary); }
+
+        /* ---------- CONTENT LAYOUT ---------- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        .contact-info-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .contact-info-card h2 { font-size: 32px; margin-bottom: 10px; color: var(--primary); font-weight: 700; }
+        .contact-info-card p { font-size: 16px; color: #ccc; margin-bottom: 40px; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(15px);
+    padding: 25px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+.info-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    background: linear-gradient(120deg, transparent, rgba(0,198,255,0.3), transparent);
+    opacity: 0;
+    transition: 0.4s;
+}
+
+
+    .info-item:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: #00c6ff;
+    box-shadow: 0 0 25px rgba(0,198,255,0.25);
+}
+.info-item:hover::before {
+    opacity: 1;
+}
+
+        .info-item .icon { 
+            width: 40px; height: 40px; background: var(--primary); border-radius: 50%; 
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; 
+            color: #000; font-weight: bold; font-size: 18px;
+        }
+
+        .info-item b { color: var(--primary); display: block; margin-bottom: 5px; font-size: 14px; text-transform: uppercase; }
+        .info-item span { font-size: 15px; color: #fff; line-height: 1.4; }
+
+        /* ---------- MAP SECTION ---------- */
+        .map-wrapper {
+            width: 100%;
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05); /* Placeholder while loading */
+            filter: grayscale(1) invert(0.92) contrast(1.2);
+            opacity: 0.8;
+            transition: 0.5s;
+        }
+        .map-wrapper:hover { opacity: 1; filter: grayscale(0.2) invert(0.92); }
+
+        @media (max-width: 600px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .contact-info-card { padding: 30px 20px; }
+        }
+        .map-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(15, 32, 39, 0.8);
+    z-index: 2;
+    font-size: 14px;
+    color: #ccc;
+}
+
+/* 🔄 Spinner */
+.spinner {
+    width: 35px;
+    height: 35px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top: 3px solid #00c6ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+/* ---------- SKELETON LOADER ---------- */
+#contactLoader {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.skeleton-line {
+    background: linear-gradient(90deg, #1a2a33 25%, #2c5364 50%, #1a2a33 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+.skeleton-line.medium {
+    width: 300px;
+    height: 14px;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* ---------- FADE-IN ---------- */
+.fade-text {
+    opacity: 0;
+    transform: translateY(15px);
+    filter: blur(6px);
+    transition: all 0.6s ease;
+}
+
+.fade-text.show {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+#topLoader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #00c6ff, #00ffae);
+    z-index: 9999;
+    transition: width 0.3s ease;
+}
+.map-pin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -150%);
+    font-size: 30px;
+    color: #00c6ff;
+    opacity: 0;
+    animation: dropPin 0.8s ease forwards;
+}
+
+@keyframes dropPin {
+    0% {
+        transform: translate(-50%, -200%);
+        opacity: 0;
+    }
+    70% {
+        transform: translate(-50%, -40%);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -60%);
+    }
+}
+.whatsapp-btn {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 12px 25px;
+    border-radius: 50px;
+    background: linear-gradient(45deg, #25D366, #128C7E);
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+    box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(37, 211, 102, 0.7);
+}
+/* Navbar logo loading state */
+.logo {
+    transition: opacity 0.4s ease;
+}
+
+.logo.loading {
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0.1) 25%, 
+        rgba(255,255,255,0.2) 50%, 
+        rgba(255,255,255,0.1) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 4px;
+    color: transparent !important;
+    min-width: 120px;
+    display: inline-block;
+}
+
+.logo.loading span {
+    color: transparent !important;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+    </style>
+</head>
+<body>
+<div id="topLoader"></div>
+    <header class="navbar">
+        <div class="menu-toggle" id="menuToggle">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <div class="logo">Symposium <span>2026</span></div>
+    </header>
+
+    <nav id="sideMenu" class="nav-overlay">
+        <div class="overlay-content">
+            <a href="index.html" class="nav-item">
+                <span class="nav-number">01</span>
+                <div class="nav-text">Home <small>Landing Page</small></div>
+            </a>
+            <a href="student-details.html" class="nav-item">
+                <span class="nav-number">02</span>
+                <div class="nav-text">Registration <small>Step 1</small></div>
+            </a>
+            <a href="about-events.html" class="nav-item">
+                <span class="nav-number">03</span>
+                <div class="nav-text">About Events <small>Details</small></div>
+            </a>
+            <a href="view-registration.html" class="nav-item">
+                <span class="nav-number">04</span>
+                <div class="nav-text">My History <small>View Entry</small></div>
+            </a>
+            <a href="contact.html" class="nav-item active">
+                <span class="nav-number">05</span>
+                <div class="nav-text">Contact Us <small>Get in Touch</small></div>
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="contact-info-card">
+            <h2>Venue & Support</h2>
+          <div id="contactLoader">
+    <div class="skeleton-line medium"></div>
+</div>
+
+<p id="contactLocationText" class="fade-text"></p>
+            <div class="info-grid">
+                <a id="whatsappBtn" class="whatsapp-btn" target="_blank">
+    💬 Chat on WhatsApp
+</a>
+                <div class="info-item">
+    <div class="icon">V</div>
+    <b>Location</b>
+   <span id="contactLocation" class="fade-text"></span>
+</div>
+
+<div class="info-item">
+    <div class="icon">E</div>
+    <b>Email Us</b>
+   <a id="contactEmail" href="#" class="fade-text"></a>
+</div>
+
+<div class="info-item">
+    <div class="icon">C</div>
+    <b>Call Support</b>
+   <a id="contactPhone" class="fade-text"></a>
+</div>
+            </div>
+        </div>
+
+<div class="map-wrapper" id="mapContainer">
+
+    <!-- 🔄 Loader -->
+    <div id="mapLoading" class="map-loading">
+        <div class="spinner"></div>
+        <span>Loading map...</span>
+    </div>
+
+    <!-- 🗺 Map -->
+    <iframe 
+        id="mapFrame"
+        width="100%" 
+        height="100%" 
+        style="border:0; opacity:0; transition: opacity 0.6s ease;"
+        allowfullscreen="" 
+        loading="lazy">
+    </iframe>
+    <div id="mapPin" class="map-pin">📍</div>
+
+</div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-nowr.onrender.com';
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuToggle = document.getElementById("menuToggle");
+            const sideMenu = document.getElementById("sideMenu");
+
+            menuToggle.addEventListener("click", (e) => {
+                e.stopPropagation();
+                sideMenu.classList.toggle("open");
+                menuToggle.classList.toggle("open");
+            });
+
+            document.addEventListener("click", (e) => {
+                if (sideMenu.classList.contains("open") && !sideMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sideMenu.classList.remove("open");
+                    menuToggle.classList.remove("open");
+                }
+            });
+        });
+async function loadContactData() {
+    startLoader();
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/contact`);
+        const data = await res.json();
+
+        const loader = document.getElementById("contactLoader");
+
+        const locationText = document.getElementById("contactLocationText");
+        const location = document.getElementById("contactLocation");
+        const email = document.getElementById("contactEmail");
+        const phone = document.getElementById("contactPhone");
+        const whatsappBtn = document.getElementById("whatsappBtn");
+ if (data.contact_phone) {
+    const phoneNumber = data.contact_phone.replace(/\D/g, "");
+
+    whatsappBtn.href = `https://wa.me/${phoneNumber}?text=Hello%20I%20want%20details%20about%20Symposium%202026`;
+} else {
+    whatsappBtn.style.display = "none";
+}
+        // Set values
+        locationText.innerText = data.contact_location || "Location unavailable";
+        location.innerHTML = (data.contact_location || "").replace(/\n/g, "<br>");
+       if (data.contact_email) {
+    email.innerText = data.contact_email;
+    email.href = `mailto:${data.contact_email}`;
+} else {
+    email.innerText = "Not available";
+}
+       if (data.contact_phone) {
+    phone.innerText = data.contact_phone;
+    phone.href = `tel:${data.contact_phone}`;
+} else {
+    phone.innerText = "Not available";
+}
+
+        // Remove skeleton
+        if (loader) loader.style.display = "none";
+
+        // Animate text
+        setTimeout(() => {
+            locationText.classList.add("show");
+            location.classList.add("show");
+            email.classList.add("show");
+            phone.classList.add("show");
+        }, 100);
+
+        // MAP
+        const iframe = document.getElementById("mapFrame");
+
+        iframe.onload = () => {
+            document.getElementById("mapLoading").style.display = "none";
+            document.getElementById("mapPin").style.display = "block";
+            iframe.style.opacity = "1";
+        };
+
+        if (data.contact_lat && data.contact_lng) {
+            iframe.src =
+                `https://www.google.com/maps?q=${data.contact_lat},${data.contact_lng}&hl=en&z=16&output=embed`;
+        }
+
+    } catch (err) {
+        console.error("Failed to load contact data:", err);
+    } finally {
+        finishLoader();
+    }
+}
+function startLoader() {
+    const bar = document.getElementById("topLoader");
+    bar.style.width = "30%";
+    setTimeout(() => bar.style.width = "70%", 300);
+}
+
+function finishLoader() {
+    const bar = document.getElementById("topLoader");
+    bar.style.width = "100%";
+    setTimeout(() => bar.style.opacity = "0", 300);
+}
+document.addEventListener("DOMContentLoaded", loadContactData);
+
+async function loadNavbarTitle() {
+    const logoEl = document.querySelector('.logo');
+    if (!logoEl) return;
+
+    // Show shimmer skeleton while loading
+    logoEl.classList.add('loading');
+
+    try {
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : 'https://login-system-1-nowr.onrender.com';
+
+        const res = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const data = await res.json();
+
+        if (data && data.symposium_title) {
+            const title = data.symposium_title;
+            const parts = title.split(/(\d{2,4})/);
+
+            // Remove shimmer, set content, fade in
+            logoEl.classList.remove('loading');
+            logoEl.style.opacity = '0';
+            logoEl.style.transition = 'opacity 0.5s ease';
+
+            if (parts.length >= 2) {
+                logoEl.innerHTML = `${parts[0].trim()} <span>${parts[1].trim()}</span>`;
+            } else {
+                logoEl.textContent = title;
+            }
+
+            requestAnimationFrame(() => {
+                logoEl.style.opacity = '1';
+            });
+        }
+    } catch(err) {
+        // Fallback — just show what's already there
+        logoEl.classList.remove('loading');
+        logoEl.style.opacity = '1';
+    }
+}
+fetch(`${API_BASE_URL}/api/public-settings`)
+  .then(r => r.json())
+  .then(d => { if (d?.symposium_title) document.title = `Contact Us | ${d.symposium_title}`; })
+  .catch(() => {});
+loadNavbarTitle();
+
+    </script>
+</body>
+</html>

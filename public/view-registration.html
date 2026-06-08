@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Status - Symposium 2026</title>
+    <link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+    --primary: #00c6ff;
+    --primary-blue: #00c6ff; /* Add this line */
+    --dark-bg: #0f2027;
+    --accent: #00ffae;
+    --error-red: #ff4b2b;
+    --transition-speed: 0.5s;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 80px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        /* ---------- ANIMATIONS ---------- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes modalPop {
+            0% { transform: scale(0.9) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .fade-in { animation: fadeIn var(--transition-speed) ease forwards; }
+        
+        /* ---------- NAVBAR & MENU ---------- */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 20px 40px; display: flex; align-items: center;
+            gap: 20px; z-index: 10001; background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px); box-sizing: border-box;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .logo { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+        .logo span { color: var(--primary); }
+        .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+        .bar { width: 25px; height: 2px; background-color: var(--primary); margin: 5px 0; transition: 0.4s; }
+        .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+        .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+        .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
+
+       
+       
+     
+
+        /* ---------- CONTAINER ---------- */
+        .container {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            padding: 35px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 1;
+            margin: 20px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        h2 { text-align: center; margin-bottom: 25px; font-weight: 300; font-size: 2rem; }
+        h2 b { color: var(--primary); font-weight: 700; text-shadow: 0 0 10px rgba(0,198,255,0.3); }
+
+        input {
+            width: 100%; padding: 14px; border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.08);
+            color: #fff; box-sizing: border-box; margin-bottom: 20px; outline: none;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+        input:focus { border-color: var(--primary); background: rgba(0,198,255,0.05); box-shadow: 0 0 15px rgba(0,198,255,0.2); }
+
+        button {
+            width: 100%; padding: 14px; background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border: none; border-radius: 12px; font-weight: bold;
+            cursor: pointer; color: #fff; transition: all 0.3s ease;
+            position: relative; overflow: hidden; font-size: 1rem;
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 198, 255, 0.4); filter: brightness(1.1); }
+        button:active { transform: translateY(0); }
+        button:disabled { background: #444; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* ---------- STATUS DISPLAY ---------- */
+        .result-wrapper {
+    display: none;
+    margin-top: 30px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.result-wrapper.visible { display: block; opacity: 1; transform: translateY(0); }
+
+.status-card {
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,198,255,0.1);
+    position: relative;
+}
+        .status-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .status-header {
+            border-bottom: 1px dashed #ddd;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-header h3 { margin: 0; color: #2c5364; font-size: 1.3rem; letter-spacing: -0.5px; }
+
+        .data-row { margin-bottom: 12px; display: flex; font-size: 14px; align-items: center; }
+        .data-label { font-weight: 800; width: 110px; color: #aaa; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .data-value { font-weight: 600; color: #111; font-size: 15px; }
+
+        .event-section { margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px; }
+        .event-item {
+            background: #f8fbff;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+        .event-item:hover { transform: scale(1.03) translateX(5px); background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        /* ---------- PROFESSIONAL MODALS ---------- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+            z-index: 30000; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .modal-box { 
+            background: #1a2a30; padding: 40px; border-radius: 28px; 
+            text-align: center; width: 100%; max-width: 360px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        }
+        .modal-box .icon { font-size: 50px; margin-bottom: 15px; display: block; }
+        .modal-box h3 { font-size: 1.5rem; margin: 10px 0; }
+        .modal-box p { color: #8899a0; font-size: 0.95em; line-height: 1.6; margin: 15px 0 25px; }
+        
+        .modal-box button { 
+            background: transparent; 
+            border: 1px solid var(--primary); 
+            color: var(--primary); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .modal-box button:hover { background: var(--primary); color: #000; }
+
+        #step-reg, #step-otp { transition: opacity 0.4s ease, transform 0.4s ease; }
+         /* ---------- SIDE MENU ---------- */
+        .nav-overlay {
+            height: 100vh; 
+            width: 280px; 
+            position: fixed;
+            z-index: 10000; 
+            top: 0; left: 0;
+            background: #0a1419; 
+            border-right: 1px solid var(--primary);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+        }
+        .nav-overlay.open { transform: translateX(0); }
+        .overlay-content { padding: 120px 30px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .nav-item { 
+            text-decoration: none; 
+            padding: 15px 0; 
+            display: block; 
+            transition: 0.3s;
+        }
+
+        .nav-number { font-size: 10px; color: var(--primary-blue); font-weight: bold; margin-bottom: 5px; display: block; }
+        .nav-text { color: #ffffff; font-size: 18px; font-weight: 600; transition: 0.3s; }
+        .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
+        
+        .nav-item:hover .nav-text, .nav-item.active .nav-text { color: #4fdcff; transform: translateX(10px); }
+        .nav-item.active .nav-text { color: var(--primary-blue); }
+        
+        #qrcode img { margin: 0 auto; border: 5px solid #fff; border-radius: 10px; }
+        /* ---------- MOBILE RESPONSIVE ---------- */
+@media (max-width: 600px) {
+    .navbar { padding: 15px 20px; }
+
+    .container {
+        padding: 25px 18px;
+        margin: 10px;
+    }
+
+    h2 { font-size: 1.6rem; }
+
+    /* Fix modal going off screen */
+    .modal-overlay { padding: 15px; box-sizing: border-box; }
+
+    .modal-box {
+        padding: 25px 20px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-radius: 20px;
+    }
+
+    .modal-box .icon { font-size: 35px; margin-bottom: 10px; }
+    .modal-box h3 { font-size: 1.2rem; }
+    .modal-box p { font-size: 0.85em; margin: 10px 0 18px; }
+
+    /* Fix status card on mobile */
+    .status-card { padding: 20px 15px; }
+
+    .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    #qrcode img { width: 80px !important; height: 80px !important; }
+
+    .data-label { width: 90px; font-size: 9px; }
+    .data-value { font-size: 13px; }
+
+    .event-item { padding: 12px; }
+
+    /* Fix resend timer text wrapping */
+    .resend-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+        text-align: center;
+        font-size: 13px;
+    }
+}
+/* Navbar logo loading state */
+.logo {
+    transition: opacity 0.4s ease;
+}
+
+.logo.loading {
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0.1) 25%, 
+        rgba(255,255,255,0.2) 50%, 
+        rgba(255,255,255,0.1) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 4px;
+    color: transparent !important;
+    min-width: 120px;
+    display: inline-block;
+}
+
+.logo.loading span {
+    color: transparent !important;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+/* ── DIGITAL PASS ENHANCEMENTS ── */
+.status-card {
+    background: linear-gradient(145deg, #ffffff, #f0f7ff);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+.status-card::before {
+    height: 6px;
+    background: linear-gradient(90deg, #00c6ff, #00ffae, #0072ff);
+    background-size: 200%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0%; }
+    50% { background-position: 100%; }
+    100% { background-position: 0%; }
+}
+
+.status-header {
+    background: linear-gradient(135deg, #e8f4f8, #d0ecf8);
+    padding: 20px 25px;
+    margin: -30px -30px 20px -30px;
+    border-bottom: 1px dashed #c0dce8;
+}
+
+.status-header h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #1a3a4a;
+}
+
+.pass-subtitle {
+    font-size: 10px;
+    color: #7aaabb;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 3px;
+    font-weight: 600;
+}
+
+.data-row {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+}
+
+.data-row:last-of-type { border-bottom: none; }
+
+.data-label {
+    color: #7aaabb;
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.data-value {
+    color: #1a3a4a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Event section */
+.event-section h4 {
+    color: #7aaabb;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-weight: 700;
+}
+
+.event-item {
+    background: #fff;
+    border-left: 4px solid var(--primary);
+    border-radius: 0 14px 14px 0;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    animation: slideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) both;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.event-item:hover {
+    transform: translateX(6px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.event-name {
+    font-weight: 800;
+    color: #1a3a4a;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.event-badge {
+    font-size: 9px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.badge-solo {
+    background: #e0f7fa;
+    color: #00838f;
+}
+
+.badge-group {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.event-meta {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #888;
+}
+
+.event-meta b { color: var(--primary); font-size: 12px; }
+
+.event-category-tag {
+    display: inline-block;
+    font-size: 8px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 6px;
+    text-transform: uppercase;
+}
+
+.tag-technical {
+    background: rgba(0,198,255,0.1);
+    color: #0099cc;
+    border: 1px solid rgba(0,198,255,0.2);
+}
+
+.tag-nontechnical {
+    background: rgba(255,160,0,0.1);
+    color: #cc7700;
+    border: 1px solid rgba(255,160,0,0.2);
+}
+
+.team-lineup-label {
+    font-size: 9px;
+    color: #aaa;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.team-member-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.team-member-row span {
+    font-size: 12px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Pass footer */
+.pass-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px dashed #dde;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pass-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #2e7d32;
+    background: #e8f5e9;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+
+/* QR styling */
+#qrcode {
+    background: #fff;
+    padding: 6px;
+    border-radius: 10px;
+    border: 2px solid #e0ecf4;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Info rows - level, degree */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+/* Animated top strip */
+.pass-top-strip {
+    height: 5px;
+    background: linear-gradient(90deg, #00c6ff, #00ffae, #0072ff, #00c6ff);
+    background-size: 300%;
+    animation: stripShift 4s linear infinite;
+}
+@keyframes stripShift {
+    0%   { background-position: 0%; }
+    100% { background-position: 300%; }
+}
+
+/* HEADER */
+.pass-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 26px 18px;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 60%, #1a3a4a 100%);
+    border-bottom: 1px solid rgba(0,198,255,0.15);
+}
+.pass-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.pass-event-logo {
+    width: 44px; height: 44px;
+    background: rgba(0,198,255,0.12);
+    border: 1px solid rgba(0,198,255,0.3);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+}
+.pass-event-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.pass-tagline {
+    font-size: 10px;
+    color: #00c6ff;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 3px;
+}
+.pass-qr-wrap {
+    text-align: center;
+}
+.pass-qr-wrap #qrcode {
+    background: #fff;
+    padding: 6px;
+    border-radius: 10px;
+    border: 2px solid rgba(0,198,255,0.3);
+    box-shadow: 0 0 20px rgba(0,198,255,0.15);
+}
+.pass-qr-label {
+    font-size: 8px;
+    color: #6b8099;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+/* IDENTITY STRIP */
+.pass-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 26px;
+    background: linear-gradient(90deg, #f0f8ff, #e8f4f8);
+    border-bottom: 2px dashed #d0e8f0;
+}
+.pass-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(0,198,255,0.35);
+    flex-shrink: 0;
+}
+.pass-identity-info { flex: 1; }
+.pass-student-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a3a4a;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.pass-reg-no {
+    font-size: 12px;
+    color: #7aaabb;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-top: 2px;
+    font-family: 'Courier New', monospace;
+}
+.pass-verified-chip {
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    border: 1px solid #a5d6a7;
+    white-space: nowrap;
+}
+
+/* DETAILS GRID */
+.pass-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: #fff;
+    border-bottom: 1px solid #e8f0f4;
+}
+.pass-detail-cell {
+    padding: 14px 22px;
+    border-right: 1px solid #e8f0f4;
+    border-bottom: 1px solid #e8f0f4;
+}
+.pass-detail-cell:nth-child(even) { border-right: none; }
+.pass-detail-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: #9bbccc;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.pass-detail-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a3a4a;
+    line-height: 1.4;
+}
+.degree-chip {
+    display: inline-block;
+    background: rgba(0,198,255,0.1);
+    color: #0099bb;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* EVENTS SECTION */
+.pass-events-section {
+    background: #f8fbff;
+    padding: 20px 22px;
+}
+.pass-events-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.pass-events-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: #7aaabb;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.pass-event-count {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 12px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+}
+
+/* Individual event card */
+.pass-event-card {
+    background: #fff;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    animation: eventSlideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e8f0f4;
+}
+.pass-event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+@keyframes eventSlideIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.pass-event-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px 10px;
+}
+.pass-event-name-text {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1a3a4a;
+    letter-spacing: 0.5px;
+}
+.pass-event-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.badge {
+    font-size: 8px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.badge-technical    { background: rgba(0,198,255,0.12); color: #0088bb; border: 1px solid rgba(0,198,255,0.2); }
+.badge-nontechnical { background: rgba(168,85,247,0.1);  color: #7c3aed; border: 1px solid rgba(168,85,247,0.2); }
+.badge-solo         { background: rgba(0,229,190,0.12);  color: #00897b; border: 1px solid rgba(0,229,190,0.2); }
+.badge-group        { background: rgba(251,191,36,0.12); color: #b45309; border: 1px solid rgba(251,191,36,0.2); }
+
+.pass-event-card-bottom {
+    border-top: 1px solid #f0f4f8;
+    padding: 10px 16px 12px;
+    background: #fafcff;
+}
+.pass-token-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.pass-token-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: #9bbccc;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.pass-token-value {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    color: #0072ff;
+    background: rgba(0,114,255,0.07);
+    border: 1px solid rgba(0,114,255,0.15);
+    padding: 3px 12px;
+    border-radius: 6px;
+    letter-spacing: 2px;
+}
+.pass-team-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: #9bbccc;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.pass-team-member {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.pass-team-member-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    flex-shrink: 0;
+}
+.pass-team-member span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2c5364;
+}
+
+/* PASS FOOTER */
+.pass-footer-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 22px;
+    background: linear-gradient(90deg, #0f2027, #203a43);
+}
+.pass-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: #4a6070;
+    letter-spacing: 1px;
+}
+.pass-footer-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #00ffae;
+    box-shadow: 0 0 6px rgba(0,255,174,0.6);
+    animation: dotBlink 2s ease-in-out infinite;
+}
+@keyframes dotBlink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+}
+.pass-footer-right {
+    font-size: 9px;
+    font-weight: 800;
+    color: rgba(0,198,255,0.4);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+    </style>
+</head>
+<body>
+
+    <div id="errorModal" class="modal-overlay">
+        <div class="modal-box" style="border-top: 4px solid var(--error-red);">
+            <span class="icon">🔍</span>
+            <h3 style="color: var(--error-red);">Not Found</h3>
+            <p>We couldn't locate any registration for that number. Please double-check your ID and try again.</p>
+            <button onclick="closeErrorModal()" style="border-color: var(--error-red); color: var(--error-red);">Check Again</button>
+        </div>
+    </div>
+
+    <div id="customAlert" class="modal-overlay">
+        <div class="modal-box" style="border-top: 4px solid var(--primary);">
+            <span class="icon">⚠️</span>
+            <h3 style="color: var(--primary);">Verification Failed</h3>
+            <p id="alertMessage"></p>
+            <button onclick="closeAlert()">Try Again</button>
+        </div>
+    </div>
+
+    <header class="navbar">
+        <div class="menu-toggle" id="menuToggle">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <div class="logo">Symposium <span>2026</span></div>
+    </header>
+
+    <nav id="sideMenu" class="nav-overlay">
+        <div class="overlay-content">
+            <a href="index.html" class="nav-item">
+                <span class="nav-number">01</span>
+                <div class="nav-text">Home <small>Landing Page</small></div>
+            </a>
+            <a href="student-details.html" class="nav-item">
+                <span class="nav-number">02</span>
+                <div class="nav-text">Registration <small>Step 1</small></div>
+            </a>
+            <a href="about-events.html" class="nav-item">
+                <span class="nav-number">03</span>
+                <div class="nav-text">About Events <small>Details</small></div>
+            </a>
+            <a href="view-registration.html" class="nav-item active">
+                <span class="nav-number">04</span>
+                <div class="nav-text">My History <small>View Entry</small></div>
+            </a>
+            <a href="contact.html" class="nav-item">
+                <span class="nav-number">05</span>
+                <div class="nav-text">Contact Us <small>Get in Touch</small></div>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container fade-in" id="mainContainer">
+        <h2>Live <b>Status</b></h2>
+
+        <div id="step-reg">
+            <p style="text-align: center; font-size: 0.85em; opacity: 0.8; margin-bottom: 25px; line-height: 1.6;">Securely access your registration details and event tokens.</p>
+          <input type="text" id="regNo" placeholder="Enter 12-digit Register No" 
+       maxlength="12" 
+       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <button onclick="handleSendOTP()" id="sendOtpBtn">Get Access OTP</button>
+        </div>
+
+        <div id="step-otp" style="display: none; opacity: 0; transform: translateY(10px);">
+            <p id="otp-status" style="text-align: center; font-size: 0.9em; color: var(--accent); line-height: 1.6; margin-bottom: 20px;"></p>
+            <input type="text" id="otpInput" placeholder="Enter 6-digit Code" maxlength="6">
+            <button onclick="handleVerifyOTP()">Verify Identity</button>
+            <div class="resend-container">
+                <span id="timerText" style="opacity: 0.6;">Resend available in <span id="seconds">30</span>s</span>
+                <a id="resendBtnLink" style="cursor:pointer; color:var(--primary); text-decoration:underline;" onclick="handleResendLogic()">Resend OTP Now</a>
+            </div>
+        </div>
+
+        <div class="error" id="error" style="color: #ff6b6b; text-align: center; margin-top: 15px; font-size: 0.9em; font-weight: 500;"></div>
+
+        <div id="capture-area" class="result-wrapper">
+        <div class="status-card" id="result">
+
+  <!-- TOP GRADIENT STRIP (animated) -->
+  <div class="pass-top-strip"></div>
+
+  <!-- PASS HEADER -->
+  <div class="pass-header">
+    <div class="pass-header-left">
+      <div class="pass-event-logo">🎓</div>
+      <div>
+        <div class="pass-event-name" id="pass-title">SYMPOSIUM 2026</div>
+        <div class="pass-tagline">Official Digital Pass</div>
+      </div>
+    </div>
+    <div class="pass-qr-wrap">
+      <div id="qrcode"></div>
+      <div class="pass-qr-label">Scan to Verify</div>
+    </div>
+  </div>
+
+  <!-- STUDENT IDENTITY STRIP -->
+  <div class="pass-identity">
+    <div class="pass-avatar" id="pass-avatar">S</div>
+    <div class="pass-identity-info">
+      <div class="pass-student-name" id="disp-name"></div>
+      <div class="pass-reg-no" id="disp-reg"></div>
+    </div>
+    <div class="pass-verified-chip">✓ VERIFIED</div>
+  </div>
+
+  <!-- STUDENT DETAILS GRID -->
+  <div class="pass-details-grid">
+    <div class="pass-detail-cell">
+      <div class="pass-detail-label">COLLEGE</div>
+      <div class="pass-detail-value" id="disp-college"></div>
+    </div>
+    <div class="pass-detail-cell">
+      <div class="pass-detail-label">DEPARTMENT</div>
+      <div class="pass-detail-value" id="disp-dept"></div>
+    </div>
+    <div class="pass-detail-cell">
+      <div class="pass-detail-label">LEVEL & DEGREE</div>
+      <div class="pass-detail-value">
+        <span id="disp-level"></span>
+        <span class="degree-chip" id="disp-degree-chip"></span>
+      </div>
+    </div>
+    <div class="pass-detail-cell">
+      <div class="pass-detail-label">YEAR & PHONE</div>
+      <div class="pass-detail-value">
+        Year <span id="disp-year"></span>
+        &nbsp;·&nbsp;
+        <span id="disp-phone"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENTS SECTION -->
+  <div class="pass-events-section">
+    <div class="pass-events-header">
+      <span class="pass-events-title">🎯 Registered Events</span>
+      <span class="pass-event-count" id="pass-event-count">0 Events</span>
+    </div>
+    <div id="event-list"></div>
+  </div>
+
+  <!-- PASS FOOTER -->
+  <div class="pass-footer-bar">
+    <div class="pass-footer-left">
+      <span class="pass-footer-dot"></span>
+      <span id="footerVerifiedText">Verified Digital ID • Symposium 2026</span>
+    </div>
+    <div class="pass-footer-right">ENTRY PASS</div>
+  </div>
+
+</div>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const reg = urlParams.get('reg');
+        const regInput = document.getElementById('regNo');
+        
+        if (reg && regInput) {
+            regInput.value = reg;
+            // Optional: Automatically trigger the OTP send if the number is valid
+            if (reg.length === 12) {
+                console.log("Auto-filled registration number detected.");
+            }
+        }
+    });
+    /* ALL ORIGINAL LOGIC PRESERVED */
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://login-system-1-nowr.onrender.com';
+    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function closeErrorModal() { closeModal('errorModal'); }
+    
+    function showCustomAlert(msg) {
+        document.getElementById('alertMessage').textContent = msg;
+        showModal('customAlert');
+    }
+    function closeAlert() { closeModal('customAlert'); }
+
+    const menuToggle = document.getElementById("menuToggle");
+    const sideMenu = document.getElementById("sideMenu");
+    menuToggle.onclick = () => {
+        sideMenu.classList.toggle("open");
+        menuToggle.classList.toggle("open");
+    };
+
+    let cachedData = null;
+    let serverOTP = ""; 
+    let resendTimer;
+
+function maskEmail(email) {
+    if (!email) return "your registered email";
+    const [user, domain] = email.split("@");
+    // Shows 1st char, then asterisks, then the domain
+    const maskedUser = user.charAt(0) + "*".repeat(5); 
+    return `${maskedUser}@${domain}`;
+}
+
+    function startResendTimer() {
+        const timerText = document.getElementById("timerText");
+        const resendBtnLink = document.getElementById("resendBtnLink");
+        const secondsSpan = document.getElementById("seconds");
+        let timeLeft = 30;
+
+        timerText.style.display = "inline";
+        resendBtnLink.style.display = "none";
+        secondsSpan.textContent = timeLeft;
+
+        clearInterval(resendTimer);
+        resendTimer = setInterval(() => {
+            timeLeft--;
+            secondsSpan.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(resendTimer);
+                timerText.style.display = "none";
+                resendBtnLink.style.display = "inline";
+            }
+        }, 1000);
+    }
+
+    async function handleSendOTP() {
+    const regNoField = document.getElementById("regNo");
+    const regNo = regNoField.value.trim();
+    const btn = document.getElementById("sendOtpBtn");
+    const errorDiv = document.getElementById("error");
+
+    if (!regNo || regNo.length !== 12) {
+        errorDiv.textContent = "Please enter a valid 12-digit Register No";
+        return;
+    }
+    
+    btn.disabled = true; 
+    btn.textContent = "Sending Code...";
+    errorDiv.textContent = "";
+
+    try {
+        // 1. Request the server to send the OTP email
+        const otpResponse = await fetch(`${API_BASE_URL}/send-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reg_no: regNo })
+        });
+
+        const data = await otpResponse.json();
+
+        if (!otpResponse.ok) {
+            // STOP: Captures 429 (Limit) or 404 (Not Found)
+            if (typeof showCustomAlert === "function") {
+                showCustomAlert(data.message || "Request failed");
+            } else {
+                alert(data.message || "Request failed");
+            }
+            btn.disabled = false;
+            btn.textContent = "Get Access OTP";
+            return; 
+        }
+
+        // 2. Fetch student data for UI
+        const dataResponse = await fetch(`${API_BASE_URL}/registration/${regNo}`);
+        if (!dataResponse.ok) throw new Error("Could not find registration");
+        
+        cachedData = await dataResponse.json();
+
+        // 3. UI TRANSITION
+        const stepReg = document.getElementById("step-reg");
+        stepReg.style.opacity = '0';
+        
+        setTimeout(() => {
+            stepReg.style.display = "none";
+            const stepOtp = document.getElementById("step-otp");
+            stepOtp.style.display = "block";
+            
+            setTimeout(() => {
+                stepOtp.style.opacity = '1';
+                stepOtp.style.transform = 'translateY(0)';
+            }, 50);
+            
+            const userEmail = cachedData.student.email;
+            document.getElementById("otp-status").innerHTML = 
+                `Verification code sent to <br><b style="color:var(--primary)">${maskEmail(userEmail)}</b>`;
+            startResendTimer();
+        }, 400);
+
+    } catch (err) {
+        console.error("Critical Frontend Error:", err);
+        const errMsg = err.message || "An unexpected error occurred.";
+        if (typeof showCustomAlert === "function") {
+            showCustomAlert(errMsg);
+        } else {
+            alert(errMsg);
+        }
+        btn.disabled = false;
+        btn.textContent = "Get Access OTP";
+    }
+}
+   async function handleVerifyOTP() {
+        const otpInput = document.getElementById("otpInput").value;
+        const regNo = document.getElementById("regNo").value.trim();
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reg_no: regNo, otp: otpInput })
+            });
+
+            if (response.ok) {
+                displayStatus(); // Show the digital pass
+            } else {
+                showCustomAlert("Invalid or expired OTP. Please try again.");
+            }
+        } catch (err) {
+            showCustomAlert("Connection error. Try again later.");
+        }
+    }
+
+   function displayStatus() {
+    const { student, events } = cachedData;
+
+    // Avatar initial
+    document.getElementById("pass-avatar").textContent = student.name.charAt(0).toUpperCase();
+    document.getElementById("disp-name").textContent = student.name.toUpperCase();
+    document.getElementById("disp-reg").textContent = student.reg_no;
+    document.getElementById("disp-dept").textContent = student.department;
+    document.getElementById("disp-college").textContent = student.college || '—';
+    document.getElementById("disp-year").textContent = student.year || '—';
+    document.getElementById("disp-phone").textContent = student.phone || '—';
+    document.getElementById("disp-level").textContent = student.level || '—';
+    const degreeChip = document.getElementById("disp-degree-chip");
+    if (student.degree) { degreeChip.textContent = student.degree; }
+
+    // Event count
+    document.getElementById("pass-event-count").textContent = `${events.length} Event${events.length !== 1 ? 's' : ''}`;
+
+    let qrData = `${student.name.toUpperCase()}\n${student.reg_no}\n`;
+
+    const eventListDiv = document.getElementById("event-list");
+    eventListDiv.innerHTML = "";
+
+    events.forEach((ev, index) => {
+        const isGroup  = ev.event_type === 'group';
+        const isTech   = (ev.event_category || '').toLowerCase() === 'technical';
+        const catClass = isTech ? 'badge-technical' : 'badge-nontechnical';
+        const catLabel = isTech ? '⚡ Technical' : '🎨 Non-Tech';
+        const typeLabel = isGroup ? '👥 Group' : '👤 Solo';
+        const typeClass = isGroup ? 'badge-group' : 'badge-solo';
+
+        qrData += `${ev.event_name} (${isGroup ? 'Group' : 'Solo'})\n`;
+
+        let bottomHtml = '';
+        if (isGroup && ev.team_token) {
+            let membersHtml = '';
+            if (ev.team_members) {
+                membersHtml = ev.team_members.split(',').map(n =>
+                    `<div class="pass-team-member">
+                        <div class="pass-team-member-dot"></div>
+                        <span>${n.trim().toUpperCase()}</span>
+                    </div>`
+                ).join('');
+            }
+            bottomHtml = `
+                <div class="pass-event-card-bottom">
+                    <div class="pass-token-row">
+                        <span class="pass-token-label">Team Token</span>
+                        <span class="pass-token-value">${ev.team_token}</span>
+                    </div>
+                    ${membersHtml ? `<div class="pass-team-label">Team Lineup</div>${membersHtml}` : ''}
+                </div>`;
+        }
+
+        const card = document.createElement("div");
+        card.className = "pass-event-card";
+        card.style.animationDelay = `${index * 120}ms`;
+        card.innerHTML = `
+            <div class="pass-event-card-top">
+                <span class="pass-event-name-text">${ev.event_name.toUpperCase()}</span>
+                <div class="pass-event-badges">
+                    <span class="badge ${catClass}">${catLabel}</span>
+                    <span class="badge ${typeClass}">${typeLabel}</span>
+                </div>
+            </div>
+            ${bottomHtml}`;
+        eventListDiv.appendChild(card);
+    });
+
+    // QR Code
+    const qrContainer = document.getElementById("qrcode");
+    qrContainer.innerHTML = "";
+    new QRCode(qrContainer, { text: qrData, width: 90, height: 90, correctLevel: QRCode.CorrectLevel.M });
+
+    // Transition
+    const stepOtp = document.getElementById("step-otp");
+    const wrapper = document.getElementById("capture-area");
+    stepOtp.style.opacity = '0';
+    stepOtp.style.transform = 'translateY(-10px)';
+    setTimeout(() => {
+        stepOtp.style.display = "none";
+        wrapper.style.display = "block";
+        setTimeout(() => wrapper.classList.add('visible'), 50);
+    }, 400);
+}
+    async function handleResendLogic() {
+    const resendBtn = document.getElementById("resendBtnLink");
+    resendBtn.style.pointerEvents = "none"; // Prevent double clicks
+    resendBtn.textContent = "Sending...";
+    
+    // Simply call handleSendOTP, it will handle the API call and restart the timer
+    await handleSendOTP();
+    
+    resendBtn.style.pointerEvents = "auto";
+    resendBtn.textContent = "Resend OTP Now";
+}
+async function loadNavbarTitle() {
+    const logoEl = document.querySelector('.logo');
+    if (!logoEl) return;
+
+    // Show shimmer skeleton while loading
+    logoEl.classList.add('loading');
+
+    try {
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : 'https://login-system-1-nowr.onrender.com';
+
+        const res = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const data = await res.json();
+
+        if (data && data.symposium_title) {
+            const title = data.symposium_title;
+            const parts = title.split(/(\d{2,4})/);
+
+            // Remove shimmer, set content, fade in
+            logoEl.classList.remove('loading');
+            logoEl.style.opacity = '0';
+            logoEl.style.transition = 'opacity 0.5s ease';
+
+            if (parts.length >= 2) {
+                logoEl.innerHTML = `${parts[0].trim()} <span>${parts[1].trim()}</span>`;
+            } else {
+                logoEl.textContent = title;
+            }
+             document.title = `Registration Status | ${title}`;
+             const footerText = document.getElementById('footerVerifiedText');
+if (footerText) footerText.textContent = `Verified Digital ID • ${title}`;
+const passTitle = document.getElementById('pass-title');
+if (passTitle) passTitle.textContent = title.toUpperCase();
+            requestAnimationFrame(() => {
+                logoEl.style.opacity = '1';
+            });
+        }
+    } catch(err) {
+        // Fallback — just show what's already there
+        logoEl.classList.remove('loading');
+        logoEl.style.opacity = '1';
+    }
+}
+
+loadNavbarTitle();
+</script>
+</body>
+</html>

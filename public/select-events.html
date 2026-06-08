@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Events | Symposium 2026</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+ 
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #07111a;
+      --surface: rgba(255,255,255,0.04);
+      --border:  rgba(255,255,255,0.08);
+      --accent:  #00c6ff;
+      --green:   #00ffae;
+      --danger:  #ff4b2b;
+      --muted:   #6b8099;
+      --text:    #e8f0f8;
+      --ease:    cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: calc(80px + env(safe-area-inset-top));
+      overflow-x: hidden;
+    }
+
+    /* ── ANIMATED BG ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 80% 10%, rgba(0,198,255,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 35% at 10% 80%, rgba(0,255,174,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      animation: bgPulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgPulse {
+      from { opacity: 0.6; }
+      to   { opacity: 1; }
+    }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #0f2027;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 9999;
+      transition: opacity 0.6s var(--ease);
+    }
+
+    #loader.hide { opacity: 0; pointer-events: none; }
+
+    .spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(0,198,255,0.15);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #loader-text {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse { 0%,100%{ opacity:0.5 } 50%{ opacity:1 } }
+
+  
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+  
+    .step-circle.done {
+      background: var(--green);
+      color: #07111a;
+      box-shadow: 0 0 16px rgba(0,255,174,0.35);
+    }
+
+    .step-circle.done::after {
+      content: '✓';
+      font-size: 16px;
+    }
+
+    .step-circle.active {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(0,198,255,0.4);
+      animation: activePop 0.5s var(--ease);
+    }
+
+    @keyframes activePop {
+      0% { transform: scale(0.8); }
+      60% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .step-circle.pending {
+      background: rgba(255,255,255,0.07);
+      color: var(--muted);
+      border: 1.5px solid rgba(255,255,255,0.12);
+    }
+
+    .step-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.3s;
+      white-space: nowrap;
+    }
+
+    .step-item.active .step-label { color: var(--accent); }
+    .step-item.done .step-label   { color: var(--green); }
+
+   
+
+    .step-line.filled {
+      background: linear-gradient(90deg, var(--green), var(--accent));
+      box-shadow: 0 0 8px rgba(0,255,174,0.3);
+    }
+
+    .step-line.filled::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* ── WRAPPER ── */
+    .wrapper {
+      width: 100%;
+      max-width: 760px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.6s var(--ease) 0.3s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+     font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 34px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .page-title em {
+      font-style: normal;
+      color: var(--accent);
+      font-weight: 900;
+      text-shadow: 0 0 30px rgba(0,198,255,0.4);
+    }
+
+    /* ── MAIN CARD ── */
+    .card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 32px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    /* ── SCROLL AREA ── */
+    .scroll-area {
+      max-height: 56vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 8px;
+      margin-bottom: 28px;
+    }
+
+    .scroll-area::-webkit-scrollbar { width: 3px; }
+    .scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .scroll-area::-webkit-scrollbar-thumb { background: rgba(0,198,255,0.2); border-radius: 4px; }
+
+    /* ── PARTICIPATION SECTION ── */
+    .participation-section { margin-bottom: 28px; }
+    .participation-section:last-child { margin-bottom: 0; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .section-icon { font-size: 14px; }
+
+    .section-label {
+     
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* ── CATEGORY LABEL ── */
+    .cat-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 16px 0 12px;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .cat-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ── EVENTS GRID ── */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    /* ── EVENT CARD ── */
+    .event-card {
+      position: relative;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px 14px 16px;
+      cursor: pointer;
+      transition:
+        border-color 0.3s var(--ease),
+        background 0.3s var(--ease),
+        transform 0.3s var(--ease),
+        box-shadow 0.3s var(--ease);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      animation: cardIn 0.5s var(--ease) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .event-card:hover {
+      border-color: rgba(0,198,255,0.45);
+      background: rgba(0,198,255,0.06);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,198,255,0.1);
+    }
+
+    .event-card.selected {
+      border-color: var(--green);
+      background: rgba(0,255,174,0.07);
+      box-shadow: 0 0 24px rgba(0,255,174,0.15), 0 0 0 1px rgba(0,255,174,0.1);
+      transform: translateY(-2px);
+    }
+
+    .cat-icon {
+      position: absolute;
+      top: 8px; left: 10px;
+      font-size: 10px;
+      opacity: 0.4;
+      line-height: 1;
+    }
+
+    .indicator {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #07111a;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.3) rotate(-45deg);
+      transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+    }
+
+    .event-card.selected .indicator {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    .event-card h3 {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--text);
+      margin-top: 8px;
+      line-height: 1.5;
+      transition: color 0.25s;
+    }
+
+    .event-card.selected h3 { color: var(--green); }
+
+    /* ── TEAM CODE ── */
+    .team-code-container {
+      width: 100%;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      animation: expandIn 0.3s var(--ease);
+    }
+
+    .event-card.selected .team-code-container { display: flex; }
+
+    @keyframes expandIn {
+      from { opacity: 0; transform: translateY(-6px); max-height: 0; }
+      to   { opacity: 1; transform: translateY(0); max-height: 200px; }
+    }
+
+    .team-code-container label {
+      display: block;
+     font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* KEY FIX: token-row uses column layout to prevent overlap */
+    .token-row {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      width: 100%;
+    }
+
+    .team-code-container input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 9px;
+      border: 1.5px solid rgba(0,198,255,0.25);
+      background: rgba(0,0,0,0.3);
+      color: var(--green);
+      font-size: 12px;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .team-code-container input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,198,255,0.1);
+    }
+
+    .verify-btn {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: none;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #fff;
+     font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+      box-shadow: 0 4px 12px rgba(0,114,255,0.25);
+    }
+
+    .verify-btn:hover {
+      background: linear-gradient(90deg, #00ffae, #00c6ff);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0,198,255,0.35);
+    }
+
+    .token-msg {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      min-height: 14px;
+      text-align: center;
+      transition: color 0.25s;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      gap: 16px;
+    }
+
+    .status-text {
+     font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .status-text .count { color: var(--accent); font-weight: 700; }
+    .status-text .max   { color: var(--green);  font-weight: 700; }
+
+    .confirm-btn {
+      padding: 13px 36px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+     font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s var(--ease);
+      box-shadow: 0 8px 24px rgba(0,198,255,0.25);
+    }
+
+    .confirm-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(0,198,255,0.4);
+      background: linear-gradient(90deg, #00ffae, #00c6ff);
+    }
+
+    .confirm-btn:disabled {
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* ── ALERT MODAL ── */
+    .alert-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(12px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 30000;
+    }
+
+    .alert-overlay.show { display: flex; }
+
+    .alert-box {
+      background: rgba(15,32,39,0.95);
+      border: 1px solid rgba(255,75,43,0.35);
+      border-radius: 20px;
+      padding: 36px 32px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+      backdrop-filter: blur(20px);
+      animation: popIn 0.35s var(--ease);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .alert-box .alert-icon { font-size: 36px; margin-bottom: 14px; }
+
+    .alert-box h3 {
+     
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--danger);
+      margin-bottom: 10px;
+    }
+
+    .alert-box p {
+     font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .alert-box button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #fff;
+     font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      width: 100%;
+      transition: filter 0.2s, transform 0.2s;
+    }
+
+    .alert-box button:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 520px) {
+      body { padding: 0 14px 40px;
+       padding-top: 80px;}
+      .card { padding: 20px 14px; }
+      .events-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-title { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="spinner"></div>
+  <div id="loader-text">Loading events...</div>
+</div>
+
+<!-- ALERT MODAL -->
+<div class="alert-overlay" id="alertOverlay">
+  <div class="alert-box">
+    <div class="alert-icon">⚠️</div>
+    <h3 id="alertTitle">Limit Reached</h3>
+    <p id="alertMessage"></p>
+    <button onclick="closeAlert()">Got it</button>
+  </div>
+</div>
+
+
+
+<!-- PAGE -->
+<div class="wrapper">
+
+  <div class="page-header">
+    <h1 class="page-title">Select <em>Events</em></h1>
+  </div>
+
+  <div class="card">
+    <div class="progress" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:28px; position:relative;">
+  
+  <!-- connector line as a real pseudo-element via a span -->
+  <div style="position:absolute; top:15px; left:calc(16% + 15px); right:calc(16% + 15px); height:2px; background:rgba(255,255,255,0.1); z-index:0;"></div>
+
+  <div style="text-align:center; z-index:1; width:33%; flex-shrink:0;">
+    <div style="width:30px;height:30px;border-radius:50%;background:#00c6ff;margin:0 auto 8px;line-height:30px;font-size:13px;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(0,198,255,0.5);">✓</div>
+    <div style="font-size:11px; white-space:nowrap;">Student</div>
+  </div>
+
+  <div style="text-align:center; z-index:1; width:33%; flex-shrink:0;">
+    <div style="width:30px;height:30px;border-radius:50%;background:#00c6ff;margin:0 auto 8px;line-height:30px;font-size:13px;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(0,198,255,0.5);">2</div>
+    <div style="font-size:11px; white-space:nowrap;">Events</div>
+  </div>
+
+  <div style="text-align:center; z-index:1; width:33%; flex-shrink:0;">
+    <div style="width:30px;height:30px;border-radius:50%;background:#162a31;margin:0 auto 8px;line-height:30px;font-size:13px;color:#fff;border:1px solid rgba(255,255,255,0.2);">3</div>
+   
+  </div>
+
+</div>
+    <div class="scroll-area" id="scrollArea">
+
+      <div class="participation-section" id="soloSection">
+        <div class="section-header">
+          <span class="section-icon">👤</span>
+          <span class="section-label">Solo Events</span>
+        </div>
+        <div id="soloEventsContainer"></div>
+      </div>
+
+      <div class="participation-section" id="groupSection">
+        <div class="section-header">
+          <span class="section-icon">👥</span>
+          <span class="section-label">Group Events</span>
+        </div>
+        <div id="groupEventsContainer"></div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div class="status-text">
+        Selected: <span class="count" id="count">0</span> / <span class="max" id="max-limit-display">3</span>
+      </div>
+      <button class="confirm-btn" id="confirmBtn" disabled onclick="submitEvents()">
+        Confirm Choice
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://login-system-1-nowr.onrender.com';
+
+  let selectedList    = [];
+  let adminEventLimit = 3;
+  let validatedTokens = {};
+
+  function animateLoaderText() {
+    const steps = ["Fetching settings...", "Loading events...", "Preparing UI...", "Almost ready..."];
+    let i = 0;
+    const el = document.getElementById("loader-text");
+    const iv = setInterval(() => { el.textContent = steps[i++]; if (i >= steps.length) clearInterval(iv); }, 600);
+  }
+
+  function hideLoader() {
+    const l = document.getElementById("loader");
+    l.classList.add("hide");
+    setTimeout(() => l.style.display = "none", 600);
+  }
+
+  async function syncAdminSettings() {
+    animateLoaderText();
+    try {
+      const [settingsRes, eventRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/public-settings`),
+        fetch(`${API_BASE_URL}/events`)
+      ]);
+
+      const settings    = await settingsRes.json();
+      const adminEvents = await eventRes.json();
+
+      if (settings?.symposium_title) document.title = `Select Events | ${settings.symposium_title}`;
+
+      adminEventLimit = parseInt(settings.event_selection_limit) || 3;
+      document.getElementById('max-limit-display').textContent = adminEventLimit;
+
+      const soloContainer  = document.getElementById("soloEventsContainer");
+      const groupContainer = document.getElementById("groupEventsContainer");
+      soloContainer.innerHTML  = "";
+      groupContainer.innerHTML = "";
+
+      if (!adminEvents || adminEvents.length === 0) {
+        document.getElementById("scrollArea").innerHTML = '<div class="empty">No events available yet.</div>';
+        return;
+      }
+
+      const renderedNames = new Set();
+      let cardDelay = 0;
+
+      adminEvents.forEach(event => {
+        const eName    = (event.event_name || event.name || '').trim();
+        const normName = eName.toLowerCase();
+        if (renderedNames.has(normName)) return;
+        renderedNames.add(normName);
+
+        const isGroup = event.event_type === 'group' || event.type === 'group';
+        const cat     = (event.event_category || 'technical').toLowerCase();
+        const catIcon = cat === 'technical' ? '⚡' : '🎨';
+        const catText = cat === 'technical' ? '⚡ Technical' : '🎨 Non-Technical';
+
+        const parentContainer = isGroup ? groupContainer : soloContainer;
+        const sectionId = `section_${isGroup ? 'group' : 'solo'}_${cat}`;
+        let section = document.getElementById(sectionId);
+
+        if (!section) {
+          section = document.createElement('div');
+          section.id = sectionId;
+
+          const catLabelEl = document.createElement('div');
+          catLabelEl.className = 'cat-label';
+          catLabelEl.textContent = catText;
+          section.appendChild(catLabelEl);
+
+          const grid = document.createElement('div');
+          grid.className = 'events-grid';
+          grid.id = `grid_${sectionId}`;
+          section.appendChild(grid);
+
+          parentContainer.appendChild(section);
+        }
+
+        const card = document.createElement("div");
+        card.className = "event-card";
+        card.style.animationDelay = `${cardDelay}ms`;
+        cardDelay += 60;
+
+        card.onclick = function(e) {
+          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+            toggleEvent(card, eName);
+          }
+        };
+
+        card.innerHTML = `
+          <span class="cat-icon">${catIcon}</span>
+          <span class="indicator">✓</span>
+          <h3>${eName}</h3>
+          ${isGroup ? `
+            <div class="team-code-container">
+              <label>Join Team — leave blank to be Leader</label>
+              <div class="token-row">
+                <input type="text" id="token_${event.id}" maxlength="16"
+                       placeholder="Enter team code"
+                       oninput="resetValidation('${eName}', this)">
+                <button type="button" class="verify-btn"
+                        onclick="verifyToken(event, ${event.id}, '${eName}')">
+                  Verify
+                </button>
+              </div>
+              <p id="msg_${event.id}" class="token-msg"></p>
+            </div>` : ''}
+        `;
+
+        const grid = document.getElementById(`grid_${sectionId}`);
+        grid.appendChild(card);
+      });
+
+      if (!soloContainer.innerHTML.trim())  document.getElementById("soloSection").style.display  = "none";
+      if (!groupContainer.innerHTML.trim()) document.getElementById("groupSection").style.display = "none";
+
+    } catch (err) {
+      console.error("Sync Error:", err);
+      document.getElementById("scrollArea").innerHTML = '<div class="empty">Failed to load events. Please refresh.</div>';
+    } finally {
+      hideLoader();
+    }
+  }
+
+  function toggleEvent(el, name) {
+    const norm = name.trim().toLowerCase();
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      selectedList = selectedList.filter(i => i !== name);
+      delete validatedTokens[norm];
+    } else {
+      if (selectedList.length < adminEventLimit) {
+        el.classList.add('selected');
+        selectedList.push(name);
+        validatedTokens[norm] = true;
+      } else {
+        openAlert(`You can only select up to ${adminEventLimit} events.`, "Limit Reached");
+      }
+    }
+    updateState();
+  }
+
+  function updateState() {
+    document.getElementById('count').textContent = selectedList.length;
+    document.getElementById('confirmBtn').disabled = selectedList.length === 0;
+  }
+
+  function openAlert(msg, title = "Notice") {
+    document.getElementById('alertTitle').textContent   = title;
+    document.getElementById('alertMessage').textContent = msg;
+    document.getElementById('alertOverlay').classList.add('show');
+  }
+
+  function closeAlert() {
+    document.getElementById('alertOverlay').classList.remove('show');
+  }
+
+  async function verifyToken(evt, eventId, eventName) {
+    if (evt) evt.stopPropagation();
+    const norm    = eventName.trim().toLowerCase();
+    const inputEl = document.getElementById(`token_${eventId}`);
+    const msgEl   = document.getElementById(`msg_${eventId}`);
+    const token   = inputEl.value.trim();
+
+    if (token === "") {
+      msgEl.textContent = "👑 You will be the Team Leader";
+      msgEl.style.color = "#00ffae";
+      validatedTokens[norm] = true;
+      return;
+    }
+
+    if (token.length < 3) {
+      msgEl.textContent = "⚠ Token too short";
+      msgEl.style.color = "orange";
+      validatedTokens[norm] = false;
+      return;
+    }
+
+    try {
+      const res  = await fetch(`${API_BASE_URL}/validate-token?eventId=${eventId}&token=${encodeURIComponent(token)}`);
+      const data = await res.json();
+      msgEl.textContent = data.message;
+      if (data.status === "join") {
+        msgEl.style.color = "#2ecc71";
+        validatedTokens[norm] = true;
+      } else {
+        msgEl.style.color = "#ff4b2b";
+        validatedTokens[norm] = false;
+      }
+    } catch {
+      msgEl.textContent = "Connection error";
+      msgEl.style.color = "orange";
+    }
+  }
+
+  function resetValidation(eventName, inputEl) {
+    const norm  = eventName.trim().toLowerCase();
+    const id    = inputEl.id.split('_')[1];
+    const msgEl = document.getElementById(`msg_${id}`);
+    if (inputEl.value.trim() === "") {
+      validatedTokens[norm] = true;
+      if (msgEl) { msgEl.textContent = "👑 Leader Mode"; msgEl.style.color = "#00ffae"; }
+    } else {
+      validatedTokens[norm] = false;
+      if (msgEl) { msgEl.textContent = "⚠ Please verify this code"; msgEl.style.color = "orange"; }
+    }
+  }
+
+  function generateUniqueToken(eventName) {
+    const prefix = eventName.substring(0, 3).toUpperCase().replace(/\s/g, 'X');
+    const rand   = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const ts     = Date.now().toString().slice(-3);
+    return `${prefix}-${rand}${ts}`;
+  }
+
+  async function submitEvents() {
+    const confirmBtn  = document.getElementById("confirmBtn");
+    const studentData = JSON.parse(localStorage.getItem("studentData"));
+
+    for (let card of document.querySelectorAll('.event-card.selected')) {
+      const eName      = card.querySelector('h3').innerText.trim().toLowerCase();
+      const tokenInput = card.querySelector('input[type="text"]');
+      if (tokenInput && tokenInput.value.trim() !== "" && !validatedTokens[eName]) {
+        openAlert(`Please verify the team code for "${card.querySelector('h3').innerText}" or leave it blank to be the Leader.`, "Verification Required");
+        return;
+      }
+    }
+
+    if (!studentData) {
+      alert("Session expired.");
+      window.location.href = "student-details.html";
+      return;
+    }
+
+    const eventPayload = Array.from(document.querySelectorAll('.event-card.selected')).map(card => {
+      const origName   = card.querySelector('h3').innerText.trim();
+      const tokenInput = card.querySelector('input[type="text"]');
+      let finalToken   = null;
+      if (tokenInput) {
+        const val = tokenInput.value.trim();
+        finalToken = val === "" ? generateUniqueToken(origName.toLowerCase()) : val;
+      }
+      return { name: origName, token: finalToken };
+    });
+
+    const payload = { ...studentData, events: eventPayload };
+
+    confirmBtn.disabled    = true;
+    confirmBtn.textContent = "Processing...";
+
+    try {
+      const res    = await fetch(`${API_BASE_URL}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        window.location.href = 'registration-success.html';
+      } else {
+        openAlert(result.message, "Registration Error");
+        confirmBtn.disabled    = false;
+        confirmBtn.textContent = "Confirm Choice";
+      }
+    } catch {
+      openAlert("Network error. Please check your connection.", "Error");
+      confirmBtn.disabled    = false;
+      confirmBtn.textContent = "Confirm Choice";
+    }
+  }
+
+  window.onload = syncAdminSettings;
+</script>
+</body>
+</html>
