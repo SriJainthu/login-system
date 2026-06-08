@@ -975,10 +975,13 @@ app.post("/admin/update-year-settings", verifyAdmin, async (req, res) => {
         res.json({ success: true });
     } catch (err) { res.status(500).json({ success: false, error: err.sqlMessage }); }
 });
+<<<<<<< HEAD
 // Lightweight ping route for cron-job.org
 app.get("/ping", (req, res) => {
     res.json({ status: "ok", time: new Date().toISOString() });
 });
+=======
+>>>>>>> c2ce605500b195fd88e79f68b115c5d74b023962
 app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));

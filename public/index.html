@@ -348,17 +348,17 @@
 <p id="headerText" class="fade-text"></p>
 <h1 id="symposiumTitle" class="fade-text"></h1>
         
-        <div class="countdown" id="timer">
+       <div class="countdown" id="timer" style="opacity:0; transition: opacity 0.5s ease;">
             <div class="time-box"><span id="days">00</span><label>Days</label></div>
             <div class="time-box"><span id="hours">00</span><label>Hours</label></div>
             <div class="time-box"><span id="mins">00</span><label>Mins</label></div>
             <div class="time-box"><span id="secs">00</span><label>Secs</label></div>
         </div>
 
-        <div class="btn-group">
-            <a href="student-details.html" class="main-btn" id="regBtn">Register Now</a>
-            <a href="about-events.html" class="outline-btn">Explore Events</a>
-        </div>
+        <div class="btn-group" id="btnGroup" style="opacity:0; transition: opacity 0.5s ease;">
+    <a href="student-details.html" class="main-btn" id="regBtn">Register Now</a>
+    <a href="about-events.html" class="outline-btn">Explore Events</a>
+</div>
     </section>
     
     <script>
@@ -379,63 +379,67 @@ let serverDeadline = null;
 
 async function syncDeadline() {
     try {
-       const response = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const response = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await response.json();
         serverDeadline = new Date(data.registration_deadline).getTime();
     } catch (err) {
         console.error("Sync Error:", err);
-        // Fallback if server is unreachable
         serverDeadline = new Date("March 15, 2026 09:00:00").getTime();
     }
+
+    // ✅ Only show buttons AFTER deadline is known
+    applyDeadlineState();
 }
 
-async function updateTimer() {
-    // If we haven't fetched the deadline yet, get it
-    if (!serverDeadline) await syncDeadline();
-
+function applyDeadlineState() {
     const now = new Date().getTime();
     const diff = serverDeadline - now;
     const regBtn = document.getElementById("regBtn");
     const timerContainer = document.getElementById("timer");
+    const btnGroup = document.getElementById("btnGroup");
 
     if (diff <= 0) {
-        // --- REGISTRATION CLOSED STATE ---
-        timerContainer.innerHTML = "<h2 style='color: var(--primary); letter-spacing: 2px;'>REGISTRATION CLOSED</h2>";
+        // Registration CLOSED
+        timerContainer.innerHTML = "<h2 style='color:var(--primary);letter-spacing:2px;'>REGISTRATION CLOSED</h2>";
         
-        if(regBtn) {
+        if (regBtn) {
             regBtn.innerText = "Registration Closed";
             regBtn.classList.add("btn-closed");
-            regBtn.href = "javascript:void(0)"; 
+            regBtn.href = "javascript:void(0)";
             regBtn.onclick = function() { openModal(); };
         }
-    } else {
-        // --- REGISTRATION OPEN STATE ---
-        // Restore the timer HTML if it was previously set to "CLOSED"
-        if (timerContainer.innerHTML.includes("REGISTRATION CLOSED")) {
-            timerContainer.innerHTML = `
-                <div class="time-box"><span id="days">00</span><label>Days</label></div>
-                <div class="time-box"><span id="hours">00</span><label>Hours</label></div>
-                <div class="time-box"><span id="mins">00</span><label>Mins</label></div>
-                <div class="time-box"><span id="secs">00</span><label>Secs</label></div>
-            `;
-            
-            // Restore Button
-            regBtn.innerText = "Register Now";
-            regBtn.classList.remove("btn-closed");
-            regBtn.href = "student-details.html";
-            regBtn.onclick = null;
-        }
-
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-        document.getElementById("days").innerText = d < 10 ? "0"+d : d;
-        document.getElementById("hours").innerText = h < 10 ? "0"+h : h;
-        document.getElementById("mins").innerText = m < 10 ? "0"+m : m;
-        document.getElementById("secs").innerText = s < 10 ? "0"+s : s;
     }
+    // else: registration open — buttons stay as is
+
+    // ✅ Fade in timer and buttons together
+    setTimeout(() => {
+        timerContainer.style.opacity = "1";
+        btnGroup.style.opacity = "1";
+    }, 200);
+}
+
+function updateTimer() {
+    if (!serverDeadline) return; // wait until deadline is loaded
+
+    const now = new Date().getTime();
+    const diff = serverDeadline - now;
+    const timerContainer = document.getElementById("timer");
+
+    if (diff <= 0) return; // already handled in applyDeadlineState
+
+    // check if timer boxes exist (they might have been replaced)
+    const daysEl = document.getElementById("days");
+    if (!daysEl) return;
+
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById("days").innerText  = d < 10 ? "0"+d : d;
+    document.getElementById("hours").innerText = h < 10 ? "0"+h : h;
+    document.getElementById("mins").innerText  = m < 10 ? "0"+m : m;
+    document.getElementById("secs").innerText  = s < 10 ? "0"+s : s;
 }
 async function loadHomepageText() {
     startLoader();
@@ -504,13 +508,13 @@ function finishLoader() {
 
 loadHomepageText();
 
-// Initial Sync
+// Fetch deadline first — buttons only show after this resolves
 syncDeadline();
 
-// Update numbers every second
+// Start ticking every second
 setInterval(updateTimer, 1000);
 
-// Re-sync with server every 30 seconds in case Admin changes time while user is on page
+// Re-sync every 30 seconds
 setInterval(syncDeadline, 30000);
 
 updateTimer();
