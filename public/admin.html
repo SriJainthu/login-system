@@ -1721,16 +1721,13 @@ async function loadAdminSettings() {
     document.getElementById("adminSymposiumTitle").value = s.symposium_title || "";
     document.getElementById("adminLimitInput").value    = s.event_selection_limit || 3;
       // ✅ ADD THIS — restore saved deadline into the datetime-local input
-    if (s.registration_deadline) {
-      const d = new Date(s.registration_deadline);
-      // datetime-local needs "YYYY-MM-DDTHH:MM" format
-      const formatted = d.getFullYear() + '-' +
-        String(d.getMonth() + 1).padStart(2, '0') + '-' +
-        String(d.getDate()).padStart(2, '0') + 'T' +
-        String(d.getHours()).padStart(2, '0') + ':' +
-        String(d.getMinutes()).padStart(2, '0');
-      document.getElementById("adminDateInput").value = formatted;
-    }
+  if (s.registration_deadline) {
+  // ✅ Slice directly — avoids timezone conversion entirely
+  // MySQL returns "2026-07-01T04:53:00.000Z" or "2026-07-01 04:53:00"
+  // We just need "2026-07-01T04:53" for datetime-local input
+  const raw = s.registration_deadline.toString().replace(' ', 'T').substring(0, 16);
+  document.getElementById("adminDateInput").value = raw;
+}
     const c = await (await adminFetch(`${API_BASE_URL}/api/contact`)).json();
     document.getElementById("adminEmail").value    = c.contact_email    || "";
     document.getElementById("adminPhone").value    = c.contact_phone    || "";
