@@ -326,8 +326,15 @@
 </head>
 <body>
 
-<div id="toast"></div>
+<!-- Instant auth guard — prevents flash -->
+<style>#page-guard { display:none; }</style>
+<script>
+    if (!sessionStorage.getItem("coordToken") || !sessionStorage.getItem("coordEvent")) {
+        window.location.replace("coordinator-login.html");
+    }
+</script>
 
+<div id="toast"></div>
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
@@ -454,7 +461,6 @@
 const coordToken = sessionStorage.getItem("coordToken");
 const coordEvent = sessionStorage.getItem("coordEvent");
 const coordType  = sessionStorage.getItem("coordType");
-if (!coordToken || !coordEvent) window.location.href = "coordinator-login.html";
 
 const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
@@ -638,7 +644,6 @@ function updateCount(n) {
     document.getElementById("tableCount").textContent = `${n} record${n !== 1 ? "s" : ""}`;
 }
 
-// CSV Export
 function exportCSV() {
     const rows = document.getElementById("tableBody").querySelectorAll("tr");
     if (!rows.length) return showToast("No data to export");
@@ -695,43 +700,87 @@ function exportCSV() {
     showToast("✓ CSV downloaded");
 }
 
-// PDF Export
 function exportPDF() {
     const rows = document.getElementById("tableBody").querySelectorAll("tr");
     if (!rows.length) return showToast("No data to export");
-    let tbl = `<table border="1"><thead>`;
+
+    const p = {
+        name:   document.getElementById("ex-name").checked,
+        reg:    document.getElementById("ex-reg").checked,
+        college:document.getElementById("ex-college").checked,
+        dept:   document.getElementById("ex-dept").checked,
+        degree: document.getElementById("ex-degree").checked,
+        level:  document.getElementById("ex-level").checked,
+        year:   document.getElementById("ex-year").checked
+    };
+
+    let tbl = `<table border="1"><thead><tr>`;
+
     if (isGroup) {
-        tbl += `<tr><th>Team Token</th><th>Team No</th><th>Reg No</th><th>Name</th><th>Dept</th><th>College</th></tr>`;
+        tbl += `<th>Team Token</th><th>Team No</th><th>Reg No</th><th>Name</th><th>Dept</th><th>College</th>`;
     } else {
-        tbl += `<tr><th>Name</th><th>Reg No</th><th>College</th><th>Dept</th><th>Degree</th><th>Level</th><th>Year</th></tr>`;
+        if(p.name)   tbl += `<th>Name</th>`;
+        if(p.reg)    tbl += `<th>Reg No</th>`;
+        if(p.college)tbl += `<th>College</th>`;
+        if(p.dept)   tbl += `<th>Dept</th>`;
+        if(p.degree) tbl += `<th>Degree</th>`;
+        if(p.level)  tbl += `<th>Level</th>`;
+        if(p.year)   tbl += `<th>Year</th>`;
     }
-    tbl += `</thead><tbody>`;
+
+    tbl += `</tr></thead><tbody>`;
+
     rows.forEach(row => {
         const cells = Array.from(row.cells);
-        tbl += `<tr>${cells.map(c => `<td>${c.innerText}</td>`).join("")}</tr>`;
+        tbl += `<tr>`;
+        if (isGroup) {
+            // Group view — export all columns as-is
+            const isLeader = cells.length > 4;
+            if (isLeader) {
+                tbl += `<td>${cells[0].innerText}</td><td>${cells[1].innerText}</td><td>${cells[2].innerText}</td><td>${cells[3].innerText}</td><td>${cells[4].innerText}</td><td>${cells[5].innerText}</td>`;
+            } else {
+                tbl += `<td></td><td></td><td>${cells[0].innerText}</td><td>${cells[1].innerText}</td><td>${cells[2].innerText}</td><td>${cells[3].innerText}</td>`;
+            }
+        } else {
+            // Solo view — respect checkboxes
+            // Table columns: Name(0), Reg(1), College(2), Dept(3), Degree(4), Level(5), Year(6)
+            if(p.name)   tbl += `<td>${cells[0]?.innerText||''}</td>`;
+            if(p.reg)    tbl += `<td>${cells[1]?.innerText||''}</td>`;
+            if(p.college)tbl += `<td>${cells[2]?.innerText||''}</td>`;
+            if(p.dept)   tbl += `<td>${cells[3]?.innerText||''}</td>`;
+            if(p.degree) tbl += `<td>${cells[4]?.innerText||''}</td>`;
+            if(p.level)  tbl += `<td>${cells[5]?.innerText||''}</td>`;
+            if(p.year)   tbl += `<td>${cells[6]?.innerText||''}</td>`;
+        }
+        tbl += `</tr>`;
     });
+
     tbl += `</tbody></table>`;
-    const w = window.open("","","height=800,width=1000");
-    w.document.write(`<html><head><title>${coordEvent}</title><style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:8px;font-size:12px;}th{background:#f0f0f0;}h2,h3{text-align:center;}</style></head><body><h2>${coordEvent}</h2><h3>Participant List</h3>${tbl}</body></html>`);
+
+    const w = window.open("", "", "height=800,width=1000");
+    w.document.write(`
+        <html><head><title>${coordEvent}</title>
+        <style>
+            body { font-family: sans-serif; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ccc; padding: 8px; font-size: 12px; }
+            th { background: #f0f0f0; }
+            h2, h3 { text-align: center; }
+        </style></head>
+        <body>
+            <h2>${coordEvent}</h2>
+            <h3>Participant List</h3>
+            ${tbl}
+        </body></html>`);
     w.document.close();
     setTimeout(() => { w.print(); w.close(); }, 500);
     showToast("✓ PDF ready");
 }
 
-// Toast
-let toastTimer;
-function showToast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent = msg; t.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-// Logout
 function logout() {
-    localStorage.removeItem("coordToken");
-    localStorage.removeItem("coordEvent");
-    localStorage.removeItem("coordType");
+    sessionStorage.removeItem("coordToken");
+    sessionStorage.removeItem("coordEvent");
+    sessionStorage.removeItem("coordType");
     window.location.href = "coordinator-login.html";
 }
 
