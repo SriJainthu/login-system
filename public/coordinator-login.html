@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinator Login</title>
+    <style>
+        :root { --accent: #00c6ff; --bg: #0f2027; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 44px 40px;
+            width: 420px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+            animation: rise 0.7s cubic-bezier(0.23,1,0.32,1) forwards;
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 28px;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 300;
+            font-size: 22px;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
+        }
+
+        h2 span { color: var(--accent); font-weight: 700; }
+
+        .field { position: relative; margin-bottom: 24px; }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #6b8099;
+            margin-bottom: 8px;
+        }
+
+        .field select, .field input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+            appearance: none;
+        }
+
+        .field select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300c6ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-color: rgba(255,255,255,0.05);
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        .field select option { background: #0f2027; color: #fff; }
+        .field select optgroup { color: #00c6ff; }
+
+        .field select:focus, .field input:focus {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.09);
+            box-shadow: 0 0 0 3px rgba(0,198,255,0.1);
+        }
+
+        .field input[type="password"] { letter-spacing: 4px; font-size: 18px; }
+        .field input[type="text"]     { letter-spacing: normal; }
+
+        .show-pw {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6b8099;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .show-pw input { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,198,255,0.35); }
+        .btn:active { transform: scale(0.98); }
+
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: none;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error {
+            background: rgba(255,75,43,0.1);
+            border: 1px solid rgba(255,75,43,0.3);
+            color: #ff6b6b;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .admin-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: #4a5a72;
+        }
+
+        .admin-link a { color: var(--accent); text-decoration: none; }
+        .admin-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo" id="logoTitle">Symposium</div>
+    <h2>Coordinator <span>Login</span></h2>
+
+    <div class="field">
+        <label>Your Event</label>
+        <select id="eventSelect">
+            <option value="" disabled selected>Loading events...</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Coordinator Password</label>
+        <input type="password" id="coordPassword" placeholder="Enter your event password">
+        <label class="show-pw">
+            <input type="checkbox" id="showPw"> Show password
+        </label>
+    </div>
+
+    <div class="error" id="errorBox"></div>
+
+    <button class="btn" id="loginBtn">
+        <span class="spinner" id="spinner"></span>
+        <span id="btnText">Login to Dashboard</span>
+    </button>
+
+    <div class="admin-link">
+        Admin? <a href="admin-login.html">Go to Admin Login →</a>
+    </div>
+</div>
+
+<script>
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://login-system-1-nowr.onrender.com';
+
+// Load symposium title
+async function loadTitle() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const data = await res.json();
+        if (data.symposium_title) {
+            const parts = data.symposium_title.split(/(\d{2,4})/);
+            const el = document.getElementById("logoTitle");
+            el.innerHTML = parts.length >= 2
+                ? `${parts[0].trim()} <span style="color:#fff">${parts[1]}</span>`
+                : data.symposium_title;
+        }
+    } catch(e) {}
+}
+
+// Load events into dropdown
+async function loadEvents() {
+    try {
+        const res  = await fetch(`${API_BASE_URL}/api/events-list`);
+        const data = await res.json();
+        const sel  = document.getElementById("eventSelect");
+        sel.innerHTML = '<option value="" disabled selected>Select your event</option>';
+
+        const tech    = data.filter(e => e.event_category === 'technical');
+        const nonTech = data.filter(e => e.event_category === 'non-technical');
+
+        function addGroup(label, items) {
+            if (!items.length) return;
+            const og = document.createElement("optgroup");
+            og.label = label;
+            items.forEach(e => {
+                const o = document.createElement("option");
+                o.value = e.event_name;
+                o.textContent = `${e.event_name} (${e.event_type})`;
+                og.appendChild(o);
+            });
+            sel.appendChild(og);
+        }
+
+        addGroup("⚡ Technical", tech);
+        addGroup("🎨 Non-Technical", nonTech);
+    } catch(e) {
+        document.getElementById("eventSelect").innerHTML =
+            '<option value="" disabled selected>Failed to load events</option>';
+    }
+}
+
+// Show password toggle
+document.getElementById("showPw").addEventListener("change", function() {
+    document.getElementById("coordPassword").type = this.checked ? "text" : "password";
+});
+
+// Login
+document.getElementById("loginBtn").addEventListener("click", async () => {
+    const event_name = document.getElementById("eventSelect").value;
+    const password   = document.getElementById("coordPassword").value;
+    const errorBox   = document.getElementById("errorBox");
+    const spinner    = document.getElementById("spinner");
+    const btnText    = document.getElementById("btnText");
+
+    errorBox.style.display = "none";
+
+    if (!event_name) { showError("Please select your event."); return; }
+    if (!password)   { showError("Please enter your coordinator password."); return; }
+
+    spinner.style.display = "block";
+    btnText.textContent = "Verifying...";
+    document.getElementById("loginBtn").style.pointerEvents = "none";
+
+    try {
+        const res  = await fetch(`${API_BASE_URL}/coordinator/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ event_name, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            localStorage.setItem("coordToken", data.token);
+            localStorage.setItem("coordEvent", data.event_name);
+            localStorage.setItem("coordType",  data.event_type);
+            window.location.href = "coordinator.html";
+        } else {
+            showError(data.message || "Invalid password.");
+        }
+    } catch(e) {
+        showError("Cannot connect to server. Try again.");
+    } finally {
+        spinner.style.display = "none";
+        btnText.textContent = "Login to Dashboard";
+        document.getElementById("loginBtn").style.pointerEvents = "auto";
+    }
+});
+
+function showError(msg) {
+    const b = document.getElementById("errorBox");
+    b.textContent = "✕ " + msg;
+    b.style.display = "block";
+}
+
+// Also allow Enter key
+document.getElementById("coordPassword").addEventListener("keydown", e => {
+    if (e.key === "Enter") document.getElementById("loginBtn").click();
+});
+
+loadTitle();
+loadEvents();
+</script>
+</body>
+</html>

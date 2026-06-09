@@ -809,10 +809,10 @@ app.delete("/admin/delete-event", verifyAdmin, (req, res) => {
     });
 });
 app.post('/admin/add-event', verifyAdmin, (req, res) => {
-    const { name, description, type, category, max_team_size } = req.body;
+    const { name, description, type, category, max_team_size, coordinator_password } = req.body;
     if (!name || !type || !category) return res.status(400).json({ success: false, error: "Missing fields" });
-    const sql = "INSERT INTO events (event_name, description, event_type, event_category, max_team_size) VALUES (?, ?, ?, ?, ?)";
-    db.query(sql, [name, description, type, category, max_team_size], (err) => {
+    const sql = "INSERT INTO events (event_name, description, event_type, event_category, max_team_size, coordinator_password) VALUES (?, ?, ?, ?, ?, ?)";
+    db.query(sql, [name, description, type, category, max_team_size, coordinator_password || null], (err) => {
         if (err) return res.status(500).json({ success: false, error: err.sqlMessage });
         res.json({ success: true });
     });
@@ -979,7 +979,108 @@ app.post("/admin/update-year-settings", verifyAdmin, async (req, res) => {
 app.get("/ping", (req, res) => {
     res.json({ status: "ok", time: new Date().toISOString() });
 });
+// Coordinator login
+app.post("/coordinator/login", async (req, res) => {
+    const { event_name, password } = req.body;
+    if (!event_name || !password) {
+        return res.status(400).json({ success: false, message: "Missing fields" });
+    }
+    try {
+        const [rows] = await promiseDb.query(
+            "SELECT id, event_name, event_type, event_category, coordinator_password FROM events WHERE event_name = ?",
+            [event_name]
+        );
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "Event not found" });
+        }
+        const event = rows[0];
+        if (!event.coordinator_password || event.coordinator_password !== password) {
+            return res.status(401).json({ success: false, message: "Invalid password" });
+        }
+        const token = jwt.sign(
+            { role: "coordinator", event_name: event.event_name, event_type: event.event_type, event_id: event.id },
+            JWT_SECRET,
+            { expiresIn: "8h" }
+        );
+        res.json({ success: true, token, event_name: event.event_name, event_type: event.event_type });
+    } catch (err) {
+        console.error("Coordinator login error:", err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
 
+// Coordinator middleware
+function verifyCoordinator(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(403).json({ message: "No token" });
+    const token = authHeader.split(" ")[1];
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.role !== "coordinator") return res.status(403).json({ message: "Not a coordinator" });
+        req.coordinator = decoded;
+        next();
+    } catch {
+        return res.status(401).json({ message: "Invalid token" });
+    }
+}
+
+// Coordinator — get their event's students
+app.get("/coordinator/students", verifyCoordinator, async (req, res) => {
+    const { department, degree, level, year, college } = req.query;
+    const event_name = req.coordinator.event_name;
+    const event_type = req.coordinator.event_type;
+
+    try {
+        if (event_type === "group") {
+            // Grouped team view
+            let sql = `
+                SELECT se.team_token, s.name, s.reg_no, s.department, s.college, s.degree, s.level, s.year
+                FROM student_events se
+                JOIN students s ON se.student_id = s.id
+                JOIN events e ON se.event_id = e.id
+                WHERE e.event_name = ?`;
+            const params = [event_name];
+            if (college) { sql += " AND s.college = ?"; params.push(college); }
+            const [rows] = await promiseDb.query(sql, params);
+            const grouped = rows.reduce((acc, row) => {
+                if (!acc[row.team_token]) acc[row.team_token] = [];
+                acc[row.team_token].push(row);
+                return acc;
+            }, {});
+            return res.json({ type: "group", data: grouped });
+        } else {
+            // Solo view
+            let sql = `
+                SELECT s.name, s.reg_no, s.college, s.department, s.degree, s.level, s.year
+                FROM student_events se
+                JOIN students s ON se.student_id = s.id
+                JOIN events e ON se.event_id = e.id
+                WHERE e.event_name = ?`;
+            const params = [event_name];
+            if (department) { sql += " AND s.department = ?"; params.push(department); }
+            if (degree)     { sql += " AND s.degree = ?";     params.push(degree); }
+            if (level)      { sql += " AND s.level = ?";      params.push(level); }
+            if (year)       { sql += " AND s.year = ?";       params.push(year); }
+            if (college)    { sql += " AND s.college = ?";    params.push(college); }
+            sql += " ORDER BY s.name ASC";
+            const [rows] = await promiseDb.query(sql, params);
+            return res.json({ type: "solo", data: rows });
+        }
+    } catch (err) {
+        console.error("Coordinator students error:", err);
+        res.status(500).json({ error: "Failed to load students" });
+    }
+});
+
+// Public — get all events (for coordinator login dropdown)
+app.get("/api/events-list", async (req, res) => {
+    try {
+        const [rows] = await promiseDb.query(
+            "SELECT event_name, event_type, event_category FROM events ORDER BY event_name ASC"
+        );
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: "Failed" }); }
+});
 app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
