@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coordinator Dashboard</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -449,9 +451,9 @@
 
 <script>
 // Auth check
-const coordToken = localStorage.getItem("coordToken");
-const coordEvent = localStorage.getItem("coordEvent");
-const coordType  = localStorage.getItem("coordType");
+const coordToken = sessionStorage.getItem("coordToken");
+const coordEvent = sessionStorage.getItem("coordEvent");
+const coordType  = sessionStorage.getItem("coordType");
 if (!coordToken || !coordEvent) window.location.href = "coordinator-login.html";
 
 const API_BASE_URL = window.location.hostname === 'localhost'

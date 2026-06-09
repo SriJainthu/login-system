@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coordinator Login</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
     <style>
+        
         :root { --accent: #00c6ff; --bg: #0f2027; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -286,10 +289,10 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
         const data = await res.json();
 
         if (data.success) {
-            localStorage.setItem("coordToken", data.token);
-            localStorage.setItem("coordEvent", data.event_name);
-            localStorage.setItem("coordType",  data.event_type);
-            window.location.href = "coordinator.html";
+           sessionStorage.setItem("coordToken", data.token);
+sessionStorage.setItem("coordEvent", data.event_name);
+sessionStorage.setItem("coordType",  data.event_type);
+window.location.href = "coordinator.html";
         } else {
             showError(data.message || "Invalid password.");
         }
