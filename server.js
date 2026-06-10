@@ -809,10 +809,10 @@ app.delete("/admin/delete-event", verifyAdmin, (req, res) => {
     });
 });
 app.post('/admin/add-event', verifyAdmin, (req, res) => {
-    const { name, description, type, category, max_team_size, coordinator_password } = req.body;
+   const { name, description, type, category, max_team_size, coordinator_password, coordinator_name } = req.body;
     if (!name || !type || !category) return res.status(400).json({ success: false, error: "Missing fields" });
-    const sql = "INSERT INTO events (event_name, description, event_type, event_category, max_team_size, coordinator_password) VALUES (?, ?, ?, ?, ?, ?)";
-    db.query(sql, [name, description, type, category, max_team_size, coordinator_password || null], (err) => {
+  const sql = "INSERT INTO events (event_name, description, event_type, event_category, max_team_size, coordinator_password, coordinator_name) VALUES (?, ?, ?, ?, ?, ?, ?)";
+db.query(sql, [name, description, type, category, max_team_size, coordinator_password || null, coordinator_name || null], (err) => {
         if (err) return res.status(500).json({ success: false, error: err.sqlMessage });
         res.json({ success: true });
     });
