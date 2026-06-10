@@ -987,7 +987,7 @@ app.post("/coordinator/login", async (req, res) => {
     }
     try {
         const [rows] = await promiseDb.query(
-            "SELECT id, event_name, event_type, event_category, coordinator_password FROM events WHERE event_name = ?",
+            "SELECT id, event_name, event_type, event_category, coordinator_password, coordinator_name FROM events WHERE event_name = ?",
             [event_name]
         );
         if (rows.length === 0) {
@@ -997,12 +997,11 @@ app.post("/coordinator/login", async (req, res) => {
         if (!event.coordinator_password || event.coordinator_password !== password) {
             return res.status(401).json({ success: false, message: "Invalid password" });
         }
-        const token = jwt.sign(
-            { role: "coordinator", event_name: event.event_name, event_type: event.event_type, event_id: event.id },
-            JWT_SECRET,
-            { expiresIn: "8h" }
-        );
-        res.json({ success: true, token, event_name: event.event_name, event_type: event.event_type });
+      const token = jwt.sign(
+    { role: "coordinator", event_name: event.event_name, event_type: event.event_type, event_id: event.id, coordinator_name: event.coordinator_name || "" },
+    JWT_SECRET, { expiresIn: "8h" }
+);
+res.json({ success: true, token, event_name: event.event_name, event_type: event.event_type, coordinator_name: event.coordinator_name || "" });
     } catch (err) {
         console.error("Coordinator login error:", err);
         res.status(500).json({ success: false, message: "Server error" });

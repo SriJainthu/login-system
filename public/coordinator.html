@@ -338,8 +338,10 @@
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
-        <div class="topbar-title" id="topbarTitle">Coordinator <span>Dashboard</span></div>
-        <div class="event-badge" id="eventBadge">Loading...</div>
+       <div style="display:flex; flex-direction:column; gap:2px;">
+    <div class="topbar-title" id="topbarTitle">Coordinator <span>Dashboard</span></div>
+    <div id="welcomeMsg" style="font-size:11px; color:var(--muted); letter-spacing:0.5px;"></div>
+</div>
     </div>
     <div style="display:flex; align-items:center; gap:14px;">
         <span class="live-dot">Live</span>
@@ -461,6 +463,10 @@
 const coordToken = sessionStorage.getItem("coordToken");
 const coordEvent = sessionStorage.getItem("coordEvent");
 const coordType  = sessionStorage.getItem("coordType");
+const coordName = sessionStorage.getItem("coordName") || "";
+if (coordName) {
+    document.getElementById("welcomeMsg").textContent = `Welcome, ${coordName} 👋`;
+}
 
 const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
