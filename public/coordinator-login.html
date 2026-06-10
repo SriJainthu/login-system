@@ -302,7 +302,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
            sessionStorage.setItem("coordToken", data.token);
 sessionStorage.setItem("coordEvent", data.event_name);
 sessionStorage.setItem("coordType",  data.event_type);
-sessionStorage.setItem("coordName", data.coordinator_name || "");
+
 window.location.href = "coordinator.html";
         } else {
             showError(data.message || "Invalid password.");
