@@ -471,10 +471,18 @@ const API_BASE_URL = window.location.hostname === 'localhost'
 
 const isGroup = coordType === "group";
 
-// Set up UI for event type
-document.getElementById("eventBadge").textContent = coordEvent;
-document.getElementById("statEvent").textContent  = coordEvent;
-document.getElementById("statType").textContent   = isGroup ? "Group Event" : "Solo Event";
+// Safe init — no crash
+document.getElementById("statEvent").textContent = coordEvent || "—";
+document.getElementById("statType").textContent  = isGroup ? "Group Event" : "Solo Event";
+
+// ✅ Welcome message
+const coordName = sessionStorage.getItem("coordName") || "";
+const welcomeEl = document.getElementById("welcomeMsg");
+if (welcomeEl) {
+    welcomeEl.textContent = coordName 
+        ? `Welcome, ${coordName} 👋` 
+        : `Welcome, Coordinator 👋`;
+}
 
 if (isGroup) {
     document.getElementById("soloFilters").style.display  = "none";
@@ -487,7 +495,7 @@ function coordFetch(url) {
         headers: { "Authorization": `Bearer ${coordToken}` }
     }).then(res => {
         if (res.status === 401 || res.status === 403) {
-            localStorage.clear();
+            sessionStorage.clear();
             window.location.href = "coordinator-login.html";
         }
         return res;
