@@ -323,6 +323,7 @@
             .stats-row { grid-template-columns: 1fr; }
         }
         .coord-name {
+            -webkit-text-fill-color: var(--accent);
     color: var(--accent);
     font-weight: 800;
     position: relative;
@@ -350,6 +351,17 @@
     }
 }
 .welcome-msg {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    margin-top: 4px;
+
+    opacity: 0;
+    transform: translateY(12px);
+
+    animation: welcomeFadeIn 1s var(--ease) forwards;
+
     background: linear-gradient(
         90deg,
         var(--text),
