@@ -115,7 +115,17 @@
             user-select: none;
         }
 
-        .show-pw input { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+.show-pw input {
+    width: 16px; height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    appearance: auto;
+    -webkit-appearance: auto;
+    background: #fff;
+    border: 2px solid var(--accent);
+    border-radius: 3px;
+    flex-shrink: 0;
+}
 
         .btn {
             width: 100%;

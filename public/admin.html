@@ -1340,14 +1340,15 @@ async function populateFilterDropdowns() {
 /* ─── EVENTS ─── */
 async function fetchEventsFromServer() {
   try {
-    const res  = await fetch(`${API_BASE_URL}/events`);
+    const res  = await adminFetch(`${API_BASE_URL}/admin/events-with-passwords`);
     const data = await res.json();
     eventsList = data.map(e => ({
       name:     e.event_name,
       desc:     e.description,
       type:     e.event_type,
       category: e.event_category || 'technical',
-      max_size: e.max_team_size
+      max_size: e.max_team_size,
+      password: e.coordinator_password || ''
     }));
     renderEvents();
     loadStudents();
@@ -1374,7 +1375,7 @@ function renderEvents() {
       const div = document.createElement("div");
       div.className = "event-item";
       div.style.animationDelay = (i * 0.06) + 's';
-      div.innerHTML = `
+   div.innerHTML = `
         <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
             <span class="event-name">${e.name}</span>
@@ -1382,6 +1383,17 @@ function renderEvents() {
             <span class="event-badge" style="background:${e.category==='technical'?'rgba(79,142,247,0.1)':'rgba(168,85,247,0.1)'}; color:${e.category==='technical'?'var(--accent2)':'#a855f7'}; border-color:${e.category==='technical'?'rgba(79,142,247,0.2)':'rgba(168,85,247,0.2)'};">${e.category==='technical'?'⚡ Tech':'🎨 Non-Tech'}</span>
           </div>
           <div class="event-desc">${e.desc}</div>
+          <div style="margin-top:8px; display:flex; align-items:center; gap:8px;">
+            <span style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted);">Coordinator Password:</span>
+            <span id="pw-display-${globalIndex}" style="font-family:monospace; font-size:12px; color:var(--label); letter-spacing:2px;">••••••••</span>
+            <button onclick="togglePwVisibility(${globalIndex}, '${e.password || ''}')" 
+                style="background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:2px 8px; cursor:pointer; font-size:10px; transition:0.2s;"
+                onmouseover="this.style.color='var(--text)'" 
+                onmouseout="this.style.color='var(--muted)'"
+                id="pw-btn-${globalIndex}">
+                👁 Show
+            </button>
+          </div>
         </div>
         <button class="delete-event" onclick="openModal(${globalIndex})">×</button>`;
       list.appendChild(div);
@@ -1918,6 +1930,19 @@ document.addEventListener("DOMContentLoaded", () => {
     updateYearFilterByLevel();
   });
 });
+function togglePwVisibility(index, password) {
+    const display = document.getElementById(`pw-display-${index}`);
+    const btn     = document.getElementById(`pw-btn-${index}`);
+    if (display.innerText === '••••••••') {
+        display.innerText = password || '(not set)';
+        display.style.color = 'var(--accent)';
+        btn.innerText = '🙈 Hide';
+    } else {
+        display.innerText = '••••••••';
+        display.style.color = 'var(--label)';
+        btn.innerText = '👁 Show';
+    }
+}
 </script>
 </body>
 </html>

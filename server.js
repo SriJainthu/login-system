@@ -1081,6 +1081,13 @@ app.get("/api/events-list", async (req, res) => {
         res.json(rows);
     } catch (err) { res.status(500).json({ error: "Failed" }); }
 });
+// Admin only — events with coordinator passwords
+app.get("/admin/events-with-passwords", verifyAdmin, (req, res) => {
+    db.query("SELECT * FROM events ORDER BY event_category, event_name", (err, rows) => {
+        if (err) return res.status(500).json({ error: "Failed" });
+        res.json(rows);
+    });
+});
 app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
