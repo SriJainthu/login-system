@@ -698,15 +698,16 @@ body { padding-bottom: 80px; }
         </div>
         <div class="event-desc">${event.description || 'No description available.'}</div>
         <div class="card-footer">
-          ${event.coordinator_name ? `
-<div class="footer-item">
-  <span style="font-size:10px; color:var(--muted);">👤 ${event.coordinator_name}</span>
-</div>` : ''}
+          
           <div class="footer-item">
             <div class="footer-dot"></div>
             ${catClass === 'cat-tech' ? 'Technical' : 'Non-Technical'}
           </div>
           ${isGroup ? `<div class="footer-item"><span class="badge badge-team">Max ${teamSize} members</span></div>` : ''}
+          ${event.coordinator_name ? `
+<div class="footer-item">
+  <span style="font-size:10px; color:var(--muted);">👤 ${event.coordinator_name}</span>
+</div>` : ''}
         </div>
       </div>`;
   }
