@@ -303,7 +303,8 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 sessionStorage.setItem("coordEvent", data.event_name);
 sessionStorage.setItem("coordType",  data.event_type);
 sessionStorage.setItem("coordName", data.coordinator_name || "");
-
+sessionStorage.setItem("coordLimit", data.participant_limit ?? "");
+sessionStorage.setItem("coordCount", data.participant_count ?? 0);
 window.location.href = "coordinator.html";
         } else {
             showError(data.message || "Invalid password.");

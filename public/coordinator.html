@@ -441,14 +441,15 @@
             <div class="stat-label">Event Type</div>
             <div class="stat-value plain" id="statType">—</div>
         </div>
-    </div>
-<!-- Replace the third stat-card: -->
+        <!-- Replace the third stat-card: -->
 <div class="stat-card">
     <div class="stat-label">Capacity</div>
     <div class="stat-value plain" id="statCapacity">— / —</div>
     <div id="capacityBar" style="margin-top:12px; height:5px; background:rgba(255,255,255,0.07); border-radius:4px; overflow:hidden; display:none;">
         <div id="capacityFill" style="height:100%; width:0%; background:var(--accent); border-radius:4px; transition:width 0.6s;"></div>
     </div>
+    </div>
+
 </div>
     <!-- FILTERS + EXPORT -->
     <div class="card" id="filterCard">
@@ -545,8 +546,7 @@
 const coordToken = sessionStorage.getItem("coordToken");
 const coordEvent = sessionStorage.getItem("coordEvent");
 const coordType  = sessionStorage.getItem("coordType");
-sessionStorage.setItem("coordLimit", data.participant_limit ?? "");
-sessionStorage.setItem("coordCount", data.participant_count ?? 0);
+
 
 
 const API_BASE_URL = window.location.hostname === 'localhost'
