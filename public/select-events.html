@@ -770,6 +770,25 @@ if (isFull) {
           <span class="cat-icon">${catIcon}</span>
           <span class="indicator">✓</span>
           <h3>${eName}</h3>
+${(event.participant_limit !== null && event.participant_limit !== undefined) ? (() => {
+    const left = event.participant_limit - event.participant_count;
+    const isFull = left <= 0;
+    const isAlmost = !isFull && (event.participant_count / event.participant_limit) >= 0.8;
+    const color = isFull ? '#ff4b2b' : isAlmost ? '#fbbf24' : '#00ffae';
+    const label = isFull ? '🔴 Full' : isAlmost ? `🟡 ${left} left` : `🟢 ${left} left`;
+    return `<div style="
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: ${color};
+        background: ${color}18;
+        border: 1px solid ${color}44;
+        border-radius: 20px;
+        padding: 3px 10px;
+        margin-top: 6px;
+        white-space: nowrap;
+    ">${label}</div>`;
+})() : ''}
           ${isGroup ? `
             <div class="team-code-container">
               <label>Join Team — leave blank to be Leader</label>
