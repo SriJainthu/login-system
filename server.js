@@ -229,7 +229,7 @@ app.post("/register", async (req, res) => {
     
     try {
         const [eventRows] = await promiseDb.query(
-            "SELECT id, event_name FROM events WHERE event_name IN (?)",
+           "SELECT id, event_name, participant_limit, participant_count FROM events WHERE event_name IN (?)",
             [eventNames]
         );
 
@@ -237,7 +237,15 @@ app.post("/register", async (req, res) => {
         if (eventRows.length === 0) {
             return res.status(400).json({ success: false, message: "Selected events not found in database." });
         }
-
+// ── BLOCK IF ANY EVENT IS FULL ──
+for (const row of eventRows) {
+    if (row.participant_limit !== null && row.participant_count >= row.participant_limit) {
+        return res.status(409).json({
+            success: false,
+            message: `"${row.event_name}" is fully booked. No seats available.`
+        });
+    }
+}
         const connection = await db.promise().getConnection();
 
         try {
@@ -277,7 +285,13 @@ app.post("/register", async (req, res) => {
                 "INSERT INTO student_events (student_id, event_id, team_token) VALUES ?",
                 [mappingValues]
             );
-
+// ── INCREMENT COUNT FOR EACH REGISTERED EVENT ──
+for (const row of eventRows) {
+    await connection.query(
+        "UPDATE events SET participant_count = participant_count + 1 WHERE id = ?",
+        [row.id]
+    );
+}
             await connection.commit();
 
             res.json({ success: true, redirect: "/registration-success.html" });
@@ -621,7 +635,7 @@ await sendSymposiumEmail({
 });
 /* ---------- PRESERVED ROUTES (EVENTS, ADMIN, ETC) ---------- */
 app.get("/events", (req, res) => {
-    db.query("SELECT * FROM events", (err, rows) => {
+    db.query("SELECT id, event_name, description, event_type, event_category, max_team_size, coordinator_name, participant_limit, participant_count FROM events", (err, rows) => {
         if (err) return res.status(500).json({ error: "Failed to fetch events" });
         res.json(rows);
     });
@@ -809,10 +823,13 @@ app.delete("/admin/delete-event", verifyAdmin, (req, res) => {
     });
 });
 app.post('/admin/add-event', verifyAdmin, (req, res) => {
-   const { name, description, type, category, max_team_size, coordinator_password, coordinator_name } = req.body;
+   const { name, description, type, category, max_team_size, coordinator_password, coordinator_name, participant_limit } = req.body;
     if (!name || !type || !category) return res.status(400).json({ success: false, error: "Missing fields" });
-  const sql = "INSERT INTO events (event_name, description, event_type, event_category, max_team_size, coordinator_password, coordinator_name) VALUES (?, ?, ?, ?, ?, ?, ?)";
-db.query(sql, [name, description, type, category, max_team_size, coordinator_password || null, coordinator_name || null], (err) => {
+  const sql = `INSERT INTO events 
+    (event_name, description, event_type, event_category, max_team_size, coordinator_password, coordinator_name, participant_limit, participant_count) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`;
+const limitVal = (participant_limit && parseInt(participant_limit) > 0) ? parseInt(participant_limit) : null;
+db.query(sql, [name, description, type, category, max_team_size, coordinator_password || null, coordinator_name || null, limitVal], (err) => {
         if (err) return res.status(500).json({ success: false, error: err.sqlMessage });
         res.json({ success: true });
     });
@@ -843,6 +860,7 @@ app.post("/admin/delete-all-students", verifyAdmin, async (req, res) => {
         await connection.query("DELETE FROM otp_verification");
         // 2. Then delete students
         await connection.query("DELETE FROM students");
+        await connection.query("UPDATE events SET participant_count = 0");
 
         await connection.commit();
 
@@ -1001,7 +1019,14 @@ app.post("/coordinator/login", async (req, res) => {
     { role: "coordinator", event_name: event.event_name, event_type: event.event_type, event_id: event.id, coordinator_name: event.coordinator_name || "" },
     JWT_SECRET, { expiresIn: "8h" }
 );
-res.json({ success: true, token, event_name: event.event_name, event_type: event.event_type, coordinator_name: event.coordinator_name || "" });
+res.json({
+    success: true, token,
+    event_name: event.event_name,
+    event_type: event.event_type,
+    coordinator_name: event.coordinator_name || "",
+    participant_limit: event.participant_limit,      // ADD
+    participant_count: event.participant_count       // ADD
+});
     } catch (err) {
         console.error("Coordinator login error:", err);
         res.status(500).json({ success: false, message: "Server error" });
@@ -1086,6 +1111,30 @@ app.get("/admin/events-with-passwords", verifyAdmin, (req, res) => {
         if (err) return res.status(500).json({ error: "Failed" });
         res.json(rows);
     });
+});
+app.post('/admin/update-event-limit', verifyAdmin, async (req, res) => {
+    const { eventName, participant_limit } = req.body;
+    if (!eventName) return res.status(400).json({ success: false });
+    try {
+        const limitVal = (participant_limit && parseInt(participant_limit) > 0) ? parseInt(participant_limit) : null;
+        await promiseDb.query(
+            "UPDATE events SET participant_limit = ? WHERE event_name = ?",
+            [limitVal, eventName]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.sqlMessage });
+    }
+});
+app.get("/coordinator/event-info", verifyCoordinator, async (req, res) => {
+    const event_name = req.coordinator.event_name;
+    try {
+        const [[row]] = await promiseDb.query(
+            "SELECT participant_limit, participant_count FROM events WHERE event_name = ?",
+            [event_name]
+        );
+        res.json(row || { participant_limit: null, participant_count: 0 });
+    } catch (err) { res.status(500).json({ error: "Failed" }); }
 });
 app.use(express.static("public"));
 

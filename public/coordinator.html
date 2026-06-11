@@ -442,7 +442,14 @@
             <div class="stat-value plain" id="statType">—</div>
         </div>
     </div>
-
+<!-- Replace the third stat-card: -->
+<div class="stat-card">
+    <div class="stat-label">Capacity</div>
+    <div class="stat-value plain" id="statCapacity">— / —</div>
+    <div id="capacityBar" style="margin-top:12px; height:5px; background:rgba(255,255,255,0.07); border-radius:4px; overflow:hidden; display:none;">
+        <div id="capacityFill" style="height:100%; width:0%; background:var(--accent); border-radius:4px; transition:width 0.6s;"></div>
+    </div>
+</div>
     <!-- FILTERS + EXPORT -->
     <div class="card" id="filterCard">
         <div class="card-header">
@@ -538,6 +545,8 @@
 const coordToken = sessionStorage.getItem("coordToken");
 const coordEvent = sessionStorage.getItem("coordEvent");
 const coordType  = sessionStorage.getItem("coordType");
+sessionStorage.setItem("coordLimit", data.participant_limit ?? "");
+sessionStorage.setItem("coordCount", data.participant_count ?? 0);
 
 
 const API_BASE_URL = window.location.hostname === 'localhost'
@@ -870,10 +879,31 @@ function logout() {
     sessionStorage.removeItem("coordName");
     window.location.href = "coordinator-login.html";
 }
-
+async function loadEventInfo() {
+    try {
+        const res  = await coordFetch(`${API_BASE_URL}/coordinator/event-info`);
+        const data = await res.json();
+        const limit = data.participant_limit;
+        const count = data.participant_count;
+        const capEl  = document.getElementById("statCapacity");
+        const barEl  = document.getElementById("capacityBar");
+        const fillEl = document.getElementById("capacityFill");
+        if (limit === null) {
+            capEl.textContent = `${count} / ∞`;
+            return;
+        }
+        const pct = Math.min(100, Math.round((count / limit) * 100));
+        capEl.textContent = `${count} / ${limit}`;
+        capEl.style.color = count >= limit ? 'var(--danger)' : count/limit >= 0.8 ? 'var(--warn)' : 'var(--accent)';
+        barEl.style.display = 'block';
+        fillEl.style.width  = pct + '%';
+        fillEl.style.background = count >= limit ? 'var(--danger)' : count/limit >= 0.8 ? 'var(--warn)' : 'var(--accent)';
+    } catch(e) { console.error("Event info load error:", e); }
+}
 // Init
 populateFilters();
 loadStudents();
+loadEventInfo();
 </script>
 </body>
 </html>

@@ -708,6 +708,18 @@ body { padding-bottom: 80px; }
 <div class="footer-item">
   <span style="font-size:10px; color:var(--muted);">👤 coordinator :${event.coordinator_name}</span>
 </div>` : ''}
+${(event.participant_limit !== null && event.participant_limit !== undefined) ? (() => {
+    const pct = event.participant_count / event.participant_limit;
+    const isFull = event.participant_count >= event.participant_limit;
+    const isAlmost = pct >= 0.8;
+    const left = event.participant_limit - event.participant_count;
+    const color = isFull ? '#ff4b2b' : isAlmost ? '#fbbf24' : '#00ffae';
+    const label = isFull ? '🔴 Seats Full' : isAlmost ? `🟡 Almost Full — ${left} left` : `🟢 ${left} seats available`;
+    return `
+    <div class="footer-item" style="margin-left:auto;">
+      <span style="font-size:10px; font-weight:700; color:${color}; background:${color}22; border:1px solid ${color}44; padding:3px 10px; border-radius:20px; white-space:nowrap;">${label}</span>
+    </div>`;
+})() : ''}
         </div>
       </div>`;
   }

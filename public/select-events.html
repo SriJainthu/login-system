@@ -695,6 +695,7 @@
 
       const settings    = await settingsRes.json();
       const adminEvents = await eventRes.json();
+      window._adminEvents = adminEvents;
 
       if (settings?.symposium_title) document.title = `Select Events | ${settings.symposium_title}`;
 
@@ -748,6 +749,14 @@
 
         const card = document.createElement("div");
         card.className = "event-card";
+        const isFull = event.participant_limit !== null && 
+               event.participant_count >= event.participant_limit;
+
+if (isFull) {
+    card.classList.add('event-full');
+    card.style.pointerEvents = 'none';
+    card.style.opacity = '0.5';
+}
         card.style.animationDelay = `${cardDelay}ms`;
         cardDelay += 60;
 
@@ -775,6 +784,10 @@
               </div>
               <p id="msg_${event.id}" class="token-msg"></p>
             </div>` : ''}
+            ${isFull ? `
+<div style="position:absolute; inset:0; background:rgba(255,75,43,0.08); border-radius:16px; display:flex; align-items:center; justify-content:center; border:1.5px solid rgba(255,75,43,0.4);">
+  <span style="font-size:10px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:#ff4b2b; background:rgba(15,20,25,0.85); padding:6px 14px; border-radius:20px;">🔴 Seats Reserved</span>
+</div>` : ''}
         `;
 
         const grid = document.getElementById(`grid_${sectionId}`);
@@ -793,6 +806,12 @@
   }
 
   function toggleEvent(el, name) {
+    // Prevent selecting full events
+const evObj = (window._adminEvents || []).find(e => (e.event_name||e.name||'').toLowerCase() === name.trim().toLowerCase());
+if (evObj && evObj.participant_limit !== null && evObj.participant_count >= evObj.participant_limit) {
+    openAlert("This event is fully booked.", "Seats Reserved");
+    return;
+}
     const norm = name.trim().toLowerCase();
     if (el.classList.contains('selected')) {
       el.classList.remove('selected');

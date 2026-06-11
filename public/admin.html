@@ -973,13 +973,18 @@
   <input type="text" id="newEventName" placeholder="e.g. Robot War">
 </div>
 <div class="fg">
-  <label class="fg-label">Coordinator Password</label>
-  <input type="text" id="newEventPassword" placeholder="e.g. coord123">
+  <label class="fg-label">Max Participants</label>
+  <input type="number" id="newEventLimit" placeholder="e.g. 100 (blank = unlimited)" min="1">
 </div>
 <div class="fg">
   <label class="fg-label">Coordinator Name</label>
   <input type="text" id="newEventCoordName" placeholder="e.g. Dr. Kumar">
 </div>
+<div class="fg">
+  <label class="fg-label">Coordinator Password</label>
+  <input type="text" id="newEventPassword" placeholder="e.g. coord123">
+</div>
+
       <div class="fg">
         <label class="fg-label">Description</label>
         <textarea id="newEventDesc" placeholder="Brief details" rows="1"></textarea>
@@ -1353,7 +1358,9 @@ async function fetchEventsFromServer() {
       category: e.event_category || 'technical',
       max_size: e.max_team_size,
       password: e.coordinator_password || '',
-      coordinator_name: e.coordinator_name || ''
+      coordinator_name: e.coordinator_name || '',
+      participant_limit: e.participant_limit ?? null,
+participant_count: e.participant_count || 0
       
     }));
     renderEvents();
@@ -1405,6 +1412,29 @@ function renderEvents() {
   <span style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted);">Coordinator:</span>
   <span style="font-size:12px; color:var(--label);">${e.coordinator_name}</span>
 </div>` : ''}
+<div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+  <span style="font-family:var(--syne); font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted);">Participants:</span>
+  <span style="font-size:12px; color:${
+    e.participant_limit === null ? 'var(--muted)' :
+    e.participant_count >= e.participant_limit ? 'var(--danger)' :
+    e.participant_count / e.participant_limit >= 0.8 ? 'var(--warn)' : 'var(--accent)'
+  }; font-weight:700;">${e.participant_count} / ${e.participant_limit ?? '∞'}</span>
+  ${e.participant_limit ? `
+  <div style="flex:1; height:4px; background:rgba(255,255,255,0.07); border-radius:4px; overflow:hidden; max-width:80px;">
+    <div style="height:100%; width:${Math.min(100, (e.participant_count/e.participant_limit)*100)}%; background:${
+      e.participant_count >= e.participant_limit ? 'var(--danger)' :
+      e.participant_count / e.participant_limit >= 0.8 ? 'var(--warn)' : 'var(--accent)'
+    }; border-radius:4px; transition:width 0.4s;"></div>
+  </div>` : ''}
+</div>
+<div style="margin-top:8px; display:flex; align-items:center; gap:6px;">
+  <input type="number" id="limit-edit-${globalIndex}" value="${e.participant_limit || ''}" placeholder="Set limit" min="1"
+    style="width:90px; padding:5px 10px; font-size:11px;">
+  <button onclick="saveEventLimit('${e.name}', ${globalIndex})"
+    style="background:rgba(0,229,190,0.1); border:1px solid rgba(0,229,190,0.25); color:var(--accent); border-radius:6px; padding:5px 10px; cursor:pointer; font-size:10px; font-family:var(--syne); font-weight:700;">
+    Save
+  </button>
+</div>
         </div>
         <button class="delete-event" onclick="openModal(${globalIndex})">×</button>`;
       list.appendChild(div);
@@ -1469,11 +1499,12 @@ async function addEvent() {
   const category = document.getElementById("newEventCategory").value;
   const password = document.getElementById("newEventPassword").value.trim();
   const coordinator_name = document.getElementById("newEventCoordName").value.trim();
+  const participant_limit = document.getElementById("newEventCoordName").value.trim();
   const size     = type === 'solo' ? 1 : parseInt(document.getElementById("newEventSize").value);
   if (!name || !desc) return alert("Fill event name and description");
   if (!password) return alert("Set a coordinator password for this event");
   try {
-    const r = await adminFetch(`${API_BASE_URL}/admin/add-event`, { method:"POST", body: JSON.stringify({ name, description: desc, type, category, max_team_size: size, coordinator_password: password, coordinator_name }) });
+    const r = await adminFetch(`${API_BASE_URL}/admin/add-event`, { method:"POST", body: JSON.stringify({ name, description: desc, type, category, max_team_size: size, coordinator_password: password, coordinator_name, participant_limit: document.getElementById("newEventLimit").value || null }) });
     const d = await r.json();
    if (d.success) { showToast("✓ Event added"); document.getElementById("newEventName").value=""; document.getElementById("newEventDesc").value=""; document.getElementById("newEventCoordName").value = "";document.getElementById("newEventPassword").value=""; fetchEventsFromServer(); }
   } catch { alert("Server error"); }
@@ -1954,6 +1985,16 @@ function togglePwVisibility(index, password) {
         display.style.color = 'var(--label)';
         btn.innerText = '👁 Show';
     }
+}
+async function saveEventLimit(eventName, index) {
+    const val = document.getElementById(`limit-edit-${index}`).value;
+    const r = await adminFetch(`${API_BASE_URL}/admin/update-event-limit`, {
+        method: 'POST',
+        body: JSON.stringify({ eventName, participant_limit: val || null })
+    });
+    const d = await r.json();
+    if (d.success) { showToast("✓ Limit updated"); fetchEventsFromServer(); }
+    else showToast("✗ Update failed");
 }
 </script>
 </body>
