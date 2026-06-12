@@ -219,7 +219,7 @@
 
 <div class="container">
 
-  <div class="progress">
+<div class="progress" id="progressBar">
     <div class="step">
       <div class="circle">✓</div>
       <div class="label">Student</div>
@@ -228,11 +228,15 @@
       <div class="circle">✓</div>
       <div class="label">Events</div>
     </div>
-    <div class="step active">
-      <div class="circle">3</div>
-      <div class="label">Confirm</div>
+    <div class="step" id="paymentStep" style="display:none;">
+      <div class="circle">✓</div>
+      <div class="label">Payment</div>
     </div>
-  </div>
+    <div class="step active">
+      <div class="circle">✓</div>
+      <div class="label">Done</div>
+    </div>
+</div>
 
   <div class="success-icon">✦</div>
   <h2>Registration <span>Successful</span></h2>
@@ -343,6 +347,15 @@ window.onload = () => {
   createConfetti();
   displayRegistrationInfo();
   loadPageData();
+  // Show payment step in progress bar if fee was enabled
+fetch(`${API_BASE_URL}/api/public-settings`)
+    .then(r => r.json())
+    .then(d => {
+        if (d?.fee_enabled) {
+            document.getElementById("paymentStep").style.display = "";
+        }
+    })
+    .catch(() => {});
 };
   const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000'

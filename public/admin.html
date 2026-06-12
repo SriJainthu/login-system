@@ -1154,6 +1154,21 @@
             <button class="btn btn-confirm" onclick="updateContactDetails()">Save Contact</button>
           </div>
         </div>
+        <div class="config-box">
+  <div class="config-label">Registration Fee</div>
+  <div class="config-hint">Collect fee via Razorpay</div>
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px;">
+    <span style="font-size:12px; color:var(--label);">Enable Fee</span>
+    <label style="position:relative; display:inline-block; width:42px; height:22px; cursor:pointer;">
+      <input type="checkbox" id="feeToggle" onchange="handleFeeChange()" style="opacity:0; width:0; height:0; position:absolute;">
+      <span id="feeToggleSlider" style="position:absolute; inset:0; background:var(--panel); border:1px solid var(--border); border-radius:22px; transition:0.3s;">
+        <span id="feeToggleThumb" style="position:absolute; width:16px; height:16px; background:var(--muted); border-radius:50%; top:2px; left:2px; transition:0.3s;"></span>
+      </span>
+    </label>
+  </div>
+  <input type="number" id="feeAmount" placeholder="Fee amount in ₹ (e.g. 150)" min="1" oninput="handleFeeChange()" style="margin-top:6px;">
+  <button class="btn btn-confirm" id="feeConfirmBtn" onclick="updateFeeSettings()">Save Fee Settings</button>
+</div>
 
         <!-- ── EXPORT COLUMN ── -->
         <div class="export-col">
@@ -1795,6 +1810,10 @@ async function loadAdminSettings() {
     document.getElementById("adminLocation").value = c.contact_location || "";
     document.getElementById("adminLat").value      = c.contact_lat      || "";
     document.getElementById("adminLng").value      = c.contact_lng      || "";
+    // ADD — load fee settings
+document.getElementById("feeToggle").checked = !!s.fee_enabled;
+document.getElementById("feeAmount").value   = s.fee_amount || "";
+updateFeeToggleUI(!!s.fee_enabled);
   } catch(e) { console.error(e); }
 }
 
@@ -1995,6 +2014,32 @@ async function saveEventLimit(eventName, index) {
     const d = await r.json();
     if (d.success) { showToast("✓ Limit updated"); fetchEventsFromServer(); }
     else showToast("✗ Update failed");
+}
+function handleFeeChange() {
+    document.getElementById("feeConfirmBtn").style.display = "block";
+    updateFeeToggleUI(document.getElementById("feeToggle").checked);
+}
+
+function updateFeeToggleUI(enabled) {
+    const thumb  = document.getElementById("feeToggleThumb");
+    const slider = document.getElementById("feeToggleSlider");
+    thumb.style.transform  = enabled ? "translateX(20px)" : "translateX(0)";
+    thumb.style.background = enabled ? "var(--accent)" : "var(--muted)";
+    slider.style.borderColor = enabled ? "rgba(0,229,190,0.4)" : "var(--border)";
+}
+
+async function updateFeeSettings() {
+    const fee_enabled = document.getElementById("feeToggle").checked;
+    const fee_amount  = document.getElementById("feeAmount").value;
+    const r = await adminFetch(`${API_BASE_URL}/api/settings`, {
+        method: "POST",
+        body: JSON.stringify({ fee_enabled, fee_amount })
+    });
+    const d = await r.json();
+    if (d.success) {
+        showToast(`✓ Fee ${fee_enabled ? 'enabled — ₹' + fee_amount : 'disabled'}`);
+        document.getElementById("feeConfirmBtn").style.display = "none";
+    }
 }
 </script>
 </body>

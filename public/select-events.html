@@ -6,7 +6,7 @@
   <title>Select Events | Symposium 2026</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
- 
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -921,62 +921,142 @@ if (evObj && evObj.participant_limit !== null && evObj.participant_count >= evOb
     return `${prefix}-${rand}${ts}`;
   }
 
-  async function submitEvents() {
+async function submitEvents() {
     const confirmBtn  = document.getElementById("confirmBtn");
     const studentData = JSON.parse(localStorage.getItem("studentData"));
 
+    // Validate team tokens
     for (let card of document.querySelectorAll('.event-card.selected')) {
-      const eName      = card.querySelector('h3').innerText.trim().toLowerCase();
-      const tokenInput = card.querySelector('input[type="text"]');
-      if (tokenInput && tokenInput.value.trim() !== "" && !validatedTokens[eName]) {
-        openAlert(`Please verify the team code for "${card.querySelector('h3').innerText}" or leave it blank to be the Leader.`, "Verification Required");
-        return;
-      }
+        const eName      = card.querySelector('h3').innerText.trim().toLowerCase();
+        const tokenInput = card.querySelector('input[type="text"]');
+        if (tokenInput && tokenInput.value.trim() !== "" && !validatedTokens[eName]) {
+            openAlert(`Please verify the team code for "${card.querySelector('h3').innerText}" or leave it blank to be the Leader.`, "Verification Required");
+            return;
+        }
     }
 
     if (!studentData) {
-      alert("Session expired.");
-      window.location.href = "student-details.html";
-      return;
+        alert("Session expired.");
+        window.location.href = "student-details.html";
+        return;
     }
 
     const eventPayload = Array.from(document.querySelectorAll('.event-card.selected')).map(card => {
-      const origName   = card.querySelector('h3').innerText.trim();
-      const tokenInput = card.querySelector('input[type="text"]');
-      let finalToken   = null;
-      if (tokenInput) {
-        const val = tokenInput.value.trim();
-        finalToken = val === "" ? generateUniqueToken(origName.toLowerCase()) : val;
-      }
-      return { name: origName, token: finalToken };
+        const origName   = card.querySelector('h3').innerText.trim();
+        const tokenInput = card.querySelector('input[type="text"]');
+        let finalToken   = null;
+        if (tokenInput) {
+            const val = tokenInput.value.trim();
+            finalToken = val === "" ? generateUniqueToken(origName.toLowerCase()) : val;
+        }
+        return { name: origName, token: finalToken };
     });
-
-    const payload = { ...studentData, events: eventPayload };
 
     confirmBtn.disabled    = true;
     confirmBtn.textContent = "Processing...";
 
     try {
-      const res    = await fetch(`${API_BASE_URL}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const result = await res.json();
+        // Check if fee is enabled
+        const settingsRes = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const settings    = await settingsRes.json();
 
-      if (result.success) {
-        window.location.href = 'registration-success.html';
-      } else {
-        openAlert(result.message, "Registration Error");
+        if (!settings.fee_enabled) {
+            // ── FEE OFF: register directly as before ──
+            const payload = { ...studentData, events: eventPayload };
+            const res     = await fetch(`${API_BASE_URL}/register`, {
+                method:  "POST",
+                headers: { "Content-Type": "application/json" },
+                body:    JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result.success) {
+                window.location.href = 'registration-success.html';
+            } else {
+                openAlert(result.message, "Registration Error");
+                confirmBtn.disabled    = false;
+                confirmBtn.textContent = "Confirm Choice";
+            }
+            return;
+        }
+
+        // ── FEE ON: create Razorpay order ──
+        const orderRes  = await fetch(`${API_BASE_URL}/payment/create-order`, {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify({
+                student_data: studentData,
+                events_data:  eventPayload,
+                amount:       settings.fee_amount
+            })
+        });
+        const orderData = await orderRes.json();
+
+        if (!orderData.success) {
+            openAlert(orderData.message || "Could not initiate payment.", "Payment Error");
+            confirmBtn.disabled    = false;
+            confirmBtn.textContent = "Confirm Choice";
+            return;
+        }
+
+        // ── Open Razorpay popup ──
+        const rzpOptions = {
+            key:         orderData.key,
+            amount:      orderData.amount,
+            currency:    "INR",
+            name:        settings.symposium_title || "Symposium",
+            description: "Event Registration Fee",
+            order_id:    orderData.order_id,
+            theme:       { color: "#00c6ff" },
+            prefill: {
+                name:    studentData.name,
+                email:   studentData.email,
+                contact: studentData.phone
+            },
+            handler: async function(response) {
+                // ── Payment successful — verify on server ──
+                confirmBtn.textContent = "Verifying payment...";
+                try {
+                    const verifyRes = await fetch(`${API_BASE_URL}/payment/verify`, {
+                        method:  "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body:    JSON.stringify({
+                            razorpay_order_id:   response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature:  response.razorpay_signature
+                        })
+                    });
+                    const verifyData = await verifyRes.json();
+                    if (verifyData.success) {
+                        window.location.href = 'registration-success.html';
+                    } else {
+                        openAlert(verifyData.message || "Payment verified but registration failed. Contact admin.", "Error");
+                        confirmBtn.disabled    = false;
+                        confirmBtn.textContent = "Confirm Choice";
+                    }
+                } catch {
+                    openAlert("Verification failed. Contact admin with your payment ID: " + response.razorpay_payment_id, "Error");
+                    confirmBtn.disabled    = false;
+                    confirmBtn.textContent = "Confirm Choice";
+                }
+            },
+            modal: {
+                ondismiss: function() {
+                    // Student closed the popup without paying
+                    confirmBtn.disabled    = false;
+                    confirmBtn.textContent = "Confirm Choice";
+                }
+            }
+        };
+
+        const rzp = new Razorpay(rzpOptions);
+        rzp.open();
+
+    } catch (err) {
+        openAlert("Network error. Please check your connection.", "Error");
         confirmBtn.disabled    = false;
         confirmBtn.textContent = "Confirm Choice";
-      }
-    } catch {
-      openAlert("Network error. Please check your connection.", "Error");
-      confirmBtn.disabled    = false;
-      confirmBtn.textContent = "Confirm Choice";
     }
-  }
+}
 
   window.onload = syncAdminSettings;
 </script>

@@ -22,7 +22,13 @@ const BREVO_ACCOUNTS = [
     { apiKey: process.env.BREVO_API_KEY_3, email: process.env.BREVO_EMAIL_3, limit: 300 }, // ✅ NEW
 ];
 console.log("✅ Brevo Email Service Ready");
+const Razorpay = require('razorpay');
+const crypto   = require('crypto');
 
+const razorpay = new Razorpay({
+    key_id:     process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 
 /* ---------- MIDDLEWARE ---------- */
@@ -780,6 +786,9 @@ app.post("/api/settings", verifyAdmin, async (req, res) => {
         const { limit, deadline, header_text, symposium_title } = req.body;
         if (limit) await promiseDb.query("UPDATE symposium_settings SET event_selection_limit = ? WHERE id = 1", [parseInt(limit)]);
         if (deadline) await promiseDb.query("UPDATE symposium_settings SET registration_deadline = ? WHERE id = 1", [deadline]);
+        // Add these two lines alongside the existing if(limit), if(deadline) etc:
+if (req.body.fee_enabled !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_enabled = ? WHERE id = 1", [req.body.fee_enabled ? 1 : 0]);
+if (req.body.fee_amount  !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_amount = ? WHERE id = 1",  [parseFloat(req.body.fee_amount) || 0]);
         if (header_text) await promiseDb.query("UPDATE symposium_settings SET header_text = ? WHERE id = 1", [header_text]);
         if (symposium_title) await promiseDb.query("UPDATE symposium_settings SET symposium_title = ? WHERE id = 1", [symposium_title]);
         const [rows] = await promiseDb.query("SELECT * FROM symposium_settings WHERE id = 1");
@@ -912,7 +921,7 @@ app.get('/admin/verify-session', verifyAdmin, (req, res) => {
 app.get("/api/public-settings", async (req, res) => {
     try {
         const [rows] = await promiseDb.query(
-            "SELECT event_selection_limit, registration_deadline, header_text, symposium_title FROM symposium_settings WHERE id = 1"
+           "SELECT event_selection_limit, registration_deadline, header_text, symposium_title, fee_enabled, fee_amount FROM symposium_settings WHERE id = 1"
         );
         res.json(rows[0]);
     } catch (err) {
@@ -1135,6 +1144,162 @@ app.get("/coordinator/event-info", verifyCoordinator, async (req, res) => {
         );
         res.json(row || { participant_limit: null, participant_count: 0 });
     } catch (err) { res.status(500).json({ error: "Failed" }); }
+});
+/* ---------- PAYMENT: CREATE ORDER ---------- */
+app.post("/payment/create-order", async (req, res) => {
+    const { student_data, events_data, amount } = req.body;
+    if (!student_data || !events_data || !amount) {
+        return res.status(400).json({ success: false, message: "Missing data" });
+    }
+    try {
+        const order = await razorpay.orders.create({
+            amount:   Math.round(parseFloat(amount) * 100), // paise
+            currency: "INR",
+            receipt:  `sym_${Date.now()}`
+        });
+
+        // Store student + events data temporarily against this order
+        await promiseDb.query(
+            "INSERT INTO payment_temp (order_id, student_data, events_data, amount) VALUES (?, ?, ?, ?)",
+            [order.id, JSON.stringify(student_data), JSON.stringify(events_data), amount]
+        );
+
+        res.json({ success: true, order_id: order.id, amount: order.amount, key: process.env.RAZORPAY_KEY_ID });
+    } catch (err) {
+        console.error("❌ Create order error:", err);
+        res.status(500).json({ success: false, message: "Could not create payment order" });
+    }
+});
+
+/* ---------- PAYMENT: VERIFY + REGISTER ---------- */
+app.post("/payment/verify", async (req, res) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    // 1. Verify signature
+    const expectedSignature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+        return res.status(400).json({ success: false, message: "Payment verification failed. Invalid signature." });
+    }
+
+    // 2. Fetch stored student + events data
+    const [rows] = await promiseDb.query(
+        "SELECT * FROM payment_temp WHERE order_id = ?",
+        [razorpay_order_id]
+    );
+
+    if (rows.length === 0) {
+        return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    const { student_data, events_data } = rows[0];
+    const studentData = JSON.parse(student_data);
+    const eventsData  = JSON.parse(events_data);
+    const { name, reg_no, college, department, year, level, degree, email, phone } = studentData;
+    const events = eventsData;
+
+    // 3. Run registration (same logic as /register)
+    try {
+        const eventNames = events.map(e => e.name || e.event_name).filter(Boolean);
+
+        const [eventRows] = await promiseDb.query(
+            "SELECT id, event_name, participant_limit, participant_count FROM events WHERE event_name IN (?)",
+            [eventNames]
+        );
+
+        if (eventRows.length === 0) {
+            return res.status(400).json({ success: false, message: "Selected events not found." });
+        }
+
+        // Check capacity
+        for (const row of eventRows) {
+            if (row.participant_limit !== null && row.participant_count >= row.participant_limit) {
+                return res.status(409).json({ success: false, message: `"${row.event_name}" is now fully booked.` });
+            }
+        }
+
+        const connection = await db.promise().getConnection();
+        try {
+            await connection.beginTransaction();
+
+            const [studentResult] = await connection.query(
+                "INSERT INTO students (name, reg_no, college, department, year, email, phone, degree, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [name, reg_no, college, department, year, email, phone, degree, level]
+            );
+            const studentId = studentResult.insertId;
+
+            const mappingValues = [];
+            for (const row of eventRows) {
+                const originalEvent = events.find(e =>
+                    (e.name || e.event_name || '').toLowerCase() === row.event_name.toLowerCase()
+                );
+                if (!originalEvent) continue;
+                const token = (originalEvent.token && originalEvent.token.trim() !== "")
+                    ? originalEvent.token.trim() : null;
+                mappingValues.push([studentId, row.id, token]);
+            }
+
+            if (mappingValues.length === 0) {
+                await connection.rollback();
+                connection.release();
+                return res.status(400).json({ success: false, message: "Could not map events." });
+            }
+
+            await connection.query(
+                "INSERT INTO student_events (student_id, event_id, team_token) VALUES ?",
+                [mappingValues]
+            );
+
+            for (const row of eventRows) {
+                await connection.query(
+                    "UPDATE events SET participant_count = participant_count + 1 WHERE id = ?",
+                    [row.id]
+                );
+            }
+
+            // Clean up temp record
+            await connection.query("DELETE FROM payment_temp WHERE order_id = ?", [razorpay_order_id]);
+
+            await connection.commit();
+
+            res.json({ success: true });
+            console.log(`✅ Paid registration complete for ${name} | Payment: ${razorpay_payment_id}`);
+
+            // Background confirmation email
+            setTimeout(async () => {
+                try {
+                    const sympTitle = await getSymposiumTitle();
+                    const [details] = await promiseDb.query(
+                        `SELECT e.event_name, e.event_category, e.event_type, se.team_token 
+                         FROM student_events se 
+                         JOIN events e ON se.event_id = e.id 
+                         WHERE se.student_id = ?`,
+                        [studentId]
+                    );
+                    await sendSymposiumEmail({
+                        to: email,
+                        subject: `🎉 Registration Confirmed — ${name} | ${sympTitle}`,
+                        html: `<p>Hi ${name}, your registration and payment are confirmed! Payment ID: ${razorpay_payment_id}</p>`
+                    });
+                } catch (mailErr) {
+                    console.error("❌ Post-payment email error:", mailErr.message);
+                }
+            }, 2000);
+
+        } catch (err) {
+            await connection.rollback();
+            throw err;
+        } finally {
+            connection.release();
+        }
+
+    } catch (err) {
+        console.error("❌ Payment verify + register error:", err);
+        if (!res.headersSent) res.status(500).json({ success: false, message: "Registration failed after payment" });
+    }
 });
 app.use(express.static("public"));
 
