@@ -354,7 +354,24 @@
             <div class="time-box"><span id="mins">00</span><label>Mins</label></div>
             <div class="time-box"><span id="secs">00</span><label>Secs</label></div>
         </div>
-
+<!-- ADD THIS -->
+<div id="feeNotice" style="display:none; margin-bottom: 20px; opacity:0; transition: opacity 0.5s ease;">
+    <span style="
+        background: rgba(0,255,174,0.08);
+        border: 1px solid rgba(0,255,174,0.3);
+        color: #00ffae;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 10px 22px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    ">
+        💳 Registration Fee: ₹<span id="feeAmountDisplay">0</span>
+    </span>
+</div>
         <div class="btn-group" id="btnGroup" style="opacity:0; transition: opacity 0.5s ease;">
     <a href="student-details.html" class="main-btn" id="regBtn">Register Now</a>
     <a href="about-events.html" class="outline-btn">Explore Events</a>
@@ -378,19 +395,26 @@ function closeModal() {
 let serverDeadline = null;
 
 async function syncDeadline() {
-    try {
+   try {
         const response = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await response.json();
         serverDeadline = new Date(data.registration_deadline).getTime();
+
+        // ADD THIS — show fee notice if enabled
+        if (data.fee_enabled) {
+            document.getElementById("feeAmountDisplay").textContent = data.fee_amount;
+            const feeEl = document.getElementById("feeNotice");
+            feeEl.style.display = "block";
+            setTimeout(() => feeEl.style.opacity = "1", 250);
+        }
+
     } catch (err) {
         console.error("Sync Error:", err);
         serverDeadline = new Date("March 15, 2026 09:00:00").getTime();
     }
 
-    // ✅ Only show buttons AFTER deadline is known
     applyDeadlineState();
 }
-
 function applyDeadlineState() {
     const now = new Date().getTime();
     const diff = serverDeadline - now;

@@ -468,7 +468,11 @@ button#nextStepBtn:disabled {
     </div>
 
     <h2 style="text-align: center; margin-top: 0; font-weight: 300; letter-spacing: 1px;">Register <span style="color: var(--primary-blue); font-weight: 700;">Now</span></h2>
-
+    <div id="feeNoticeBox" style="display:none; margin-bottom: 20px; padding: 12px 16px; background: rgba(0,255,174,0.06); border: 1px solid rgba(0,255,174,0.25); border-radius: 12px; text-align: center;">
+    <span style="font-size: 13px; color: #00ffae; font-weight: 600;">
+        💳 This symposium requires a registration fee of ₹<span id="feeAmountText">0</span>, payable after selecting your events.
+    </span>
+</div>
     <div class="input-field">
     <input type="text" id="name" placeholder=" " required oninput="validateField('name')">
     <label>Full Name</label>
@@ -592,6 +596,10 @@ document.addEventListener("DOMContentLoaded", async () => {
        const response = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await response.json();
         // Assuming your API returns { settings: { registration_deadline: "..." } }
+         if (data.fee_enabled) {
+        document.getElementById("feeAmountText").textContent = data.fee_amount;
+        document.getElementById("feeNoticeBox").style.display = "block";
+    }
         const deadline = data.settings ? data.settings.registration_deadline : data.registration_deadline;
         
         const targetTime = new Date(deadline).getTime();

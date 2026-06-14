@@ -93,6 +93,14 @@ async function getSymposiumTitle() {
     scheduled: true,
     timezone: "Asia/Kolkata"
 });*/
+cron.schedule('0 2 * * *', async () => {
+    try {
+        await promiseDb.query(
+            "DELETE FROM payment_temp WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 DAY)"
+        );
+        console.log("🧹 Cleaned up stale payment_temp entries");
+    } catch (err) { console.error("Cleanup error:", err); }
+}, { timezone: "Asia/Kolkata" });
 
 async function sendSymposiumEmail(mailOptions) {
     // ── Fetch dynamic title for sender name ──
