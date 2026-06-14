@@ -1154,7 +1154,7 @@
             <button class="btn btn-confirm" onclick="updateContactDetails()">Save Contact</button>
           </div>
         </div>
-        <div class="config-box">
+  <div class="config-box">
   <div class="config-label">Registration Fee</div>
   <div class="config-hint">Collect fee via Razorpay</div>
   <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px;">
@@ -1167,6 +1167,13 @@
     </label>
   </div>
   <input type="number" id="feeAmount" placeholder="Fee amount in ₹ (e.g. 150)" min="1" oninput="handleFeeChange()" style="margin-top:6px;">
+
+  <!-- ADD THIS -->
+  <div id="feeDescGroup" style="display:none; margin-top:6px;">
+    <label class="fg-label" style="display:block; margin-bottom:6px;">What does this fee cover?</label>
+    <textarea id="feeDescription" placeholder="e.g. Participation Certificate, Symposium Kit, Lunch & Refreshments" rows="3" oninput="handleFeeChange()"></textarea>
+  </div>
+
   <button class="btn btn-confirm" id="feeConfirmBtn" onclick="updateFeeSettings()">Save Fee Settings</button>
 </div>
 
@@ -1813,6 +1820,9 @@ async function loadAdminSettings() {
     // ADD — load fee settings
 document.getElementById("feeToggle").checked = !!s.fee_enabled;
 document.getElementById("feeAmount").value   = s.fee_amount || "";
+document.getElementById("feeDescription").value = s.fee_description || "";
+document.getElementById("feeDescGroup").style.display = s.fee_enabled ? "block" : "none";
+
 updateFeeToggleUI(!!s.fee_enabled);
   } catch(e) { console.error(e); }
 }
@@ -2017,9 +2027,10 @@ async function saveEventLimit(eventName, index) {
 }
 function handleFeeChange() {
     document.getElementById("feeConfirmBtn").style.display = "block";
-    updateFeeToggleUI(document.getElementById("feeToggle").checked);
+    const enabled = document.getElementById("feeToggle").checked;
+    updateFeeToggleUI(enabled);
+    document.getElementById("feeDescGroup").style.display = enabled ? "block" : "none";
 }
-
 function updateFeeToggleUI(enabled) {
     const thumb  = document.getElementById("feeToggleThumb");
     const slider = document.getElementById("feeToggleSlider");
@@ -2031,9 +2042,10 @@ function updateFeeToggleUI(enabled) {
 async function updateFeeSettings() {
     const fee_enabled = document.getElementById("feeToggle").checked;
     const fee_amount  = document.getElementById("feeAmount").value;
+    const fee_description = document.getElementById("feeDescription").value.trim();
     const r = await adminFetch(`${API_BASE_URL}/api/settings`, {
         method: "POST",
-        body: JSON.stringify({ fee_enabled, fee_amount })
+        body: JSON.stringify({ fee_enabled, fee_amount, fee_description })
     });
     const d = await r.json();
     if (d.success) {

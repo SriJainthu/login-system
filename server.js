@@ -780,6 +780,7 @@ app.get("/admin/download", verifyAdmin,(req, res) => {
 
 app.get("/api/settings", verifyAdmin, async (req, res) => {
     try {
+        if (req.body.fee_description !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_description = ? WHERE id = 1", [req.body.fee_description]);
         const [rows] = await promiseDb.query(
             "SELECT * FROM symposium_settings WHERE id = 1"
         );
@@ -916,7 +917,7 @@ app.post("/api/update-contact",  verifyAdmin,async (req, res) => {
 app.get("/api/contact", async (req, res) => {
     try {
         const [rows] = await promiseDb.query(
-            "SELECT contact_email, contact_phone, contact_location, contact_lat, contact_lng FROM symposium_settings WHERE id = 1"
+          "SELECT contact_email, contact_phone, contact_location, contact_lat, contact_lng, fee_enabled, fee_amount, fee_description FROM symposium_settings WHERE id = 1"
         );
         res.json(rows[0]);
     } catch (err) {
@@ -929,7 +930,7 @@ app.get('/admin/verify-session', verifyAdmin, (req, res) => {
 app.get("/api/public-settings", async (req, res) => {
     try {
         const [rows] = await promiseDb.query(
-           "SELECT event_selection_limit, registration_deadline, header_text, symposium_title, fee_enabled, fee_amount FROM symposium_settings WHERE id = 1"
+          "SELECT event_selection_limit, registration_deadline, header_text, symposium_title, fee_enabled, fee_amount, fee_description FROM symposium_settings WHERE id = 1"
         );
         res.json(rows[0]);
     } catch (err) {
