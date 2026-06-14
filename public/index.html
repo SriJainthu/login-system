@@ -354,13 +354,14 @@
             <div class="time-box"><span id="mins">00</span><label>Mins</label></div>
             <div class="time-box"><span id="secs">00</span><label>Secs</label></div>
         </div>
-<div id="feeNotice" style="margin-bottom: 20px; opacity:0; transition: opacity 0.5s ease;">
-    <!-- Skeleton shown while loading -->
-    <div id="feeSkeleton" class="skeleton-line" style="width: 220px; height: 38px; border-radius: 50px; margin: 0 auto;"></div>
-
-    <!-- Actual fee badge — hidden until loaded -->
+<div id="feeNotice" style="
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+">
     <span id="feeBadge" style="
-        display: none;
         background: rgba(0,255,174,0.08);
         border: 1px solid rgba(0,255,174,0.3);
         color: #00ffae;
@@ -369,8 +370,10 @@
         letter-spacing: 1px;
         padding: 10px 22px;
         border-radius: 50px;
+        display: inline-flex;
         align-items: center;
         gap: 8px;
+        white-space: nowrap;
     ">
         💳 Registration Fee: ₹<span id="feeAmountDisplay">0</span>
     </span>
@@ -403,6 +406,12 @@ async function syncDeadline() {
         serverDeadline = new Date(data.registration_deadline).getTime();
 
         const feeEl       = document.getElementById("feeNotice");
+        if (data.fee_enabled) {
+    document.getElementById("feeAmountDisplay").textContent = data.fee_amount;
+    feeEl.style.height  = "58px";
+    feeEl.style.margin  = "0 0 20px 0";
+    feeEl.style.opacity = "1";
+}
         const feeSkeleton = document.getElementById("feeSkeleton");
         const feeBadge    = document.getElementById("feeBadge");
 
