@@ -596,11 +596,35 @@ body { padding-bottom: 80px; }
 <!-- MAIN -->
 <main class="wrapper">
 
-  <div class="page-header">
+ <div class="page-header">
    
     <h1 class="page-title">Event <span>Catalog</span></h1>
     <p class="page-sub">Explore all technical and non-technical competitions and challenges</p>
-  </div>
+
+    <!-- ADD THIS -->
+    <div id="feeInfoBanner" style="
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+    ">
+        <div style="
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,255,174,0.06);
+            border: 1px solid rgba(0,255,174,0.2);
+            color: #00ffae;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-top: 16px;
+        ">
+            💳 A one-time registration fee of ₹<span id="feeInfoAmount">0</span> applies for all events
+        </div>
+    </div>
+</div>
 
   <div id="eventsContent">
     <!-- Skeleton loader -->
@@ -681,7 +705,18 @@ body { padding-bottom: 80px; }
   .then(r => r.json())
   .then(d => { if (d?.symposium_title) document.title = `About Events | ${d.symposium_title}`; })
   .catch(() => {});
-
+async function loadFeeInfo() {
+    try {
+        const res  = await fetch(`${API_BASE_URL}/api/public-settings`);
+        const data = await res.json();
+        if (data.fee_enabled) {
+            document.getElementById("feeInfoAmount").textContent = data.fee_amount;
+            const el = document.getElementById("feeInfoBanner");
+            el.style.height  = "58px";
+            el.style.opacity = "1";
+        }
+    } catch (err) { console.error("Fee info load failed:", err); }
+}
   /* ── BUILD CARD ── */
   function buildCard(event, catClass) {
     const isGroup  = event.event_type === 'group';
@@ -810,6 +845,7 @@ setInterval(() => {
 }, 3500);
   loadNavbarTitle();
   loadEvents();
+  loadFeeInfo();  
 </script>
 </body>
 </html>
