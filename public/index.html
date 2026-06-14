@@ -354,9 +354,13 @@
             <div class="time-box"><span id="mins">00</span><label>Mins</label></div>
             <div class="time-box"><span id="secs">00</span><label>Secs</label></div>
         </div>
-<!-- ADD THIS -->
-<div id="feeNotice" style="display:none; margin-bottom: 20px; opacity:0; transition: opacity 0.5s ease;">
-    <span style="
+<div id="feeNotice" style="margin-bottom: 20px; opacity:0; transition: opacity 0.5s ease;">
+    <!-- Skeleton shown while loading -->
+    <div id="feeSkeleton" class="skeleton-line" style="width: 220px; height: 38px; border-radius: 50px; margin: 0 auto;"></div>
+
+    <!-- Actual fee badge — hidden until loaded -->
+    <span id="feeBadge" style="
+        display: none;
         background: rgba(0,255,174,0.08);
         border: 1px solid rgba(0,255,174,0.3);
         color: #00ffae;
@@ -365,7 +369,6 @@
         letter-spacing: 1px;
         padding: 10px 22px;
         border-radius: 50px;
-        display: inline-flex;
         align-items: center;
         gap: 8px;
     ">
@@ -393,24 +396,31 @@ function closeModal() {
 
 // Store deadline globally to avoid fetching every single second
 let serverDeadline = null;
-
 async function syncDeadline() {
-   try {
+    try {
         const response = await fetch(`${API_BASE_URL}/api/public-settings`);
         const data = await response.json();
         serverDeadline = new Date(data.registration_deadline).getTime();
 
-        // ADD THIS — show fee notice if enabled
+        const feeEl       = document.getElementById("feeNotice");
+        const feeSkeleton = document.getElementById("feeSkeleton");
+        const feeBadge    = document.getElementById("feeBadge");
+
         if (data.fee_enabled) {
             document.getElementById("feeAmountDisplay").textContent = data.fee_amount;
-            const feeEl = document.getElementById("feeNotice");
-            feeEl.style.display = "block";
-            setTimeout(() => feeEl.style.opacity = "1", 250);
+            feeSkeleton.style.display = "none";
+            feeBadge.style.display = "inline-flex";
+            setTimeout(() => feeEl.style.opacity = "1", 100);
+        } else {
+            // No fee — fade out and remove the whole block
+            feeEl.style.opacity = "0";
+            setTimeout(() => feeEl.style.display = "none", 500);
         }
 
     } catch (err) {
         console.error("Sync Error:", err);
         serverDeadline = new Date("March 15, 2026 09:00:00").getTime();
+        document.getElementById("feeNotice").style.display = "none";
     }
 
     applyDeadlineState();
