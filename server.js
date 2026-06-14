@@ -1196,8 +1196,8 @@ app.post("/payment/verify", async (req, res) => {
     }
 
     const { student_data, events_data } = rows[0];
-    const studentData = JSON.parse(student_data);
-    const eventsData  = JSON.parse(events_data);
+const studentData = typeof student_data === 'string' ? JSON.parse(student_data) : student_data;
+const eventsData  = typeof events_data  === 'string' ? JSON.parse(events_data)  : events_data;
     const { name, reg_no, college, department, year, level, degree, email, phone } = studentData;
     const events = eventsData;
 
