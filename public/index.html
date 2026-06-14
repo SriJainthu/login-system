@@ -405,31 +405,19 @@ async function syncDeadline() {
         const data = await response.json();
         serverDeadline = new Date(data.registration_deadline).getTime();
 
-        const feeEl       = document.getElementById("feeNotice");
-        if (data.fee_enabled) {
-    document.getElementById("feeAmountDisplay").textContent = data.fee_amount;
-    feeEl.style.height  = "58px";
-    feeEl.style.margin  = "0 0 20px 0";
-    feeEl.style.opacity = "1";
-}
-        const feeSkeleton = document.getElementById("feeSkeleton");
-        const feeBadge    = document.getElementById("feeBadge");
+        const feeEl = document.getElementById("feeNotice");
 
         if (data.fee_enabled) {
             document.getElementById("feeAmountDisplay").textContent = data.fee_amount;
-            feeSkeleton.style.display = "none";
-            feeBadge.style.display = "inline-flex";
-            setTimeout(() => feeEl.style.opacity = "1", 100);
-        } else {
-            // No fee — fade out and remove the whole block
-            feeEl.style.opacity = "0";
-            setTimeout(() => feeEl.style.display = "none", 500);
+            feeEl.style.height  = "58px";
+            feeEl.style.margin  = "0 0 20px 0";
+            feeEl.style.opacity = "1";
         }
+        // if fee is off, feeNotice stays collapsed — no action needed
 
     } catch (err) {
         console.error("Sync Error:", err);
         serverDeadline = new Date("March 15, 2026 09:00:00").getTime();
-        document.getElementById("feeNotice").style.display = "none";
     }
 
     applyDeadlineState();
