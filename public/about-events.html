@@ -713,7 +713,7 @@ async function loadFeeInfo() {
         if (data.fee_enabled) {
             document.getElementById("feeInfoAmount").textContent = data.fee_amount;
             const el = document.getElementById("feeInfoBanner");
-            el.style.height  = "58px";
+            el.style.maxHeight = "120px"; // Changed from height to max-height to support wrapping
             el.style.opacity = "1";
         }
     } catch (err) { console.error("Fee info load failed:", err); }
