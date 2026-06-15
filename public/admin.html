@@ -1166,10 +1166,11 @@
       </span>
     </label>
   </div>
-  <input type="number" id="feeAmount" placeholder="Fee amount in ₹ (e.g. 150)" min="1" oninput="handleFeeChange()" style="margin-top:6px;">
+  
 
   <!-- ADD THIS -->
   <div id="feeDescGroup" style="display:none; margin-top:6px;">
+    <input type="number" id="feeAmount" placeholder="Fee amount in ₹ (e.g. 150)" min="1" oninput="handleFeeChange()" style="margin-top:6px;">
     <label class="fg-label" style="display:block; margin-bottom:6px;">What does this fee cover?</label>
     <textarea id="feeDescription" placeholder="e.g. Participation Certificate, Symposium Kit, Lunch & Refreshments" rows="3" oninput="handleFeeChange()"></textarea>
   </div>
