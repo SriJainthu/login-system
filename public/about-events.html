@@ -601,29 +601,30 @@ body { padding-bottom: 80px; }
     <h1 class="page-title">Event <span>Catalog</span></h1>
     <p class="page-sub">Explore all technical and non-technical competitions and challenges</p>
 
-    <!-- ADD THIS -->
-    <div id="feeInfoBanner" style="
-        height: 0;
-        opacity: 0;
-        overflow: hidden;
-        transition: height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+   <!-- UPDATED FEE BANNER -->
+<div id="feeInfoBanner" style="
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+">
+    <div style="
+        display: inline-block;
+        max-width: 100%;
+        background: rgba(0,255,174,0.06);
+        border: 1px solid rgba(0,255,174,0.2);
+        color: #00ffae;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.5;
+        padding: 10px 20px;
+        border-radius: 25px;
+        margin-top: 16px;
+        box-sizing: border-box;
     ">
-        <div style="
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(0,255,174,0.06);
-            border: 1px solid rgba(0,255,174,0.2);
-            color: #00ffae;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 50px;
-            margin-top: 16px;
-        ">
-            💳 A one-time registration fee of ₹<span id="feeInfoAmount">0</span> applies for all events
-        </div>
+        💳 A one-time registration fee of ₹<span id="feeInfoAmount">0</span> applies for all events
     </div>
+</div>
 </div>
 
   <div id="eventsContent">
