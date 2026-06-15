@@ -780,7 +780,6 @@ app.get("/admin/download", verifyAdmin,(req, res) => {
 
 app.get("/api/settings", verifyAdmin, async (req, res) => {
     try {
-        if (req.body.fee_description !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_description = ? WHERE id = 1", [req.body.fee_description]);
         const [rows] = await promiseDb.query(
             "SELECT * FROM symposium_settings WHERE id = 1"
         );
@@ -793,13 +792,16 @@ app.get("/api/settings", verifyAdmin, async (req, res) => {
 app.post("/api/settings", verifyAdmin, async (req, res) => {
     try {
         const { limit, deadline, header_text, symposium_title } = req.body;
-        if (limit) await promiseDb.query("UPDATE symposium_settings SET event_selection_limit = ? WHERE id = 1", [parseInt(limit)]);
-        if (deadline) await promiseDb.query("UPDATE symposium_settings SET registration_deadline = ? WHERE id = 1", [deadline]);
-        // Add these two lines alongside the existing if(limit), if(deadline) etc:
-if (req.body.fee_enabled !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_enabled = ? WHERE id = 1", [req.body.fee_enabled ? 1 : 0]);
-if (req.body.fee_amount  !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_amount = ? WHERE id = 1",  [parseFloat(req.body.fee_amount) || 0]);
-        if (header_text) await promiseDb.query("UPDATE symposium_settings SET header_text = ? WHERE id = 1", [header_text]);
+        if (limit)           await promiseDb.query("UPDATE symposium_settings SET event_selection_limit = ? WHERE id = 1", [parseInt(limit)]);
+        if (deadline)        await promiseDb.query("UPDATE symposium_settings SET registration_deadline = ? WHERE id = 1", [deadline]);
+        if (header_text)     await promiseDb.query("UPDATE symposium_settings SET header_text = ? WHERE id = 1", [header_text]);
         if (symposium_title) await promiseDb.query("UPDATE symposium_settings SET symposium_title = ? WHERE id = 1", [symposium_title]);
+        if (req.body.fee_enabled !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_enabled = ? WHERE id = 1", [req.body.fee_enabled ? 1 : 0]);
+        if (req.body.fee_amount  !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_amount = ? WHERE id = 1", [parseFloat(req.body.fee_amount) || 0]);
+
+        // ✅ ADD THIS LINE — saves fee_description:
+        if (req.body.fee_description !== undefined) await promiseDb.query("UPDATE symposium_settings SET fee_description = ? WHERE id = 1", [req.body.fee_description]);
+
         const [rows] = await promiseDb.query("SELECT * FROM symposium_settings WHERE id = 1");
         res.json({ success: true, settings: rows[0] });
     } catch (err) {
