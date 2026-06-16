@@ -38,21 +38,19 @@
       padding-top: 80px;
     }
 
-    /* ── NAVBAR (matches student-details.html) ── */
-   .navbar {
-  position: fixed;
-  top: 0; left: 0; width: 100%;
-  padding: 20px 40px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  z-index: 10001;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  box-sizing: border-box;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+.navbar {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 10001;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-
     .logo {
       font-size: 20px;
       font-weight: 700;
@@ -547,11 +545,11 @@
 body { padding-bottom: 80px; }
 
 @media (max-width: 600px) {
-   .navbar { padding: 18px 20px; }
-    .cta-footer { flex-direction: column; padding: 14px 20px; gap: 10px; text-align: center; }
-    .cta-quote  { font-size: 12px; }
-    body { padding-bottom: 110px; }
-    
+    .navbar { padding: 18px 20px; }
+    .container { 
+        width: 90%;
+        padding: 30px 20px;
+    }
 }
   </style>
 
