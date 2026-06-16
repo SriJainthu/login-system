@@ -451,12 +451,11 @@
     .retry-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,198,255,0.3); }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .page-title { font-size: 28px; }
-      .events-grid { grid-template-columns: 1fr; }
-      .wrapper { padding: 36px 16px 60px; }
-      .navbar { padding: 18px 20px; }
-    }
+   @media (max-width: 768px) {
+  .page-title { font-size: 28px; }
+  .events-grid { grid-template-columns: 1fr; }
+  .wrapper { padding: 36px 16px 60px; }
+}
     /* ── STICKY FOOTER CTA ── */
 .cta-footer {
     position: fixed;
@@ -548,9 +547,11 @@
 body { padding-bottom: 80px; }
 
 @media (max-width: 600px) {
+   .navbar { padding: 18px 20px; }
     .cta-footer { flex-direction: column; padding: 14px 20px; gap: 10px; text-align: center; }
     .cta-quote  { font-size: 12px; }
     body { padding-bottom: 110px; }
+    
 }
   </style>
 
