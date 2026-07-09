@@ -837,37 +837,100 @@
     letter-spacing: 4px;
     text-transform: uppercase;
 }
+/* Inline Error Styling */
+.error-text {
+    position: absolute;
+    top: -12px;
+    right: 15px;
+    background: #fff;
+    color: #333;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid #ff4b2b;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.input-field.has-error input {
+    border-color: #ff6b6b !important;
+    background: rgba(255,75,43,0.05) !important;
+}
+
+.input-field.has-error select {
+    border-color: #ff6b6b !important;
+    background: rgba(255,75,43,0.05) !important;
+}
+
+.input-field.has-error .error-text {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.error-text::before {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #ff4b2b;
+}
+
+.error-text::after {
+    content: "⚠️";
+    font-size: 14px;
+    order: -1;
+}
+
+@keyframes errorShake {
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-4px);}
+    40%{transform:translateX(4px);}
+    60%{transform:translateX(-2px);}
+    80%{transform:translateX(2px);}
+}
+
+.input-field.has-error{
+    animation:errorShake .4s ease-in-out;
+}
+.close-modal-btn:hover {
+    opacity: 0.85;
+    transform: scale(1.05);
+    transition: all 0.3s;
+}
     </style>
 </head>
 <body>
 
-   <div id="errorModal" class="modal-overlay">
-    <div class="modal-box" style="border-top:4px solid var(--error-red);">
-        <span class="icon">❌</span>
-
-        <h3 id="errorModalTitle" style="color:var(--error-red);">
-            Verification Failed
-        </h3>
-
-        <p id="errorModalMsg">
-            Something went wrong.
-        </p>
-
-        <button onclick="closeErrorModal()"
-            style="border-color:var(--error-red); color:var(--error-red);">
+ <div class="modal-overlay" id="errorModal">
+    <div class="modal-box" style="background:#1a2a33; border:1px solid var(--error-red); border-radius:20px; padding:40px; text-align:center; max-width:400px; box-shadow:0 0 30px rgba(255,75,43,0.3);">
+        <h2 id="errorModalTitle" style="color:#ff4b2b; margin-top:0;">Verification Failed</h2>
+        <p id="errorModalMsg" style="color:#ccc; line-height:1.6;"></p>
+        <button onclick="closeErrorModal()" class="close-modal-btn" style="margin-top:20px; padding:10px 25px; background:var(--error-red); border:none; border-radius:5px; color:#fff; font-weight:bold; cursor:pointer;">
             Try Again
         </button>
     </div>
 </div>
 
-    <div id="customAlert" class="modal-overlay">
-        <div class="modal-box" style="border-top: 4px solid var(--primary);">
-            <span class="icon">⚠️</span>
-            <h3 style="color: var(--primary);">Verification Failed</h3>
-            <p id="alertMessage"></p>
-            <button onclick="closeAlert()">Try Again</button>
-        </div>
+   <div class="modal-overlay" id="customAlert">
+    <div class="modal-box" style="background:#1a2a33; border:1px solid var(--primary); border-radius:20px; padding:40px; text-align:center; max-width:400px; box-shadow:0 0 30px rgba(0,198,255,0.3);">
+        <h2 style="color:var(--primary); margin-top:0;">⚠️ Alert</h2>
+        <p id="alertMessage" style="color:#ccc; line-height:1.6;"></p>
+        <button onclick="closeAlert()" class="close-modal-btn" style="margin-top:20px; padding:10px 25px; background:var(--primary); border:none; border-radius:5px; color:#000; font-weight:bold; cursor:pointer;">
+            Got it
+        </button>
     </div>
+</div>
 
     <header class="navbar">
         <div class="menu-toggle" id="menuToggle">
