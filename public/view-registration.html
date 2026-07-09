@@ -841,14 +841,24 @@
 </head>
 <body>
 
-    <div id="errorModal" class="modal-overlay">
-        <div class="modal-box" style="border-top: 4px solid var(--error-red);">
-            <span class="icon">🔍</span>
-            <h3 style="color: var(--error-red);">Not Found</h3>
-            <p>We couldn't locate any registration for that number. Please double-check your ID and try again.</p>
-            <button onclick="closeErrorModal()" style="border-color: var(--error-red); color: var(--error-red);">Check Again</button>
-        </div>
+   <div id="errorModal" class="modal-overlay">
+    <div class="modal-box" style="border-top:4px solid var(--error-red);">
+        <span class="icon">❌</span>
+
+        <h3 id="errorModalTitle" style="color:var(--error-red);">
+            Verification Failed
+        </h3>
+
+        <p id="errorModalMsg">
+            Something went wrong.
+        </p>
+
+        <button onclick="closeErrorModal()"
+            style="border-color:var(--error-red); color:var(--error-red);">
+            Try Again
+        </button>
     </div>
+</div>
 
     <div id="customAlert" class="modal-overlay">
         <div class="modal-box" style="border-top: 4px solid var(--primary);">
@@ -1069,7 +1079,7 @@ function maskEmail(email) {
     const errorDiv = document.getElementById("error");
 
     if (!regNo || regNo.length !== 12) {
-        errorDiv.textContent = "Please enter a valid 12-digit Register No";
+        showError("Please enter a valid 12-digit Register No");
         return;
     }
     
@@ -1087,17 +1097,12 @@ function maskEmail(email) {
 
         const data = await otpResponse.json();
 
-        if (!otpResponse.ok) {
-            // STOP: Captures 429 (Limit) or 404 (Not Found)
-            if (typeof showCustomAlert === "function") {
-                showCustomAlert(data.message || "Request failed");
-            } else {
-                alert(data.message || "Request failed");
-            }
-            btn.disabled = false;
-            btn.textContent = "Get Access OTP";
-            return; 
-        }
+     if (!otpResponse.ok) {
+    showError(data.message || "Request failed");
+    btn.disabled = false;
+    btn.textContent = "Get Access OTP";
+    return;
+}
 
         // 2. Fetch student data for UI
         const dataResponse = await fetch(`${API_BASE_URL}/registration/${regNo}`);
@@ -1126,16 +1131,13 @@ function maskEmail(email) {
         }, 400);
 
     } catch (err) {
-        console.error("Critical Frontend Error:", err);
-        const errMsg = err.message || "An unexpected error occurred.";
-        if (typeof showCustomAlert === "function") {
-            showCustomAlert(errMsg);
-        } else {
-            alert(errMsg);
-        }
-        btn.disabled = false;
-        btn.textContent = "Get Access OTP";
-    }
+    console.error(err);
+
+    showError(err.message || "Something went wrong.");
+
+    btn.disabled = false;
+    btn.textContent = "Get Access OTP";
+}
 }
    async function handleVerifyOTP() {
         const otpInput = document.getElementById("otpInput").value;
@@ -1298,7 +1300,19 @@ if (passTitle) passTitle.textContent = title.toUpperCase();
         logoEl.style.opacity = '1';
     }
 }
+function showError(message, title = "Verification Failed") {
+    document.getElementById("errorModalTitle").textContent = title;
+    document.getElementById("errorModalMsg").textContent = message;
+    document.getElementById("errorModal").style.display = "flex";
+}
 
+function closeErrorModal() {
+    document.getElementById("errorModal").style.display = "none";
+}
+
+document.getElementById("errorModal").addEventListener("click", function(e) {
+    if (e.target === this) closeErrorModal();
+});
 loadNavbarTitle();
 </script>
 </body>
