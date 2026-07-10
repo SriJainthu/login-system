@@ -200,7 +200,7 @@ app.post("/register/send-otp", async (req, res) => {
                 </p>
                 <div style="background: rgba(0, 198, 255, 0.05); border: 1px dashed #00c6ff; border-radius: 18px; padding: 30px; margin: 30px 0;">
                     <span style="display: block; color: #00ffae; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800;">Double-Click to Copy</span>
-            <div style="font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; display: block; padding: 10px 0; white-space: nowrap; user-select: all; -webkit-user-select: all;">
+       <div style="font-size: 32px; font-weight: 800; letter-spacing: 4px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 198, 255, 0.6); font-family: 'Courier New', monospace; display: block; padding: 10px 0; word-break: break-all; white-space: normal; user-select: all; -webkit-user-select: all; max-width: 100%;">
     ${otp}
 </div>
                 </div>
