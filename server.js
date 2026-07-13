@@ -1480,32 +1480,200 @@ app.post("/registration/:reg_no/update", async (req, res) => {
                          WHERE se.student_id = ?`,
                         [studentId]
                     );
-                    await sendSymposiumEmail({
-                        to: student.email,
-                        subject: `✏️ Registration Updated — ${name} | ${sympTitle}`,
-                        html: `
-                        <div style="background:#0f2027;padding:40px 20px;font-family:'Segoe UI',sans-serif;">
-                          <div style="max-width:500px;margin:0 auto;background:#16262e;border:1px solid rgba(0,198,255,0.2);border-radius:24px;overflow:hidden;">
-                            <div style="background:linear-gradient(90deg,#00c6ff,#0072ff);padding:28px;text-align:center;">
-                              <h1 style="color:#fff;margin:0;font-size:20px;letter-spacing:3px;font-weight:800;text-transform:uppercase;">${sympTitle}</h1>
-                              <p style="color:#fff;margin:8px 0 0;font-size:10px;text-transform:uppercase;letter-spacing:2px;">Registration Updated</p>
-                            </div>
-                            <div style="padding:32px;">
-                              <p style="color:#00ffae;font-size:13px;font-weight:700;text-align:center;margin-bottom:20px;">✏️ Your registration has been updated successfully!</p>
-                              <p style="color:#8899a0;font-size:13px;margin-bottom:8px;"><b style="color:#fff;">Name:</b> ${name}</p>
-                              <p style="color:#8899a0;font-size:13px;margin-bottom:8px;"><b style="color:#fff;">Register No:</b> ${reg_no}</p>
-                              <p style="color:#8899a0;font-size:13px;margin-bottom:8px;"><b style="color:#fff;">Department:</b> ${department}</p>
-                              <p style="color:#8899a0;font-size:13px;margin-bottom:20px;"><b style="color:#fff;">Updated Events:</b></p>
-                              ${details.map(d => `
-                                <div style="background:rgba(0,198,255,0.05);border:1px solid rgba(0,198,255,0.15);border-radius:10px;padding:12px 16px;margin-bottom:10px;">
-                                  <span style="color:#fff;font-size:13px;font-weight:700;">${d.event_name}</span>
-                                  ${d.team_token ? `<span style="color:#00ffae;font-size:11px;margin-left:10px;font-family:monospace;">${d.team_token}</span>` : ''}
-                                </div>`).join('')}
-                              <p style="color:#556a75;font-size:11px;text-align:center;margin-top:20px;">Please carry your Register Number on the day of the symposium.</p>
-                            </div>
-                          </div>
-                        </div>`
-                    });
+                 await sendSymposiumEmail({
+    to: student.email,
+    subject: `✏️ Registration Updated — ${name} | ${sympTitle}`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#07111a;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(160deg,#0f2027 0%,#203a43 50%,#0f2027 100%);min-height:100vh;padding:40px 20px;">
+<tr><td align="center">
+<table width="100%" style="max-width:580px;" cellpadding="0" cellspacing="0">
+
+  <tr><td style="height:3px;background:linear-gradient(90deg,transparent,#00c6ff,#0072ff,#00c6ff,transparent);border-radius:3px 3px 0 0;"></td></tr>
+
+  <tr><td style="background:linear-gradient(180deg,#0d1f2d 0%,#111e2a 100%);border:1px solid rgba(0,198,255,0.15);border-top:none;border-radius:0 0 28px 28px;overflow:hidden;">
+
+    <!-- TOP BANNER -->
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="background:linear-gradient(135deg,#00c6ff 0%,#0072ff 60%,#005fdb 100%);padding:36px 40px;text-align:center;">
+          <div style="display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:50px;padding:5px 18px;margin-bottom:14px;">
+            <span style="color:#ffffff;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;">Registration Update</span>
+          </div>
+          <h1 style="color:#ffffff;margin:0 0 6px 0;font-size:28px;font-weight:800;letter-spacing:4px;text-transform:uppercase;text-shadow:0 2px 20px rgba(0,0,0,0.3);">${sympTitle}</h1>
+          <div style="width:40px;height:2px;background:rgba(255,255,255,0.5);margin:16px auto 0;border-radius:2px;"></div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- UPDATE BADGE -->
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="padding:32px 40px 0;text-align:center;">
+          <div style="display:inline-block;background:rgba(0,255,174,0.08);border:1px solid rgba(0,255,174,0.3);border-radius:50px;padding:10px 24px;">
+            <span style="color:#00ffae;font-size:13px;font-weight:700;letter-spacing:2px;">✏️ &nbsp;REGISTRATION UPDATED</span>
+          </div>
+          <h2 style="color:#ffffff;font-size:22px;font-weight:600;margin:20px 0 6px;">Your changes have been saved, ${name}!</h2>
+          <p style="color:#6b8099;font-size:14px;margin:0;line-height:1.6;">Your registration details have been updated and recorded in our system.</p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- STUDENT DETAILS CARD -->
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="padding:28px 40px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(0,198,255,0.04);border:1px solid rgba(0,198,255,0.12);border-radius:16px;overflow:hidden;">
+
+            <tr>
+              <td colspan="2" style="padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                <span style="color:#00c6ff;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;">👤 &nbsp;Student Information</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:12px 20px 0;width:50%;vertical-align:top;">
+                <div style="color:#4a5a72;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Full Name</div>
+                <div style="color:#e8f0f8;font-size:14px;font-weight:600;">${name}</div>
+              </td>
+              <td style="padding:12px 20px 0;width:50%;vertical-align:top;">
+                <div style="color:#4a5a72;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Register No</div>
+                <div style="color:#00ffae;font-size:14px;font-weight:700;font-family:monospace;letter-spacing:1px;">${reg_no}</div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:12px 20px 0;vertical-align:top;">
+                <div style="color:#4a5a72;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">College</div>
+                <div style="color:#e8f0f8;font-size:13px;">${student.college}</div>
+              </td>
+              <td style="padding:12px 20px 0;vertical-align:top;">
+                <div style="color:#4a5a72;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Department</div>
+                <div style="color:#e8f0f8;font-size:13px;">${department}</div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:12px 20px 0;vertical-align:top;">
+                <div style="color:#4a5a72;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Degree &amp; Level</div>
+                <div style="color:#e8f0f8;font-size:13px;">${degree} &nbsp;<span style="background:rgba(0,198,255,0.15);color:#00c6ff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:1px;">${level}</span></div>
+              </td>
+              <td style="padding:12px 20px 0;vertical-align:top;">
+                <div style="color:#4a5a72;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Year of Study</div>
+                <div style="color:#e8f0f8;font-size:13px;">Year ${year}</div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:12px 20px 16px;vertical-align:top;">
+                <div style="color:#4a5a72;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Email</div>
+                <div style="color:#e8f0f8;font-size:13px;">${student.email}</div>
+              </td>
+              <td style="padding:12px 20px 16px;vertical-align:top;">
+                <div style="color:#4a5a72;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Phone</div>
+                <div style="color:#e8f0f8;font-size:13px;">${phone}</div>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- EVENTS SECTION -->
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="padding:20px 40px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(0,255,174,0.03);border:1px solid rgba(0,255,174,0.12);border-radius:16px;overflow:hidden;">
+
+            <tr>
+              <td style="padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                <span style="color:#00ffae;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;">🎯 &nbsp;Updated Events</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:16px 20px;">
+                ${details.map(d => {
+                    const catColor = d.event_category === 'technical' ? '#4f8ef7' : '#a855f7';
+                    const catBg    = d.event_category === 'technical' ? 'rgba(79,142,247,0.12)' : 'rgba(168,85,247,0.12)';
+                    const catLabel = d.event_category === 'technical' ? '⚡ Technical' : '🎨 Non-Technical';
+                    const typeBg   = d.event_type === 'group' ? 'rgba(251,191,36,0.12)' : 'rgba(0,229,190,0.12)';
+                    const typeColor= d.event_type === 'group' ? '#fbbf24' : '#00e5be';
+                    const typeLabel= d.event_type === 'group' ? '👥 Group' : '👤 Solo';
+                    return `
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(0,255,174,0.03);border:1px solid rgba(0,255,174,0.12);border-radius:16px;overflow:hidden;margin-bottom:10px;">
+                      <tr>
+                        <td style="padding:14px 16px;">
+                          <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td>
+                                <div style="color:#ffffff;font-size:14px;font-weight:700;margin-bottom:8px;">${d.event_name}</div>
+                                <div>
+                                  <span style="display:inline-block;background:${catBg};color:${catColor};font-size:9px;font-weight:700;letter-spacing:1.5px;padding:3px 10px;border-radius:4px;margin-right:6px;">${catLabel}</span>
+                                  <span style="display:inline-block;background:${typeBg};color:${typeColor};font-size:9px;font-weight:700;letter-spacing:1.5px;padding:3px 10px;border-radius:4px;">${typeLabel}</span>
+                                </div>
+                              </td>
+                              <td style="text-align:right;vertical-align:top;">
+                                ${d.team_token ? `
+                                <div style="color:#4a5a72;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Team Token</div>
+                                <div style="color:#00ffae;font-size:12px;font-weight:800;font-family:monospace;background:rgba(0,255,174,0.08);border:1px solid rgba(0,255,174,0.2);padding:4px 10px;border-radius:6px;letter-spacing:2px;">${d.team_token}</div>
+                                ` : `<span style="color:#4a5a72;font-size:11px;">Solo Entry</span>`}
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>`;
+                }).join('')}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- IMPORTANT NOTE -->
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="padding:20px 40px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.2);border-radius:12px;">
+            <tr>
+              <td style="padding:14px 18px;">
+                <span style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:1px;">⚠ &nbsp;IMPORTANT —</span>
+                <span style="color:#8899a0;font-size:12px;"> Please carry this email or your Register Number on the day of the symposium for verification.</span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- FOOTER -->
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="padding:32px 40px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);margin-top:28px;">
+          <div style="color:#2a3a4a;font-size:10px;letter-spacing:2px;text-transform:uppercase;line-height:1.8;">
+            © ${sympTitle} Organizing Committee<br>
+            <span style="color:#1e2d3d;">Secured by Innovation Cell</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+  </td></tr>
+  <tr><td style="height:3px;background:linear-gradient(90deg,transparent,#0072ff,#00c6ff,#0072ff,transparent);border-radius:0 0 3px 3px;"></td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`
+});
                 } catch (mailErr) {
                     console.error("❌ Edit confirmation email error:", mailErr.message);
                 }
