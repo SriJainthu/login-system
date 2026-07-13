@@ -1312,6 +1312,217 @@ const eventsData  = typeof events_data  === 'string' ? JSON.parse(events_data)  
         if (!res.headersSent) res.status(500).json({ success: false, message: "Registration failed after payment" });
     }
 });
+/* ---------- EDIT REGISTRATION: GET CURRENT DATA ---------- */
+app.get("/registration/:reg_no/edit-data", async (req, res) => {
+    const reg_no = req.params.reg_no.trim();
+    try {
+        // Check deadline first
+        const [[settings]] = await promiseDb.query(
+            "SELECT registration_deadline FROM symposium_settings WHERE id = 1"
+        );
+        const deadline = new Date(settings.registration_deadline).getTime();
+        if (Date.now() > deadline) {
+            return res.status(403).json({ success: false, message: "Registration deadline has passed. Edits are no longer allowed." });
+        }
+
+        const [students] = await promiseDb.query("SELECT * FROM students WHERE reg_no = ?", [reg_no]);
+        if (students.length === 0) return res.status(404).json({ success: false, message: "Student not found" });
+
+        const student = students[0];
+        const [events] = await promiseDb.query(
+            `SELECT e.id, e.event_name, e.event_type, e.event_category, e.participant_limit, e.participant_count, se.team_token
+             FROM student_events se
+             JOIN events e ON se.event_id = e.id
+             WHERE se.student_id = ?`,
+            [student.id]
+        );
+
+        res.json({ success: true, student, events });
+    } catch (err) {
+        console.error("Edit data fetch error:", err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+/* ---------- EDIT REGISTRATION: SAVE CHANGES ---------- */
+app.post("/registration/:reg_no/update", async (req, res) => {
+    const reg_no = req.params.reg_no.trim();
+    const { name, phone, department, year, degree, level, events: newEvents } = req.body;
+
+    try {
+        // 1. Deadline check
+        const [[settings]] = await promiseDb.query(
+            "SELECT registration_deadline FROM symposium_settings WHERE id = 1"
+        );
+        if (Date.now() > new Date(settings.registration_deadline).getTime()) {
+            return res.status(403).json({ success: false, message: "Registration deadline has passed." });
+        }
+
+        // 2. Get student
+        const [students] = await promiseDb.query("SELECT * FROM students WHERE reg_no = ?", [reg_no]);
+        if (students.length === 0) return res.status(404).json({ success: false, message: "Student not found" });
+        const student = students[0];
+        const studentId = student.id;
+
+        // 3. Get current events
+        const [currentEventRows] = await promiseDb.query(
+            `SELECT e.id, e.event_name FROM student_events se
+             JOIN events e ON se.event_id = e.id
+             WHERE se.student_id = ?`,
+            [studentId]
+        );
+        const currentEventIds = currentEventRows.map(e => e.id);
+
+        // 4. Get new event IDs
+        const newEventNames = (newEvents || []).map(e => e.name || e.event_name).filter(Boolean);
+        if (newEventNames.length === 0) {
+            return res.status(400).json({ success: false, message: "Please select at least one event." });
+        }
+
+        const [newEventRows] = await promiseDb.query(
+            "SELECT id, event_name, participant_limit, participant_count FROM events WHERE event_name IN (?)",
+            [newEventNames]
+        );
+
+        const newEventIds = newEventRows.map(e => e.id);
+
+        // 5. Figure out which events are added and removed
+        const addedEventIds   = newEventIds.filter(id => !currentEventIds.includes(id));
+        const removedEventIds = currentEventIds.filter(id => !newEventIds.includes(id));
+
+        // 6. Check seat availability for newly added events only
+        for (const row of newEventRows) {
+            if (addedEventIds.includes(row.id)) {
+                if (row.participant_limit !== null && row.participant_count >= row.participant_limit) {
+                    return res.status(409).json({
+                        success: false,
+                        message: `"${row.event_name}" is fully booked. Please choose a different event.`
+                    });
+                }
+            }
+        }
+
+        const connection = await db.promise().getConnection();
+        try {
+            await connection.beginTransaction();
+
+            // 7. Update student fields
+            await connection.query(
+                "UPDATE students SET name = ?, phone = ?, department = ?, year = ?, degree = ?, level = ?, last_edited_at = NOW() WHERE id = ?",
+                [name, phone, department, year, degree, level, studentId]
+            );
+
+            // 8. Remove old event mappings for removed events
+            if (removedEventIds.length > 0) {
+                await connection.query(
+                    "DELETE FROM student_events WHERE student_id = ? AND event_id IN (?)",
+                    [studentId, removedEventIds]
+                );
+                // Decrement participant_count for removed events
+                for (const eid of removedEventIds) {
+                    await connection.query(
+                        "UPDATE events SET participant_count = GREATEST(participant_count - 1, 0) WHERE id = ?",
+                        [eid]
+                    );
+                }
+            }
+
+            // 9. Add new event mappings for added events
+            if (addedEventIds.length > 0) {
+                const mappingValues = [];
+                for (const row of newEventRows) {
+                    if (!addedEventIds.includes(row.id)) continue;
+                    const originalEvent = newEvents.find(e =>
+                        (e.name || e.event_name || '').toLowerCase() === row.event_name.toLowerCase()
+                    );
+                    const token = originalEvent?.token?.trim() || null;
+                    mappingValues.push([studentId, row.id, token]);
+                }
+                if (mappingValues.length > 0) {
+                    await connection.query(
+                        "INSERT INTO student_events (student_id, event_id, team_token) VALUES ?",
+                        [mappingValues]
+                    );
+                    for (const eid of addedEventIds) {
+                        await connection.query(
+                            "UPDATE events SET participant_count = participant_count + 1 WHERE id = ?",
+                            [eid]
+                        );
+                    }
+                }
+            }
+
+            // 10. Update team tokens for unchanged events if changed
+            for (const ev of newEvents) {
+                const evName = ev.name || ev.event_name;
+                const matchedRow = newEventRows.find(r => r.event_name.toLowerCase() === evName.toLowerCase());
+                if (!matchedRow || !newEventIds.includes(matchedRow.id) || addedEventIds.includes(matchedRow.id)) continue;
+                const token = ev.token?.trim() || null;
+                await connection.query(
+                    "UPDATE student_events SET team_token = ? WHERE student_id = ? AND event_id = ?",
+                    [token, studentId, matchedRow.id]
+                );
+            }
+
+            await connection.commit();
+
+            res.json({ success: true, message: "Registration updated successfully!" });
+            console.log(`✏️ Registration edited for ${name} (${reg_no})`);
+
+            // Background email
+            setTimeout(async () => {
+                try {
+                    const sympTitle = await getSymposiumTitle();
+                    const [details] = await promiseDb.query(
+                        `SELECT e.event_name, e.event_category, e.event_type, se.team_token
+                         FROM student_events se
+                         JOIN events e ON se.event_id = e.id
+                         WHERE se.student_id = ?`,
+                        [studentId]
+                    );
+                    await sendSymposiumEmail({
+                        to: student.email,
+                        subject: `✏️ Registration Updated — ${name} | ${sympTitle}`,
+                        html: `
+                        <div style="background:#0f2027;padding:40px 20px;font-family:'Segoe UI',sans-serif;">
+                          <div style="max-width:500px;margin:0 auto;background:#16262e;border:1px solid rgba(0,198,255,0.2);border-radius:24px;overflow:hidden;">
+                            <div style="background:linear-gradient(90deg,#00c6ff,#0072ff);padding:28px;text-align:center;">
+                              <h1 style="color:#fff;margin:0;font-size:20px;letter-spacing:3px;font-weight:800;text-transform:uppercase;">${sympTitle}</h1>
+                              <p style="color:#fff;margin:8px 0 0;font-size:10px;text-transform:uppercase;letter-spacing:2px;">Registration Updated</p>
+                            </div>
+                            <div style="padding:32px;">
+                              <p style="color:#00ffae;font-size:13px;font-weight:700;text-align:center;margin-bottom:20px;">✏️ Your registration has been updated successfully!</p>
+                              <p style="color:#8899a0;font-size:13px;margin-bottom:8px;"><b style="color:#fff;">Name:</b> ${name}</p>
+                              <p style="color:#8899a0;font-size:13px;margin-bottom:8px;"><b style="color:#fff;">Register No:</b> ${reg_no}</p>
+                              <p style="color:#8899a0;font-size:13px;margin-bottom:8px;"><b style="color:#fff;">Department:</b> ${department}</p>
+                              <p style="color:#8899a0;font-size:13px;margin-bottom:20px;"><b style="color:#fff;">Updated Events:</b></p>
+                              ${details.map(d => `
+                                <div style="background:rgba(0,198,255,0.05);border:1px solid rgba(0,198,255,0.15);border-radius:10px;padding:12px 16px;margin-bottom:10px;">
+                                  <span style="color:#fff;font-size:13px;font-weight:700;">${d.event_name}</span>
+                                  ${d.team_token ? `<span style="color:#00ffae;font-size:11px;margin-left:10px;font-family:monospace;">${d.team_token}</span>` : ''}
+                                </div>`).join('')}
+                              <p style="color:#556a75;font-size:11px;text-align:center;margin-top:20px;">Please carry your Register Number on the day of the symposium.</p>
+                            </div>
+                          </div>
+                        </div>`
+                    });
+                } catch (mailErr) {
+                    console.error("❌ Edit confirmation email error:", mailErr.message);
+                }
+            }, 1500);
+
+        } catch (err) {
+            await connection.rollback();
+            throw err;
+        } finally {
+            connection.release();
+        }
+
+    } catch (err) {
+        console.error("❌ Edit registration error:", err);
+        if (!res.headersSent) res.status(500).json({ success: false, message: "Server error during update" });
+    }
+});
 app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
