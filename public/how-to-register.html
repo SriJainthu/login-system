@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Register | Symposium 2026</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+  <style>
+    :root {
+      --primary: #00c6ff;
+      --accent:  #00ffae;
+      --danger:  #ff4b2b;
+      --warn:    #fbbf24;
+      --purple:  #a855f7;
+      --bg:      #0f2027;
+      --surface: rgba(255,255,255,0.05);
+      --border:  rgba(255,255,255,0.08);
+      --text:    #e8f0f8;
+      --muted:   #6b8099;
+      --ease:    cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #2c5364, #203a43, #0f2027);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-top: 80px;
+      padding-bottom: 60px;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 10001;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      box-sizing: border-box;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .logo { font-size: 20px; font-weight: 700; color: #fff; transition: opacity 0.4s ease; }
+    .logo span { color: var(--primary); }
+    .logo.loading {
+      background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 4px;
+      color: transparent !important;
+      min-width: 120px;
+      display: inline-block;
+    }
+    .logo.loading span { color: transparent !important; }
+
+    .menu-toggle { cursor: pointer; position: relative; z-index: 10002; }
+    .bar { width: 25px; height: 2px; background-color: var(--primary); margin: 5px 0; transition: 0.4s; }
+    .menu-toggle.open .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); background-color: #fff; }
+    .menu-toggle.open .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.open .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); background-color: #fff; }
+
+    /* ── SIDE MENU ── */
+    .nav-overlay {
+      height: 100vh; width: 280px; position: fixed;
+      z-index: 10000; top: 0; left: 0;
+      background: #0a1419; border-right: 1px solid var(--primary);
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
+    }
+    .nav-overlay.open { transform: translateX(0); }
+    .overlay-content { padding: 120px 30px; display: flex; flex-direction: column; gap: 10px; }
+    .nav-item { text-decoration: none; padding: 15px 0; display: block; transition: 0.3s; }
+    .nav-number { font-size: 10px; color: var(--primary); font-weight: bold; margin-bottom: 5px; display: block; }
+    .nav-text { color: #fff; font-size: 18px; font-weight: 600; transition: 0.3s; }
+    .nav-text small { display: block; font-size: 11px; color: #666; font-weight: 400; margin-top: 4px; }
+    .nav-item:hover .nav-text, .nav-item.active .nav-text { color: #4fdcff; transform: translateX(10px); }
+    .nav-item.active .nav-text { color: var(--primary); }
+
+    /* ── WRAPPER ── */
+    .wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 52px 28px 40px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+
+    .page-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .page-eyebrow::before, .page-eyebrow::after {
+      content: ''; width: 32px; height: 1px;
+      background: var(--primary); opacity: 0.5;
+    }
+
+    .page-title {
+      font-size: 42px;
+      font-weight: 300;
+      letter-spacing: 1px;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .page-title span { color: var(--primary); font-weight: 700; }
+
+    .page-sub {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+
+    .step-item {
+      display: flex;
+      gap: 0;
+      position: relative;
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+
+    /* vertical connector line */
+    .step-item:not(:last-child) .step-left::after {
+      content: '';
+      position: absolute;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: calc(100% - 20px);
+      background: linear-gradient(to bottom, var(--step-color), transparent);
+      opacity: 0.3;
+    }
+
+    .step-left {
+      flex-shrink: 0;
+      width: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding-top: 4px;
+    }
+
+    .step-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: var(--step-bg);
+      border: 1.5px solid var(--step-border);
+      box-shadow: 0 0 20px var(--step-glow);
+      flex-shrink: 0;
+    }
+
+    .step-number {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--step-color);
+      text-transform: uppercase;
+      margin-top: 8px;
+      opacity: 0.7;
+    }
+
+    .step-right {
+      flex: 1;
+      padding: 0 0 48px 24px;
+    }
+
+    .step-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .step-subtitle {
+      font-size: 12px;
+      color: var(--step-color);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .step-subtitle::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--step-color);
+      opacity: 0.2;
+      max-width: 120px;
+    }
+
+    /* ── CARDS INSIDE STEP ── */
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .info-card:hover {
+      border-color: var(--step-border);
+      transform: translateY(-2px);
+    }
+
+    .info-card-icon {
+      font-size: 20px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .info-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .info-card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── CHECKLIST ── */
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .check-item:hover {
+      border-color: var(--step-border);
+      transform: translateX(4px);
+    }
+
+    .check-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--step-bg);
+      border: 1.5px solid var(--step-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: var(--step-color);
+      font-weight: 800;
+    }
+
+    .check-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .check-text b { color: var(--step-color); font-weight: 700; }
+
+    /* ── IMPORTANT BANNER ── */
+    .important-banner {
+      background: rgba(251,191,36,0.06);
+      border: 1px solid rgba(251,191,36,0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .important-banner .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .important-banner p { font-size: 13px; color: #e0c070; line-height: 1.6; }
+    .important-banner b { color: var(--warn); }
+
+    /* ── QUICK LINKS AT BOTTOM ── */
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+    }
+
+    .quick-link:hover {
+      border-color: rgba(0,198,255,0.4);
+      background: rgba(0,198,255,0.05);
+      transform: translateY(-3px);
+    }
+
+    .quick-link-icon { font-size: 22px; flex-shrink: 0; }
+    .quick-link-title { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+    .quick-link-sub { font-size: 11px; color: var(--muted); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ── STEP DELAY ── */
+    .step-item:nth-child(1) { animation-delay: 0.1s; }
+    .step-item:nth-child(2) { animation-delay: 0.2s; }
+    .step-item:nth-child(3) { animation-delay: 0.3s; }
+    .step-item:nth-child(4) { animation-delay: 0.4s; }
+    .step-item:nth-child(5) { animation-delay: 0.5s; }
+    .step-item:nth-child(6) { animation-delay: 0.6s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .navbar { padding: 18px 20px; }
+      .wrapper { padding: 36px 16px 40px; }
+      .page-title { font-size: 28px; }
+      .step-left { width: 56px; }
+      .step-icon-wrap { width: 42px; height: 42px; font-size: 18px; border-radius: 12px; }
+      .step-right { padding-left: 14px; }
+      .step-title { font-size: 17px; }
+      .cards-row { grid-template-columns: 1fr; }
+      .quick-links { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="menu-toggle" id="menuToggle">
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  </div>
+  <div class="logo" id="navLogo">Symposium <span>2026</span></div>
+</header>
+
+<!-- SIDE MENU -->
+<nav id="sideMenu" class="nav-overlay">
+  <div class="overlay-content">
+    <a href="index.html" class="nav-item">
+      <span class="nav-number">01</span>
+      <div class="nav-text">Home <small>Landing Page</small></div>
+    </a>
+    <a href="student-details.html" class="nav-item">
+      <span class="nav-number">02</span>
+      <div class="nav-text">Registration <small>Step 1</small></div>
+    </a>
+    <a href="about-events.html" class="nav-item">
+      <span class="nav-number">03</span>
+      <div class="nav-text">About Events <small>Details</small></div>
+    </a>
+    <a href="how-to-register.html" class="nav-item active">
+      <span class="nav-number">04</span>
+      <div class="nav-text">How to Register <small>Guide</small></div>
+    </a>
+    <a href="view-registration.html" class="nav-item">
+      <span class="nav-number">05</span>
+      <div class="nav-text">My Registration <small>Digital Pass</small></div>
+    </a>
+    <a href="contact.html" class="nav-item">
+      <span class="nav-number">06</span>
+      <div class="nav-text">Contact Us <small>Get in Touch</small></div>
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="wrapper">
+
+  <div class="page-header">
+    <div class="page-eyebrow">Complete Guide</div>
+    <h1 class="page-title">How to <span>Register</span></h1>
+    <p class="page-sub">Everything you need to know — from filling your details to showing up on event day.</p>
+  </div>
+
+  <div class="steps">
+
+    <!-- STEP 1 -->
+    <div class="step-item" style="--step-color:#00c6ff; --step-bg:rgba(0,198,255,0.1); --step-border:rgba(0,198,255,0.35); --step-glow:rgba(0,198,255,0.15);">
+      <div class="step-left">
+        <div class="step-icon-wrap">👤</div>
+        <div class="step-number">Step 1</div>
+      </div>
+      <div class="step-right">
+        <div class="step-subtitle">Personal Details</div>
+        <div class="step-title">Fill Your Information</div>
+        <div class="checklist">
+          <div class="check-item"><div class="check-dot">1</div><div class="check-text">Go to <b>Registration</b> from the menu or click "Register Now" on the home page.</div></div>
+          <div class="check-item"><div class="check-dot">2</div><div class="check-text">Enter your <b>Name, Register Number, College, Department, Year</b> and other details.</div></div>
+          <div class="check-item"><div class="check-dot">3</div><div class="check-text">Provide your <b>Email Address</b> — an OTP will be sent here to verify your identity.</div></div>
+          <div class="check-item"><div class="check-dot">4</div><div class="check-text">Click <b>Next Step</b> and enter the 6-digit OTP received in your inbox.</div></div>
+          <div class="check-item"><div class="check-dot">5</div><div class="check-text">After OTP verification, you'll be taken to the <b>Event Selection</b> page.</div></div>
+        </div>
+        <div class="important-banner">
+          <span class="icon">⚠️</span>
+          <p>Each <b>Register Number</b> and <b>Email</b> can only be used once. Make sure there are no typos before proceeding.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-item" style="--step-color:#00ffae; --step-bg:rgba(0,255,174,0.1); --step-border:rgba(0,255,174,0.35); --step-glow:rgba(0,255,174,0.15);">
+      <div class="step-left">
+        <div class="step-icon-wrap">🎯</div>
+        <div class="step-number">Step 2</div>
+      </div>
+      <div class="step-right">
+        <div class="step-subtitle">Event Selection</div>
+        <div class="step-title">Choose Your Events</div>
+        <div class="checklist">
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">Browse all available events. You can select up to the allowed limit (shown on the page).</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">Events marked <b style="color:#ff4b2b;">🔴 Full</b> cannot be selected — seats are limited.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">For <b>Solo events</b> — just select and confirm. No team code needed.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">For <b>Group events</b> — leave the team code blank if you are the <b>Team Leader</b>. See Step 3 if you are a Team Member.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">Click <b>Confirm Choice</b>. If a registration fee applies, the payment popup will appear.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-item" style="--step-color:#fbbf24; --step-bg:rgba(251,191,36,0.1); --step-border:rgba(251,191,36,0.35); --step-glow:rgba(251,191,36,0.15);">
+      <div class="step-left">
+        <div class="step-icon-wrap">👥</div>
+        <div class="step-number">Step 3</div>
+      </div>
+      <div class="step-right">
+        <div class="step-subtitle">Group Events</div>
+        <div class="step-title">Team Leader vs Team Member</div>
+
+        <div class="cards-row">
+          <div class="info-card">
+            <span class="info-card-icon">👑</span>
+            <div class="info-card-title">You are the Team Leader</div>
+            <div class="info-card-desc">
+              Register first. Leave the Team Code field <b style="color:#fbbf24;">blank</b> when selecting your group event.<br><br>
+              After registration, a <b style="color:#fbbf24;">unique Team Code</b> will be sent to your email. Share this code with your team members.
+            </div>
+          </div>
+          <div class="info-card">
+            <span class="info-card-icon">👤</span>
+            <div class="info-card-title">You are a Team Member</div>
+            <div class="info-card-desc">
+              Register <b style="color:#fbbf24;">only after your Leader has registered</b> and shared the Team Code with you.<br><br>
+              When selecting the group event, enter the <b style="color:#fbbf24;">Team Code</b> and click <b>Verify</b> before confirming.
+            </div>
+          </div>
+        </div>
+
+        <div class="important-banner">
+          <span class="icon">💡</span>
+          <p><b>Important order:</b> Team Leader must register first → get Team Code by email → share with members → members register using that code. Members who register before the leader cannot join the team.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-item" style="--step-color:#a855f7; --step-bg:rgba(168,85,247,0.1); --step-border:rgba(168,85,247,0.35); --step-glow:rgba(168,85,247,0.15);">
+      <div class="step-left">
+        <div class="step-icon-wrap">📱</div>
+        <div class="step-number">Step 4</div>
+      </div>
+      <div class="step-right">
+        <div class="step-subtitle">After Registration</div>
+        <div class="step-title">Your Digital Pass</div>
+        <div class="checklist">
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">A <b>Confirmation Email</b> is sent to your registered email with all event details and team tokens.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">Visit <b>My Registration</b> from the menu to view your Digital Pass anytime.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">Enter your <b>Register Number</b> → receive OTP → verify → see your Digital Pass with all events listed.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">Your pass shows your <b>Team Token</b> for group events. Share this with your members.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-item" style="--step-color:#00c6ff; --step-bg:rgba(0,198,255,0.1); --step-border:rgba(0,198,255,0.35); --step-glow:rgba(0,198,255,0.15);">
+      <div class="step-left">
+        <div class="step-icon-wrap">✏️</div>
+        <div class="step-number">Step 5</div>
+      </div>
+      <div class="step-right">
+        <div class="step-subtitle">Made a Mistake?</div>
+        <div class="step-title">Edit Your Registration</div>
+        <div class="checklist">
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">Go to <b>My Registration</b>, verify with OTP, and click <b>✏️ Edit Registration</b> on your Digital Pass.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">You can change your <b>Name, Phone, Department, Year, Degree</b> and your selected events.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text"><b>Register Number, Email and College</b> cannot be changed after registration.</div></div>
+          <div class="check-item"><div class="check-dot">✓</div><div class="check-text">You can edit <b>multiple times</b> until the registration deadline. An updated confirmation email is sent after every change.</div></div>
+        </div>
+        <div class="important-banner">
+          <span class="icon">⏰</span>
+          <p><b>Edits are only allowed before the registration deadline.</b> Once the deadline passes, your registration is final and cannot be changed.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step-item" style="--step-color:#00ffae; --step-bg:rgba(0,255,174,0.1); --step-border:rgba(0,255,174,0.35); --step-glow:rgba(0,255,174,0.15);">
+      <div class="step-left">
+        <div class="step-icon-wrap">🎉</div>
+        <div class="step-number">Step 6</div>
+      </div>
+      <div class="step-right">
+        <div class="step-subtitle">Event Day</div>
+        <div class="step-title">What to Bring</div>
+        <div class="cards-row">
+          <div class="info-card">
+            <span class="info-card-icon">📧</span>
+            <div class="info-card-title">Confirmation Email</div>
+            <div class="info-card-desc">Show the registration confirmation email sent to your inbox, or access your Digital Pass from the website.</div>
+          </div>
+          <div class="info-card">
+            <span class="info-card-icon">🪪</span>
+            <div class="info-card-title">College ID Card</div>
+            <div class="info-card-desc">Carry your college identity card for verification at the event venue.</div>
+          </div>
+          <div class="info-card">
+            <span class="info-card-icon">👥</span>
+            <div class="info-card-title">Team Together</div>
+            <div class="info-card-desc">For group events, all team members should arrive together. Individual arrival may disqualify the team.</div>
+          </div>
+        </div>
+        <div class="important-banner">
+          <span class="icon">📌</span>
+          <p>Your <b>Register Number</b> is your identity at the event. Keep it handy — you'll need it for verification at each event desk.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUICK LINKS -->
+  <div style="margin-top: 20px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.07);">
+    <div style="text-align:center; font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:20px;">Quick Links</div>
+    <div class="quick-links">
+      <a href="student-details.html" class="quick-link">
+        <span class="quick-link-icon">📝</span>
+        <div><div class="quick-link-title">Register Now</div><div class="quick-link-sub">Start your registration</div></div>
+      </a>
+      <a href="about-events.html" class="quick-link">
+        <span class="quick-link-icon">⚡</span>
+        <div><div class="quick-link-title">Browse Events</div><div class="quick-link-sub">See all available events</div></div>
+      </a>
+      <a href="view-registration.html" class="quick-link">
+        <span class="quick-link-icon">🎫</span>
+        <div><div class="quick-link-title">My Registration</div><div class="quick-link-sub">View your Digital Pass</div></div>
+      </a>
+      <a href="contact.html" class="quick-link">
+        <span class="quick-link-icon">💬</span>
+        <div><div class="quick-link-title">Need Help?</div><div class="quick-link-sub">Contact the organizers</div></div>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://login-system-1-nowr.onrender.com';
+
+  /* ── MENU ── */
+  const menuToggle = document.getElementById('menuToggle');
+  const sideMenu   = document.getElementById('sideMenu');
+  menuToggle.addEventListener('click', e => {
+    e.stopPropagation();
+    sideMenu.classList.toggle('open');
+    menuToggle.classList.toggle('open');
+  });
+  document.addEventListener('click', e => {
+    if (sideMenu.classList.contains('open') && !sideMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+      sideMenu.classList.remove('open');
+      menuToggle.classList.remove('open');
+    }
+  });
+
+  /* ── NAVBAR TITLE ── */
+  async function loadNavbarTitle() {
+    const logoEl = document.getElementById('navLogo');
+    if (!logoEl) return;
+    logoEl.classList.add('loading');
+    try {
+      const res  = await fetch(`${API_BASE_URL}/api/public-settings`);
+      const data = await res.json();
+      if (data && data.symposium_title) {
+        const parts = data.symposium_title.split(/(\d{2,4})/);
+        logoEl.classList.remove('loading');
+        logoEl.style.opacity = '0';
+        logoEl.style.transition = 'opacity 0.5s ease';
+        logoEl.innerHTML = parts.length >= 2
+          ? `${parts[0].trim()} <span>${parts[1].trim()}</span>`
+          : data.symposium_title;
+        requestAnimationFrame(() => { logoEl.style.opacity = '1'; });
+        document.title = `How to Register | ${data.symposium_title}`;
+      } else {
+        logoEl.classList.remove('loading');
+      }
+    } catch {
+      logoEl.classList.remove('loading');
+    }
+  }
+
+  loadNavbarTitle();
+</script>
+</body>
+</html>
