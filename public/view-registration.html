@@ -1150,21 +1150,30 @@
     <div class="pass-footer-right">ENTRY PASS</div>
   </div>
 <div style="padding: 16px 22px; background: rgba(15,32,39,0.95); border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
-    <button id="editRegBtn" onclick="openEditModal()" style="
-        background: rgba(0,198,255,0.1);
-        border: 1px solid rgba(0,198,255,0.3);
-        color: #00c6ff;
-        padding: 10px 28px;
-        border-radius: 10px;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        cursor: pointer;
-        transition: 0.3s;
-        text-transform: uppercase;
-    " onmouseover="this.style.background='rgba(0,198,255,0.2)'" onmouseout="this.style.background='rgba(0,198,255,0.1)'">
-        ✏️ Edit Registration
-    </button>
+   <button id="editRegBtn" onclick="openEditModal()" style="
+    background: rgba(0,198,255,0.1);
+    border: 1px solid rgba(0,198,255,0.3);
+    color: #00c6ff;
+    padding: 10px 28px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+" onmouseover="this.style.background='rgba(0,198,255,0.2)'" onmouseout="this.style.background='rgba(0,198,255,0.1)'">
+    <span id="editBtnIcon">✏️</span>
+    <span id="editBtnText">Edit Registration</span>
+    <span id="editBtnSpinner" style="display:none; width:14px; height:14px; border:2px solid rgba(0,198,255,0.3); border-top-color:#00c6ff; border-radius:50%; animation:spin 0.8s linear infinite;"></span>
+</button>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 </div>
 
 
@@ -1489,6 +1498,16 @@ async function openEditModal() {
     const regNo = document.getElementById("regNo").value.trim();
     if (!regNo) return;
 
+    // ADD — show loading state on button
+    const btn     = document.getElementById("editRegBtn");
+    const icon    = document.getElementById("editBtnIcon");
+    const text    = document.getElementById("editBtnText");
+    const spinner = document.getElementById("editBtnSpinner");
+    btn.disabled        = true;
+    icon.style.display  = "none";
+    text.textContent    = "Loading...";
+    spinner.style.display = "inline-block";
+
     try {
         const res  = await fetch(`${API_BASE_URL}/registration/${regNo}/edit-data`);
         const data = await res.json();
@@ -1507,22 +1526,18 @@ async function openEditModal() {
             type:  e.event_type
         }));
 
-        // Pre-fill fields
         document.getElementById("edit_name").value  = data.student.name  || "";
         document.getElementById("edit_phone").value = data.student.phone || "";
         document.getElementById("edit_level").value = data.student.level || "UG";
 
-        // Load dropdowns
         await loadEditDepartments(data.student.department);
         await loadEditDegrees(data.student.level, data.student.degree);
         await loadEditYears(data.student.level, data.student.year);
 
-        // Load event limit
         const settingsRes  = await fetch(`${API_BASE_URL}/api/public-settings`);
         const settingsData = await settingsRes.json();
         editEventLimit = parseInt(settingsData.event_selection_limit) || 3;
 
-        // Load all events for add panel
         const evRes = await fetch(`${API_BASE_URL}/events`);
         allAvailableEvents = await evRes.json();
 
@@ -1533,6 +1548,12 @@ async function openEditModal() {
 
     } catch (err) {
         showCustomAlert("Could not load registration data. Try again.");
+    } finally {
+        // ADD — restore button state always
+        btn.disabled          = false;
+        icon.style.display    = "inline";
+        text.textContent      = "Edit Registration";
+        spinner.style.display = "none";
     }
 }
 

@@ -1435,8 +1435,17 @@ app.post("/registration/:reg_no/update", async (req, res) => {
                     const originalEvent = newEvents.find(e =>
                         (e.name || e.event_name || '').toLowerCase() === row.event_name.toLowerCase()
                     );
-                    const token = originalEvent?.token?.trim() || null;
-                    mappingValues.push([studentId, row.id, token]);
+                   // If student is leader (no token entered), generate a new unique token
+// If student entered a token (joining existing team), use that token
+let token = originalEvent?.token?.trim() || null;
+if (!token) {
+    // Generate a new leader token for this group event
+    const prefix = row.event_name.substring(0, 3).toUpperCase().replace(/\s/g, 'X');
+    const rand   = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const ts     = Date.now().toString().slice(-3);
+    token = `${prefix}-${rand}${ts}`;
+}
+mappingValues.push([studentId, row.id, token]);
                 }
                 if (mappingValues.length > 0) {
                     await connection.query(
