@@ -58,7 +58,15 @@
             transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.77, 0.2, 0.05, 1.0);
         }
         .nav-overlay.open { transform: translateX(0); }
-        .overlay-content { padding: 120px 30px; display: flex; flex-direction: column; gap: 10px; }
+       .overlay-content {
+  padding: 100px 30px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
         
         .nav-item { text-decoration: none; padding: 15px 0; display: block; transition: 0.3s; }
         .nav-number { font-size: 10px; color: var(--primary); font-weight: bold; margin-bottom: 5px; display: block; }
