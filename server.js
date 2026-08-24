@@ -492,21 +492,46 @@ for (const row of eventRows) {
       </tr>
     </table>
 
-    <!-- IMPORTANT NOTE -->
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="padding:20px 40px 0;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.2);border-radius:12px;">
-            <tr>
-              <td style="padding:14px 18px;">
-                <span style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:1px;">⚠ &nbsp;IMPORTANT —</span>
-                <span style="color:#8899a0;font-size:12px;"> Please carry this email or your Register Number on the day of the symposium for verification.</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+<!-- IMPORTANT NOTE + WHATSAPP -->
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="padding:20px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.2);border-radius:12px;">
+        <tr>
+          <td style="padding:14px 18px;">
+            <span style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:1px;">⚠ &nbsp;IMPORTANT —</span>
+            <span style="color:#8899a0;font-size:12px;"> Please carry this email or your Register Number on the day of the symposium for verification.</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- WHATSAPP GROUP -->
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="padding:16px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(37,211,102,0.06);border:1px solid rgba(37,211,102,0.25);border-radius:14px;overflow:hidden;">
+        <tr>
+          <td style="padding:20px 24px;">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:44px;height:44px;border-radius:12px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;text-align:center;line-height:44px;">💬</div>
+              <div style="flex:1;">
+                <div style="color:#25D366;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Join Our WhatsApp Group</div>
+                <div style="color:#8899a0;font-size:12px;line-height:1.5;">Stay updated with announcements, schedule changes, and event day instructions.</div>
+              </div>
+            </div>
+            <a href="https://chat.whatsapp.com/BDF9aJ6dKyV8EbWFZvBv6a" 
+               style="display:block;margin-top:16px;padding:13px 20px;background:linear-gradient(90deg,#25D366,#128C7E);border-radius:10px;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:1px;text-align:center;text-transform:uppercase;">
+              📲 &nbsp;Join WhatsApp Group
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
 
     <!-- FOOTER -->
     <table width="100%" cellpadding="0" cellspacing="0">
