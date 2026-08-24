@@ -205,6 +205,10 @@
   color: #aaa;
   letter-spacing: 1px;
 }
+@keyframes waPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(37,211,102,0.3); }
+  50%       { box-shadow: 0 0 35px rgba(37,211,102,0.6); }
+}
 </style>
 
 </head>
@@ -242,15 +246,44 @@
   <h2>Registration <span>Successful</span></h2>
   <p>Your details and event selections have been securely recorded. You can see the live status of your team memebers</p>
 
-  <div class="btn-group">
+<div class="btn-group">
     <button class="primary-btn" onclick="window.location.href='view-registration.html'">
-      🎟️ See Live
+      🎟️ See Live Registration
     </button>
+
+    <!-- WhatsApp Group Button -->
+    <a href="https://chat.whatsapp.com/BDF9aJ6dKyV8EbWFZvBv6a" 
+       target="_blank"
+       style="
+          width: 100%;
+          padding: 15px;
+          background: linear-gradient(90deg, #25D366, #128C7E);
+          border: none;
+          border-radius: 12px;
+          color: #fff;
+          font-size: 14px;
+          font-weight: 700;
+          text-decoration: none;
+          text-align: center;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          box-shadow: 0 0 20px rgba(37,211,102,0.3);
+          transition: 0.3s;
+          box-sizing: border-box;
+       "
+       onmouseover="this.style.boxShadow='0 0 30px rgba(37,211,102,0.6)'; this.style.transform='translateY(-2px)'"
+       onmouseout="this.style.boxShadow='0 0 20px rgba(37,211,102,0.3)'; this.style.transform='none'">
+      💬 &nbsp;Join WhatsApp Group
+    </a>
 
     <a href="student-details.html" class="outline-btn">
       Register Another Participant
     </a>
-  </div>
+</div>
 
   <div style="margin-top: 25px; font-size: 11px; color: #888; line-height: 1.5;">
     A confirmation message has been sent to your <br>
